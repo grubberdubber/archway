@@ -127,6 +127,52 @@ pkg_check() {
   ok "all ${#pkgs[@]} official packages resolve"
 }
 
+# Print only the packages that are not already provided by an installed one.
+# `pacman -S --needed` only compares package *names*, so it happily installs
+# nodejs next to nodejs-lts-jod and then removes the latter, breaking every
+# installed package that depends on it. `pacman -T` understands virtual
+# provides, which is what we actually want.
+packages_unsatisfied() {
+  local p
+  for p in "$@"; do
+    pacman -T -- "$p" > /dev/null 2>&1 && continue
+    printf '%s\n' "$p"
+  done
+}
+
+# Print "<candidate> <installed package>" pairs for real conflicts, i.e. cases
+# where pacman would have to remove something the user already has. Replaces
+# and provides are not considered here: only an explicit Conflicts With entry
+# against an installed package counts.
+packages_conflicts() {
+  local p c
+  for p in "$@"; do
+    while read -r c; do
+      [[ -n $c ]] || continue
+      c=${c%%[<>=]*}
+      [[ $c == None ]] && continue
+      pacman -Qq -- "$c" > /dev/null 2>&1 || continue
+      printf '%s %s\n' "$p" "$c"
+    done < <(pacman -Si -- "$p" 2> /dev/null | sed -n 's/^Conflicts With  *: *//p' | tr ',' ' ')
+  done
+}
+
+# Print the packages that can be installed without removing anything, and warn
+# about the ones that cannot. Used by packages_install and covered by tests.
+packages_installable() {
+  local p c i
+  local -a wanted=()
+  mapfile -t wanted < <(packages_unsatisfied "$@")
+  while read -r p c; do
+    [[ -n $p ]] || continue
+    warn "skipping $p: it conflicts with installed $c"
+    for i in "${!wanted[@]}"; do
+      [[ ${wanted[i]} == "$p" ]] && unset 'wanted[i]'
+    done
+  done < <(packages_conflicts "${wanted[@]}")
+  printf '%s\n' "${wanted[@]}" | sed '/^$/d'
+}
+
 package_install_plan() {
   local profile=$1
   local -a official=() aur=()
@@ -150,13 +196,21 @@ packages_install() {
 
   if ((${#official[@]})); then
     section "Official packages"
+    local -a installable=()
+    mapfile -t installable < <(packages_installable "${official[@]}")
+
     if ((DRY_RUN)); then
-      ui_note "[dry-run] sudo pacman -Syu && sudo pacman -S --needed ${official[*]}"
+      ui_note "[dry-run] sudo pacman -Syu && sudo pacman -S --needed ${installable[*]}"
+    elif ((${#installable[@]} == 0)); then
+      ui_note "every official package is already provided by the system"
     else
       require_cmd sudo
       # A partial upgrade bricks Arch: always sync the whole system first.
       run_cmd sudo pacman -Syu
-      run_cmd sudo pacman -S --needed -- "${official[@]}"
+      # Never let pacman remove the user's packages to satisfy ours: the
+      # conflict filter above already dropped those, and anything that still
+      # needs a removal aborts here instead of mutating the system.
+      run_cmd sudo pacman -S --needed -- "${installable[@]}"
     fi
   fi
 

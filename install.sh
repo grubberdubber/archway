@@ -91,6 +91,13 @@ main() {
   [[ $REF == -* ]] && die "invalid ref: $REF" 2
   run git -C "$SRC_DIR" checkout "$REF"
 
+  # A plain checkout leaves an existing branch at its old commit, so the CLI
+  # would silently run stale code. Fast-forward when the ref is a branch.
+  if ((! DRY_RUN)) && git -C "$SRC_DIR" rev-parse --verify --quiet "refs/remotes/origin/$REF" > /dev/null; then
+    git -C "$SRC_DIR" merge --ff-only "origin/$REF" ||
+      die "$SRC_DIR has local changes or diverged; commit, stash or remove it first"
+  fi
+
   local link="$PREFIX/bin/archway"
   run mkdir -p -- "$PREFIX/bin"
   if [[ -L $link ]]; then
