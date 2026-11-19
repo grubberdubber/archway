@@ -85,7 +85,11 @@ main() {
     run git clone --filter=blob:none -- "$REPO_URL" "$SRC_DIR"
   fi
 
-  run git -C "$SRC_DIR" checkout -- "$REF"
+  # Not `checkout -- "$REF"`: `--` marks the start of pathspecs, which makes git
+  # look for a file named after the branch and fail with "pathspec did not
+  # match". Refuse refs that look like options as well.
+  [[ $REF == -* ]] && die "invalid ref: $REF" 2
+  run git -C "$SRC_DIR" checkout "$REF"
 
   local link="$PREFIX/bin/archway"
   run mkdir -p -- "$PREFIX/bin"
