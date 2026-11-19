@@ -1,0 +1,75 @@
+# Developer profile: toolchains, LSPs, linters, API/database clients.
+# Official repositories only. Every name verified with `pacman -Si`.
+
+# Git + GitHub workflow
+github-cli
+lazygit
+openssh
+git-lfs
+pre-commit
+gitleaks
+
+# Version/runtime managers
+mise
+uv
+python
+python-pip
+
+# Build toolchains
+gcc
+clang
+make
+cmake
+ninja
+meson
+pkgconf
+ccache
+rustup
+go
+nodejs
+npm
+pnpm
+
+# Language servers, formatters, linters
+lua-language-server
+bash-language-server
+typescript-language-server
+pyright
+ruff
+gopls
+stylua
+taplo-cli
+yamllint
+markdownlint-cli2
+actionlint
+typos
+
+# Neovim build prerequisites (AGENTS.md §9.5)
+neovim
+tree-sitter-cli
+
+# API / database / containers
+xh
+httpie
+websocat
+sqlite
+postgresql
+redis
+pgcli
+docker
+docker-compose
+podman
+buildah
+skopeo
+lazydocker
+k9s
+
+# Infrastructure
+opentofu
+ansible
+ansible-lint
+qemu-full
+libvirt
+virt-manager
+distrobox
+incus

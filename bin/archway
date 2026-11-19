@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# archway — Arch Linux dotfiles framework. Entrypoint only; logic lives in lib/.
+# shellcheck source-path=SCRIPTDIR/../lib
+set -Eeuo pipefail
+
+ARCHWAY_BIN=$(readlink -f -- "${BASH_SOURCE[0]}")
+ARCHWAY_ROOT=$(cd -- "$(dirname -- "$ARCHWAY_BIN")/.." && pwd)
+readonly ARCHWAY_ROOT
+export ARCHWAY_ROOT
+
+# shellcheck source=core.sh
+source "$ARCHWAY_ROOT/lib/core.sh"
+# shellcheck source=paths.sh
+source "$ARCHWAY_ROOT/lib/paths.sh"
+# shellcheck source=ui.sh
+source "$ARCHWAY_ROOT/lib/ui.sh"
+# shellcheck source=state.sh
+source "$ARCHWAY_ROOT/lib/state.sh"
+# shellcheck source=backup.sh
+source "$ARCHWAY_ROOT/lib/backup.sh"
+# shellcheck source=theme.sh
+source "$ARCHWAY_ROOT/lib/theme.sh"
+# shellcheck source=keys.sh
+source "$ARCHWAY_ROOT/lib/keys.sh"
+# shellcheck source=packages.sh
+source "$ARCHWAY_ROOT/lib/packages.sh"
+# shellcheck source=migrate.sh
+source "$ARCHWAY_ROOT/lib/migrate.sh"
+# shellcheck source=nvim.sh
+source "$ARCHWAY_ROOT/lib/nvim.sh"
+# shellcheck source=doctor.sh
+source "$ARCHWAY_ROOT/lib/doctor.sh"
+# shellcheck source=install.sh
+source "$ARCHWAY_ROOT/lib/install.sh"
+# shellcheck source=update.sh
+source "$ARCHWAY_ROOT/lib/update.sh"
+# shellcheck source=commands.sh
+source "$ARCHWAY_ROOT/lib/commands.sh"
+
+global_help() {
+  cat << 'EOF'
+archway — a staff-grade dotfiles framework for Arch Linux
+
+Usage:
+  archway <command> [options]
+
+Commands:
+  install       install or reconcile this machine (plan by default)
+  update        fast-forward + apply changes (no re-clone)
+  rollback      restore the last consistent backup
+  doctor        diagnose deps, theme, keybinds, Neovim and state
+  theme         list | current | set | preview | validate | render | nvim-contract
+  nvim          pin | install | update | status | doctor | rollback
+  keys          list | search | generate | validate | check
+  applet        run a bundled applet (android-mount, screenshot, power, ...)
+  pkg           list | why | export | check
+  backup        create | list
+  restore       restore a specific backup
+  uninstall     remove only what Archway manages
+  pin           pin this host to a version
+  version       print version, commit, channel, host, profile, theme
+  self-update   alias for update
+
+Global options:
+  --dry-run      print what would happen; write nothing
+  --yes          non-interactive (never implies --force)
+  --json         machine-readable output where supported
+  --verbose      debug logging
+  --quiet        only warnings and errors
+  --no-color     disable ANSI colours
+  --help         per-command help
+
+Exit codes:
+  0 success | 1 error | 2 usage | 3 preflight failed | 4 cancelled
+  5 rollback executed | 10 update available (--check)
+
+State:  ~/.local/state/archway    Config: ~/.config/archway
+Cache:  ~/.cache/archway         Data:   ~/.local/share/archway
+EOF
+}
+
+dispatch() {
+  local cmd=${1:-help}
+  shift || true
+
+  case $cmd in
+    install) cmd_install "$@" ;;
+    update) cmd_update "$@" ;;
+    self-update) cmd_update "$@" ;;
+    rollback) cmd_rollback "$@" ;;
+    theme) cmd_theme "$@" ;;
+    nvim) cmd_nvim "$@" ;;
+    keys) cmd_keys "$@" ;;
+    pkg) cmd_pkg "$@" ;;
+    backup) cmd_backup "$@" ;;
+    restore) cmd_restore "$@" ;;
+    uninstall) cmd_uninstall "$@" ;;
+    pin) cmd_pin "$@" ;;
+    applet) cmd_applet "$@" ;;
+    version | --version | -V)
+      cmd_version "$@"
+      ;;
+    doctor)
+      parse_common_flags "$@"
+      doctor_run || exit "$EX_FAIL"
+      ;;
+    help | --help | -h)
+      global_help
+      ;;
+    '')
+      global_help
+      ;;
+    *)
+      err "unknown command: $cmd"
+      global_help >&2
+      exit "$EX_USAGE"
+      ;;
+  esac
+}
+
+needs_lock() {
+  case $1 in
+    install | update | self-update | rollback | restore | uninstall | backup | pin | theme | nvim)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+main() {
+  local cmd=${1:-help}
+  require_not_root
+  log_init
+  log_rotate
+  install_traps
+  debug "archway $(archway_version) ($(archway_commit)) host=$(host_name)"
+  debug "log: $LOG_FILE"
+
+  if needs_lock "$cmd"; then
+    with_lock dispatch "$@"
+  else
+    dispatch "$@"
+  fi
+}
+
+main "$@"

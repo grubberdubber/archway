@@ -1,0 +1,90 @@
+# Security profile — opt-in only, with an explicit legal notice at install time.
+# Authorised testing only: your own systems, CTFs, labs, or signed client scope.
+# Never install whole BlackArch groups. Every name verified with `pacman -Si`.
+
+# Recon and web testing
+nmap
+masscan
+ffuf
+gobuster
+feroxbuster
+sqlmap
+nikto
+whatweb
+zaproxy
+mitmproxy
+termshark
+wireshark-qt
+tcpdump
+bettercap
+ettercap
+socat
+proxychains-ng
+sshuttle
+
+# Passwords, hashes, wireless (own networks only)
+hashcat
+john
+hydra
+medusa
+aircrack-ng
+hcxtools
+hcxdumptool
+kismet
+wavemon
+
+# Exploitation / reversing / CTF
+metasploit
+exploitdb
+python-pwntools
+gdb
+radare2
+rizin
+binwalk
+binutils
+jadx
+z3
+steghide
+perl-image-exiftool
+
+# Active Directory (lab)
+impacket
+certipy
+evil-winrm
+
+# Forensics and malware analysis
+yara
+sleuthkit
+testdisk
+ddrescue
+foremost
+zeek
+suricata
+osquery
+audit
+volatility3
+
+# Defence and hardening
+lynis
+rkhunter
+clamav
+aide
+apparmor
+firejail
+bubblewrap
+usbguard
+nftables
+ufw
+fail2ban
+arch-audit
+sbctl
+tpm2-tools
+ssh-audit
+sslscan
+trivy
+grype
+syft
+cosign
+osv-scanner
+semgrep
+bandit

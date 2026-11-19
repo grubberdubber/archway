@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# atuin — private-by-default shell history.
+# Sync is opt-in and encrypted end to end; Archway never enables it for you.
+
+auto_sync = false
+update_check = false
+search_mode = "fuzzy"
+filter_mode = "global"
+filter_mode_shell_up_key_binding = "session"
+search_mode_shell_up_key_binding = "prefix"
+style = "compact"
+inline_height = 20
+show_preview = true
+max_preview_height = 10
+show_help = false
+exit_mode = "return-original"
+keymap_mode = "vim-normal"
+enter_accept = true
+
+# Never record commands that are likely to carry secrets.
+history_filter = [
+  "^\\s*export\\s+.*(TOKEN|SECRET|KEY|PASSWORD|PASSWD)=",
+  "^\\s*(bw|rbw)\\s+",
+  "^\\s*pass\\s+",
+  "^\\s*gpg\\s+.*--passphrase",
+  "^\\s*ssh-add\\s+.*-",
+  "^\\s*curl\\s+.*(-u|--user|--header\\s+['\"]?Authorization)",
+  "^\\s*op\\s+",
+  "^\\s*curl\\s+.*token=",
+  "^\\s*mysql.*-p",
+  "^\\s*psql\\s+.*password=",
+]
+
+[stats]
+common_prefix = ["sudo"]

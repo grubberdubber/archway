@@ -1,0 +1,9 @@
+# Optional: gaming. Not a v0.1 priority; install only when asked.
+# No pirated software, no ROMs.
+
+steam
+lutris
+gamemode
+mangohud
+wine
+winetricks

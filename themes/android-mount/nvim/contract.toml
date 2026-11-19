@@ -1,0 +1,12 @@
+# Theme contract between Archway and grubberdubber/nvim-config (AGENTS.md §9.5).
+# `archway theme nvim-contract` verifies every palette colour appears in
+# android-mount.lua; changing the palette requires a coordinated release.
+
+schema = 1
+upstream = "https://github.com/grubberdubber/nvim-config"
+artifact = "android-mount.lua"
+hook = "lua/archway.lua"
+hook_payload = 'return { theme = "android-mount" }'
+requires_gitignore_entry = "lua/archway.lua"
+engine = "base46 / NvChad v2.5"
+minimum_neovim = "0.12.5"

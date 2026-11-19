@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Archway zsh — native, modular, no Oh-My-Zsh.
+# Loaded through ZDOTDIR (~/.config/zsh); see `archway install` for the one-line
+# loader that goes in ~/.zshenv. This file is deliberately tiny: everything else
+# lives in conf.d/ and is sourced in numeric order.
+
+: "${ZDOTDIR:=${${(%):-%x}:A:h}}"
+export ZDOTDIR
+
+# Keep the completion dump in the XDG cache, not in $HOME.
+export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d $ZSH_CACHE_DIR ]] || mkdir -p -- "$ZSH_CACHE_DIR"
+
+# Sensible, safe defaults before anything else runs.
+setopt interactive_comments
+setopt no_beep
+setopt no_flow_control
+setopt auto_cd
+setopt auto_pushd
+setopt pushd_ignore_dups
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+setopt share_history
+setopt extended_glob
+setopt prompt_subst
+
+umask 022
+
+for _archway_conf in "$ZDOTDIR"/conf.d/*.zsh(N); do
+  source "$_archway_conf"
+done
+unset _archway_conf

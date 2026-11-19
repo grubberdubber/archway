@@ -1,0 +1,22 @@
+# Security-profile AUR packages. Authorised labs only. No BlackArch groups.
+# Names verified against the AUR RPC. Prefer official repos when a package migrates.
+
+# Modern recon tooling (ProjectDiscovery and friends)
+nuclei
+subfinder
+httpx
+katana
+naabu
+dnsx
+trufflehog
+
+# Active Directory / Windows
+netexec
+bloodhound
+enum4linux-ng
+smbmap
+python-pypykatz
+
+# Linux privilege escalation, wordlists, evidence
+peass-ng              # linpeas/winpeas; installs the scripts only
+seclists              # large wordlist collection; size is shown before install

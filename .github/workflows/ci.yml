@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: lint + test (Arch container)
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    timeout-minutes: 15
+    steps:
+      # TODO(release): pin every action to a commit SHA before tagging v0.1.0.
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          pacman -Syu --noconfirm --needed bash git jq shellcheck shfmt bats gitleaks
+
+      - name: ShellCheck
+        run: |
+          shellcheck -x bin/archway install.sh $(find lib applets scripts tests -type f -name '*.sh')
+
+      - name: shfmt
+        run: shfmt -d -i 2 -ci -sr bin lib install.sh applets scripts tests
+
+      - name: Theme validates (AA contrast + required keys)
+        run: ./bin/archway theme validate android-mount
+
+      - name: Theme artifact matches palette (Neovim contract)
+        run: ./bin/archway theme nvim-contract android-mount
+
+      - name: Keybinds valid, no duplicates or reserved chords
+        run: ./bin/archway keys validate
+
+      - name: Generated keybind artifacts are committed
+        run: ./bin/archway keys check
+
+      - name: Bats unit tests
+        run: bats tests/bats
+
+      - name: Smoke tests (end-to-end, throwaway HOME)
+        run: ./tests/smoke.sh
+
+      - name: Secret scan
+        run: gitleaks detect --source . --no-banner --redact
+
+  manifests:
+    name: package names exist
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync databases and verify official names
+        run: |
+          pacman -Syu --noconfirm --needed pacman-contrib jq
+          ./bin/archway pkg check

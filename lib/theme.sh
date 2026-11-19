@@ -1,0 +1,404 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# theme.sh — palette parsing, template rendering, contrast validation, hot reload.
+# shellcheck shell=bash
+# shellcheck disable=SC2153
+# ARCHWAY_THEME_D_DIR comes from paths.sh; globals are shared across lib files.
+
+if [[ -n ${ARCHWAY_THEME_LOADED:-} ]]; then return 0; fi
+ARCHWAY_THEME_LOADED=1
+
+THEMES_DIR="$ARCHWAY_ROOT/themes"
+THEME_REQUIRED_KEYS=(
+  bg surface surface_alt overlay border text text_muted
+  primary secondary tertiary error warning success selection selection_bg
+)
+
+# module -> stable filename inside $THEME_D_DIR
+declare -gA THEME_TARGETS=(
+  [kitty]=kitty.conf
+  [bspwm]=bspwm.sh
+  [polybar]=polybar.ini
+  [rofi]=rofi.rasi
+  [dunst]=dunst.conf
+  [tmux]=tmux.conf
+  [starship]=starship.toml
+  [fzf]=fzf.sh
+  [bat]=android-mount.tmTheme
+)
+
+declare -gA PALETTE=()
+
+theme_path() { printf '%s/%s' "$THEMES_DIR" "$1"; }
+
+theme_exists() { [[ -f $(theme_path "$1")/palette.toml ]]; }
+
+theme_list() {
+  local d
+  for d in "$THEMES_DIR"/*/; do
+    [[ -f $d/palette.toml ]] || continue
+    basename -- "$d"
+  done
+}
+
+# Parse flat `key = "value"` / `key = number` pairs out of a TOML section.
+# Only the sections we care about, and only scalar values (no nested tables).
+theme_load_palette() {
+  local id=$1 file
+  theme_exists "$id" || die "unknown theme: $id" "$EX_USAGE"
+  file="$(theme_path "$id")/palette.toml"
+  PALETTE=()
+
+  local line key value section=''
+  while IFS= read -r line || [[ -n $line ]]; do
+    # Only full-line comments: colour values legitimately start with '#'.
+    [[ $line =~ ^[[:space:]]*# ]] && continue
+    line=$(trim "$line")
+    [[ -z $line ]] && continue
+    if [[ $line =~ ^\[([a-zA-Z0-9_.-]+)\]$ ]]; then
+      section=${BASH_REMATCH[1]}
+      continue
+    fi
+    [[ -z $section ]] && continue
+    if [[ $line =~ ^([a-zA-Z0-9_]+)[[:space:]]*=[[:space:]]*\"([^\"]*)\"$ ]]; then
+      key=${BASH_REMATCH[1]} value=${BASH_REMATCH[2]}
+    elif [[ $line =~ ^([a-zA-Z0-9_]+)[[:space:]]*=[[:space:]]*([0-9]+(\.[0-9]+)?)$ ]]; then
+      key=${BASH_REMATCH[1]} value=${BASH_REMATCH[2]}
+    else
+      continue
+    fi
+    PALETTE["$key"]=$value
+  done < "$file"
+
+  ((${#PALETTE[@]})) || die "palette is empty or unparsable: $file" "$EX_FAIL"
+}
+
+_palette_get() { printf '%s' "${PALETTE[$1]:-}"; }
+
+_hex_to_rgb() {
+  local hex=${1#\#}
+  printf '%d %d %d' "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"
+}
+
+# WCAG 2.x relative luminance + contrast ratio, printed with 2 decimals.
+contrast_ratio() {
+  local fg=$1 bg=$2
+  local r1 g1 b1 r2 g2 b2
+  read -r r1 g1 b1 < <(_hex_to_rgb "$fg")
+  read -r r2 g2 b2 < <(_hex_to_rgb "$bg")
+  awk -v r1="$r1" -v g1="$g1" -v b1="$b1" -v r2="$r2" -v g2="$g2" -v b2="$b2" '
+    function lin(c,  s) {
+      s = c / 255
+      return (s <= 0.03928) ? s / 12.92 : ((s + 0.055) / 1.055) ^ 2.4
+    }
+    BEGIN {
+      l1 = 0.2126 * lin(r1) + 0.7152 * lin(g1) + 0.0722 * lin(b1)
+      l2 = 0.2126 * lin(r2) + 0.7152 * lin(g2) + 0.0722 * lin(b2)
+      if (l1 < l2) { t = l1; l1 = l2; l2 = t }
+      printf "%.2f", (l1 + 0.05) / (l2 + 0.05)
+    }'
+}
+
+# Required AA pairs: "fg bg minimum"
+theme_contrast_pairs() {
+  cat << 'EOF'
+text bg 4.5
+text surface 4.5
+text_muted surface 4.5
+primary bg 4.5
+primary surface 4.5
+secondary surface 4.5
+tertiary surface 4.5
+error surface 4.5
+success surface 4.5
+warning surface 4.5
+selection_bg selection 3.0
+EOF
+}
+
+# Decorative separators are not WCAG text/UI indicators; report them without
+# failing the theme (a visible-but-subtle 1px border is intentional here).
+theme_advisory_pairs() {
+  cat << 'EOF'
+border surface_alt 1.2
+EOF
+}
+
+theme_validate() {
+  local id=$1 errors=() warnings=()
+  theme_load_palette "$id"
+
+  local key
+  for key in "${THEME_REQUIRED_KEYS[@]}"; do
+    if [[ -z ${PALETTE[$key]:-} ]]; then
+      errors+=("missing required palette key: $key")
+      continue
+    fi
+    if [[ ! ${PALETTE[$key]} =~ ^#[0-9A-Fa-f]{6}$ ]]; then
+      errors+=("invalid color for $key: ${PALETTE[$key]} (expected #RRGGBB)")
+    fi
+  done
+
+  local fg bg min ratio
+  while read -r fg bg min; do
+    [[ ${PALETTE[$fg]:-} =~ ^#[0-9A-Fa-f]{6}$ ]] || continue
+    [[ ${PALETTE[$bg]:-} =~ ^#[0-9A-Fa-f]{6}$ ]] || continue
+    ratio=$(contrast_ratio "${PALETTE[$fg]}" "${PALETTE[$bg]}")
+    if awk -v r="$ratio" -v m="$min" 'BEGIN { exit !(r < m) }'; then
+      errors+=("contrast ${fg}/${bg} = ${ratio}:1 (needs ${min}:1)")
+    else
+      debug "contrast ${fg}/${bg} = ${ratio}:1 ok"
+    fi
+  done < <(theme_contrast_pairs)
+
+  local adv_fg adv_bg adv_min adv_ratio
+  while read -r adv_fg adv_bg adv_min; do
+    [[ ${PALETTE[$adv_fg]:-} =~ ^#[0-9A-Fa-f]{6}$ ]] || continue
+    [[ ${PALETTE[$adv_bg]:-} =~ ^#[0-9A-Fa-f]{6}$ ]] || continue
+    adv_ratio=$(contrast_ratio "${PALETTE[$adv_fg]}" "${PALETTE[$adv_bg]}")
+    if awk -v r="$adv_ratio" -v m="$adv_min" 'BEGIN { exit !(r < m) }'; then
+      warnings+=("decorative contrast ${adv_fg}/${adv_bg} = ${adv_ratio}:1 (below ${adv_min}:1)")
+    fi
+  done < <(theme_advisory_pairs)
+
+  local radius
+  for radius in radius_window radius_input radius_pill padding; do
+    if [[ -z ${PALETTE[$radius]:-} ]]; then
+      warnings+=("missing geometry key: $radius")
+    elif [[ ! ${PALETTE[$radius]} =~ ^[0-9]+$ ]]; then
+      errors+=("geometry key $radius must be an integer: ${PALETTE[$radius]}")
+    fi
+  done
+
+  [[ -n ${PALETTE[font_mono]:-} ]] || warnings+=("font_mono is not set")
+  [[ -n ${PALETTE[font_ui]:-} ]] || warnings+=("font_ui is not set")
+
+  local module template
+  for module in "${!THEME_TARGETS[@]}"; do
+    template=$(find "$(theme_path "$id")/$module" -type f 2> /dev/null | sort | head -n1)
+    [[ -n $template ]] || warnings+=("no template for module: $module")
+  done
+
+  if ((JSON_OUT)); then
+    local e w sep=''
+    printf '{"theme":%s,"ok":%s,"errors":[' "$(json_str "$id")" "$([[ ${#errors[@]} -eq 0 ]] && echo true || echo false)"
+    for e in "${errors[@]}"; do
+      printf '%s%s' "$sep" "$(json_str "$e")"
+      sep=','
+    done
+    printf '],"warnings":['
+    sep=''
+    for w in "${warnings[@]}"; do
+      printf '%s%s' "$sep" "$(json_str "$w")"
+      sep=','
+    done
+    printf ']}\n'
+  else
+    for w in "${warnings[@]}"; do warn "$w"; done
+    for e in "${errors[@]}"; do err "$e"; done
+  fi
+
+  if ((${#errors[@]} == 0)); then
+    if ((! JSON_OUT)); then
+      ok "theme '$id' validates (WCAG AA contrast, required keys present)"
+    fi
+    return 0
+  fi
+  return 1
+}
+
+_sed_escape() { printf '%s' "$1" | sed -e 's/[\\/&|]/\\&/g'; }
+
+# Render a single template file, substituting every @key@ token.
+theme_render_file() {
+  local src=$1 dest=$2
+  [[ -f $src ]] || die "template not found: $src" "$EX_FAIL"
+  local sedscript='' key
+  for key in "${!PALETTE[@]}"; do
+    sedscript+="s|@${key}@|$(_sed_escape "${PALETTE[$key]}")|g;"
+  done
+  if ((DRY_RUN)); then
+    ui_note "[dry-run] render $src -> $dest"
+    return 0
+  fi
+  mkdir -p -- "$(dirname -- "$dest")"
+  sed -e "$sedscript" "$src" > "$dest"
+  chmod 644 -- "$dest"
+}
+
+# Render every module of a theme into <dest_dir>/<module>.<ext>.
+theme_render() {
+  local id=$1 dest=$2
+  theme_load_palette "$id"
+  local module template
+  for module in "${!THEME_TARGETS[@]}"; do
+    template=$(find "$(theme_path "$id")/$module" -type f 2> /dev/null | sort | head -n1)
+    [[ -n $template ]] || continue
+    theme_render_file "$template" "$dest/${THEME_TARGETS[$module]}"
+  done
+  ok "rendered theme '$id' into $dest"
+}
+
+theme_nvim_hook_target() {
+  printf '%s/nvim/lua/archway.lua' "$XDG_CONFIG_HOME"
+}
+
+# Write the local Neovim hook. Never edits tracked files (AGENTS.md §9.5).
+theme_nvim_sync() {
+  local id=$1 hook nvim_dir=$XDG_CONFIG_HOME/nvim
+  hook=$(theme_nvim_hook_target)
+
+  if [[ ! -d $nvim_dir ]]; then
+    ui_note "Neovim config not installed; skipping theme hook"
+    return 0
+  fi
+
+  if have git && git -C "$nvim_dir" rev-parse --git-dir > /dev/null 2>&1; then
+    if ! git -C "$nvim_dir" check-ignore -q 'lua/archway.lua'; then
+      err "Neovim checkout does not ignore lua/archway.lua; upstream hook is missing."
+      err "Archway will not edit tracked files. Ask upstream to add the hook (AGENTS.md §9.5)."
+      return 1
+    fi
+    if git -C "$nvim_dir" ls-files --error-unmatch 'lua/archway.lua' > /dev/null 2>&1; then
+      err "lua/archway.lua is tracked upstream; refusing to write it."
+      return 1
+    fi
+  fi
+
+  if ((DRY_RUN)); then
+    ui_note "[dry-run] write Neovim hook: $hook"
+    return 0
+  fi
+  mkdir -p -- "$(dirname -- "$hook")"
+  cat > "$hook" << EOF
+-- Generated by Archway. Local override, intentionally untracked upstream.
+-- Active theme: $id
+return { theme = "$id" }
+EOF
+  ok "Neovim theme hook written: $hook"
+}
+
+theme_set() {
+  local id=$1
+  theme_validate "$id" || die "theme '$id' failed validation" "$EX_FAIL"
+
+  ensure_dirs "$THEME_D_DIR"
+  ui_header "Applying theme: $id"
+  theme_render "$id" "$THEME_D_DIR"
+
+  if ((! DRY_RUN)); then
+    state_set "$THEME_STATE_FILE" theme "$id"
+    render_theme_metadata "$id"
+    theme_publish_generated
+  fi
+
+  local rc=0
+  theme_nvim_sync "$id" || rc=1
+  theme_reload || true
+
+  if ((rc != 0)); then
+    err "theme applied everywhere except Neovim (see messages above)"
+    exit "$EX_FAIL"
+  fi
+  ok "theme '$id' is active; new shells pick up the rest"
+}
+
+# dunst only reads drop-ins from ~/.config/dunst/dunstrc.d and bat only finds
+# custom themes under ~/.config/bat/themes, so those two artifacts are published
+# to their native locations. Everything else is included from theme.d/.
+theme_publish_generated() {
+  local dunst_dir="$XDG_CONFIG_HOME/dunst/dunstrc.d"
+  local bat_dir="$XDG_CONFIG_HOME/bat/themes"
+  local f
+
+  if [[ -f $THEME_D_DIR/dunst.conf ]]; then
+    mkdir -p -- "$dunst_dir"
+    cp -f -- "$THEME_D_DIR/dunst.conf" "$dunst_dir/90-android-mount.conf"
+    record_managed "$dunst_dir/90-android-mount.conf" theme
+  fi
+  for f in "$THEME_D_DIR"/*.tmTheme; do
+    [[ -e $f ]] || continue
+    mkdir -p -- "$bat_dir"
+    cp -f -- "$f" "$bat_dir/"
+    record_managed "$bat_dir/$(basename -- "$f")" theme
+  done
+}
+
+render_theme_metadata() {
+  local id=$1 file
+  file="$THEME_D_DIR/theme.conf"
+  {
+    printf '# generated by archway; do not edit\n'
+    printf 'ARCHWAY_THEME=%s\n' "$id"
+    printf 'ARCHWAY_THEME_NAME=%s\n' "${PALETTE[theme_name]:-$id}"
+    printf 'ARCHWAY_THEME_DIR=%s\n' "$THEME_D_DIR"
+  } > "$file"
+  chmod 644 "$file"
+}
+
+theme_reload() {
+  if ((DRY_RUN)); then
+    ui_note "[dry-run] would reload kitty, bspwm, polybar, dunst, tmux"
+    return 0
+  fi
+  if have bspc && [[ -n ${DISPLAY:-} ]]; then
+    # shellcheck disable=SC1090,SC1091 # generated file, path built at runtime
+    source "$THEME_D_DIR/bspwm.sh" 2> /dev/null || true
+  fi
+  if have kitty && [[ -n ${KITTY_LISTEN_ON:-} ]]; then
+    kitty @ set-colors --all --configured "$THEME_D_DIR/kitty.conf" 2> /dev/null || true
+  fi
+  if have polybar-msg; then
+    polybar-msg cmd restart > /dev/null 2>&1 || true
+  fi
+  if have dunstctl; then
+    dunstctl reload > /dev/null 2>&1 || true
+  fi
+  if have tmux && tmux list-sessions > /dev/null 2>&1; then
+    tmux setenv -g ARCHWAY_THEME_DIR "$THEME_D_DIR"
+    tmux source-file "$XDG_CONFIG_HOME/tmux/tmux.conf" > /dev/null 2>&1 || true
+  fi
+  ok "reloaded running components"
+}
+
+# Compare the theme artifact in themes/<id>/nvim with palette.toml (CI drift check).
+theme_nvim_contract() {
+  local id=$1 lua errors=()
+  theme_load_palette "$id"
+  lua="$(theme_path "$id")/nvim/android-mount.lua"
+  [[ -f $lua ]] || die "missing Neovim theme artifact: $lua" "$EX_FAIL"
+
+  local key fg
+  local -A reported=()
+  for key in "${!PALETTE[@]}"; do
+    fg=${PALETTE[$key]}
+    [[ $fg =~ ^#[0-9A-Fa-f]{6}$ ]] || continue
+    [[ -n ${reported[$fg]:-} ]] && continue
+    reported[$fg]=1
+    grep -qi -- "$fg" "$lua" || errors+=("$key ($fg) missing from Neovim artifact")
+  done
+
+  if ((JSON_OUT)); then
+    printf '{"theme":%s,"artifact":%s,"ok":%s,"errors":[' "$(json_str "$id")" "$(json_str "$lua")" \
+      "$([[ ${#errors[@]} -eq 0 ]] && echo true || echo false)"
+    local sep='' e
+    for e in "${errors[@]}"; do
+      printf '%s%s' "$sep" "$(json_str "$e")"
+      sep=','
+    done
+    printf ']}\n'
+  else
+    local e
+    for e in "${errors[@]}"; do err "$e"; done
+  fi
+  if ((${#errors[@]} == 0)); then return 0; fi
+  return 1
+}
+
+theme_preview() {
+  local id=$1 previous
+  previous=$(current_theme)
+  ui_note "previewing '$id'; previous theme was '$previous'"
+  theme_set "$id"
+  ui_note "run 'archway theme set $previous' to go back"
+}

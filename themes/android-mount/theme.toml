@@ -1,0 +1,27 @@
+# Android Mount theme metadata.
+id = "android-mount"
+name = "Android Mount"
+variant = "dark"
+schema = 1
+version = "0.1.0"
+description = "Material You inspired dark theme: dense, technical, keyboard-first."
+inspiration = "Material You / Android dark surfaces; homage only, no vendor assets."
+license = "GPL-3.0-or-later"
+wallpapers = "none in v0.1.0 (original assets required before shipping any)"
+
+[variants]
+dark = "palette.toml"
+light = "planned"
+high_contrast = "planned"
+
+[targets]
+kitty = "terminal"
+bspwm = "window manager (border colours, gaps)"
+polybar = "status bar"
+rofi = "launcher"
+dunst = "notifications"
+tmux = "multiplexer"
+starship = "shell prompt"
+fzf = "fuzzy finder"
+bat = "pager / syntax highlighting"
+nvim = "artifact consumed through grubberdubber/nvim-config hook"

@@ -1,0 +1,16 @@
+# Optional: media, documents and screenshots beyond the desktop baseline.
+
+mpv
+ffmpeg
+imagemagick
+yt-dlp
+cava
+obs-studio
+zathura
+zathura-pdf-mupdf
+mpd
+ncmpcpp
+pandoc-cli
+typst
+tesseract
+tesseract-data-eng

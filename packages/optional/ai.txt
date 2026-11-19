@@ -1,0 +1,5 @@
+# Optional: local and terminal AI tooling. Never part of the default install.
+
+# llama.cpp and whisper.cpp are AUR-only; install them deliberately if needed.
+aichat
+ollama

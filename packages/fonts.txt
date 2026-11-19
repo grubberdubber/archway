@@ -1,0 +1,16 @@
+# Typography — official repositories only. Verified with `pacman -Si`.
+# JetBrains Mono Nerd Font is the terminal/code default (palette.toml: font_mono).
+# Inter is the UI default (palette.toml: font_ui), with Noto Sans as fallback.
+
+ttf-jetbrains-mono-nerd
+ttf-firacode-nerd
+ttf-iosevka-nerd
+ttf-cascadia-code-nerd
+ttf-nerd-fonts-symbols
+ttf-nerd-fonts-symbols-mono
+noto-fonts
+noto-fonts-emoji
+inter-font
+ttf-dejavu
+ttf-liberation
+fontconfig

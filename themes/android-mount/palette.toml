@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Android Mount — hand-written palette. Single source of truth for every
+# application template under themes/android-mount/.
+#
+# Material You inspired, not a reproduction of Google/Android branding.
+# Every colour here is original; contrast is verified by `archway theme validate`.
+
+[palette]
+theme_name  = "Android Mount"
+bg          = "#0B0F14"
+surface     = "#11161D"
+surface_alt = "#1A212B"
+overlay     = "#222B37"
+border      = "#2A3441"
+text        = "#E6EDF3"
+text_muted  = "#9BA7B4"
+primary     = "#8AB4F8"
+secondary   = "#81C995"
+tertiary    = "#FDD663"
+error       = "#F28B82"
+warning     = "#FDD663"
+success     = "#81C995"
+selection   = "#8AB4F8"
+selection_bg = "#1F2A3A"
+
+[geometry]
+radius_window = 12
+radius_input  = 8
+radius_pill   = 999
+padding       = 14
+border_width  = 1
+focus_width   = 2
+
+[typography]
+font_mono     = "JetBrainsMono Nerd Font"
+font_ui       = "Inter"
+font_fallback = "Noto Sans"
+font_size     = 11
+
+[effects]
+opacity      = 0.96
+transitions  = 160
+reduce_motion = 0

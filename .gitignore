@@ -1,0 +1,37 @@
+# Archway — never commit secrets, personal state or generated local files.
+# Secret patterns are denied explicitly and gitleaks runs in pre-commit + CI.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
+*.age
+auth.json
+hosts.yml
+id_rsa*
+id_ed25519*
+known_hosts
+*.log
+
+# Local state / caches
+.cache/
+.local/
+state/
+*.tmp
+*.bak
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+tags
+
+# Build
+dist/
+build/
+*.tar.gz
+*.sha256

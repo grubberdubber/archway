@@ -1,0 +1,16 @@
+# Pinned Neovim configuration consumed by Archway (AGENTS.md §9.5).
+#
+# This file is a PLACEHOLDER until a human runs:
+#     archway nvim pin <tag>
+# which resolves the tag to a commit, downloads the release tarball and records
+# its SHA256. Archway refuses to install Neovim from an unpinned lock, and
+# `archway doctor` reports it as a warning rather than pretending it is fine.
+
+schema = 1
+url = "https://github.com/grubberdubber/nvim-config"
+tag = ""
+commit = ""
+sha256 = ""
+tested_neovim = "0.12.5"
+channel = "stable"
+unpinned = true

@@ -1,0 +1,17 @@
+# AUR — one package per line, each with a reason. Reviewed PKGBUILDs only.
+# Never installed with --noconfirm; paru shows the diff first.
+# Names verified against the AUR RPC. Only what the official repos lack belongs here.
+
+# AUR helper (bootstrap: install it manually once, then it manages the rest)
+paru
+
+# Shell ergonomics
+carapace-bin          # universal completions for zsh/bash/fish/nushell
+zsh-you-should-use    # reminds you that an alias already exists
+
+# X11 clipboard history (rofi front-end; cliphist stays available for Wayland)
+greenclip             # greenclip print + rofi -modi clipboard
+
+# Theme + fonts + cursor
+bibata-cursor-theme   # cursor theme matching the palette
+i3lock-color          # scriptable lock screen; provides `i3lock`

@@ -1,0 +1,417 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Archway keybinds — the single source of truth.
+#
+# `archway keys generate` writes:
+#   dotfiles/dot_config/sxhkd/sxhkdrc
+#   docs/keybinds.md
+# `archway keys validate` rejects duplicates, empty commands and reserved
+# combinations. Edit here, never in the generated files.
+
+[[keybind]]
+id = "terminal"
+keys = "super + Return"
+command = "kitty"
+category = "apps"
+description = "Terminal"
+
+[[keybind]]
+id = "terminal-floating"
+keys = "super + shift + Return"
+command = "kitty --class floating-term"
+category = "apps"
+description = "Floating scratchpad terminal"
+
+[[keybind]]
+id = "launcher"
+keys = "super + d"
+command = "rofi -show drun"
+category = "apps"
+description = "Application launcher"
+
+[[keybind]]
+id = "file-manager"
+keys = "super + e"
+command = "kitty --class floating-term -e yazi"
+category = "apps"
+description = "File manager (yazi)"
+
+[[keybind]]
+id = "browser"
+keys = "super + b"
+command = "exec ${BROWSER:-firefox}"
+category = "apps"
+description = "Web browser"
+
+[[keybind]]
+id = "command-palette"
+keys = "super + shift + p"
+command = "rofi -show run -display-name 'Archway'"
+category = "apps"
+description = "Run a command (archway, system tools)"
+
+[[keybind]]
+id = "window-close"
+keys = "super + q"
+command = "bspc node -c"
+category = "windows"
+description = "Close focused window"
+
+[[keybind]]
+id = "window-fullscreen"
+keys = "super + f"
+command = "bspc node -t ~fullscreen"
+category = "windows"
+description = "Toggle fullscreen"
+
+[[keybind]]
+id = "window-floating"
+keys = "super + shift + f"
+command = "bspc node -t ~floating"
+category = "windows"
+description = "Toggle floating"
+
+[[keybind]]
+id = "focus-west"
+keys = "super + h"
+command = "bspc node -f west"
+category = "navigation"
+description = "Focus west"
+
+[[keybind]]
+id = "focus-south"
+keys = "super + j"
+command = "bspc node -f south"
+category = "navigation"
+description = "Focus south"
+
+[[keybind]]
+id = "focus-north"
+keys = "super + k"
+command = "bspc node -f north"
+category = "navigation"
+description = "Focus north"
+
+[[keybind]]
+id = "focus-east"
+keys = "super + l"
+command = "bspc node -f east"
+category = "navigation"
+description = "Focus east"
+
+[[keybind]]
+id = "move-west"
+keys = "super + shift + h"
+command = "bspc node -s west"
+category = "navigation"
+description = "Swap window west"
+
+[[keybind]]
+id = "move-south"
+keys = "super + shift + j"
+command = "bspc node -s south"
+category = "navigation"
+description = "Swap window south"
+
+[[keybind]]
+id = "move-north"
+keys = "super + shift + k"
+command = "bspc node -s north"
+category = "navigation"
+description = "Swap window north"
+
+[[keybind]]
+id = "move-east"
+keys = "super + shift + l"
+command = "bspc node -s east"
+category = "navigation"
+description = "Swap window east"
+
+[[keybind]]
+id = "resize-west"
+keys = "super + alt + h"
+command = "bspc node -z right -20 0 || bspc node -z left -20 0"
+category = "navigation"
+description = "Shrink horizontally"
+
+[[keybind]]
+id = "resize-south"
+keys = "super + alt + j"
+command = "bspc node -z bottom 0 20 || bspc node -z top 0 20"
+category = "navigation"
+description = "Shrink vertically"
+
+[[keybind]]
+id = "resize-north"
+keys = "super + alt + k"
+command = "bspc node -z top 0 -20 || bspc node -z bottom 0 -20"
+category = "navigation"
+description = "Grow vertically"
+
+[[keybind]]
+id = "resize-east"
+keys = "super + alt + l"
+command = "bspc node -z left 20 0 || bspc node -z right 20 0"
+category = "navigation"
+description = "Grow horizontally"
+
+[[keybind]]
+id = "workspace-1"
+keys = "super + 1"
+command = "bspc desktop -f 1"
+category = "workspaces"
+description = "Workspace 1"
+
+[[keybind]]
+id = "workspace-2"
+keys = "super + 2"
+command = "bspc desktop -f 2"
+category = "workspaces"
+description = "Workspace 2"
+
+[[keybind]]
+id = "workspace-3"
+keys = "super + 3"
+command = "bspc desktop -f 3"
+category = "workspaces"
+description = "Workspace 3"
+
+[[keybind]]
+id = "workspace-4"
+keys = "super + 4"
+command = "bspc desktop -f 4"
+category = "workspaces"
+description = "Workspace 4"
+
+[[keybind]]
+id = "workspace-5"
+keys = "super + 5"
+command = "bspc desktop -f 5"
+category = "workspaces"
+description = "Workspace 5"
+
+[[keybind]]
+id = "workspace-6"
+keys = "super + 6"
+command = "bspc desktop -f 6"
+category = "workspaces"
+description = "Workspace 6"
+
+[[keybind]]
+id = "workspace-7"
+keys = "super + 7"
+command = "bspc desktop -f 7"
+category = "workspaces"
+description = "Workspace 7"
+
+[[keybind]]
+id = "workspace-8"
+keys = "super + 8"
+command = "bspc desktop -f 8"
+category = "workspaces"
+description = "Workspace 8"
+
+[[keybind]]
+id = "workspace-9"
+keys = "super + 9"
+command = "bspc desktop -f 9"
+category = "workspaces"
+description = "Workspace 9"
+
+[[keybind]]
+id = "send-workspace-1"
+keys = "super + shift + 1"
+command = "bspc node -d 1 --follow"
+category = "workspaces"
+description = "Move window to workspace 1 (follow)"
+
+[[keybind]]
+id = "send-workspace-2"
+keys = "super + shift + 2"
+command = "bspc node -d 2 --follow"
+category = "workspaces"
+description = "Move window to workspace 2 (follow)"
+
+[[keybind]]
+id = "send-workspace-3"
+keys = "super + shift + 3"
+command = "bspc node -d 3 --follow"
+category = "workspaces"
+description = "Move window to workspace 3 (follow)"
+
+[[keybind]]
+id = "send-workspace-4"
+keys = "super + shift + 4"
+command = "bspc node -d 4 --follow"
+category = "workspaces"
+description = "Move window to workspace 4 (follow)"
+
+[[keybind]]
+id = "send-workspace-5"
+keys = "super + shift + 5"
+command = "bspc node -d 5 --follow"
+category = "workspaces"
+description = "Move window to workspace 5 (follow)"
+
+[[keybind]]
+id = "send-workspace-6"
+keys = "super + shift + 6"
+command = "bspc node -d 6 --follow"
+category = "workspaces"
+description = "Move window to workspace 6 (follow)"
+
+[[keybind]]
+id = "send-workspace-7"
+keys = "super + shift + 7"
+command = "bspc node -d 7 --follow"
+category = "workspaces"
+description = "Move window to workspace 7 (follow)"
+
+[[keybind]]
+id = "send-workspace-8"
+keys = "super + shift + 8"
+command = "bspc node -d 8 --follow"
+category = "workspaces"
+description = "Move window to workspace 8 (follow)"
+
+[[keybind]]
+id = "send-workspace-9"
+keys = "super + shift + 9"
+command = "bspc node -d 9 --follow"
+category = "workspaces"
+description = "Move window to workspace 9 (follow)"
+
+[[keybind]]
+id = "theme-selector"
+keys = "super + space"
+command = "rofi -show theme -modi 'theme:archway applet theme-selector'"
+category = "archway"
+description = "Theme selector"
+
+[[keybind]]
+id = "android-mount"
+keys = "super + shift + m"
+command = "archway applet android-mount --rofi"
+category = "archway"
+description = "Mount / unmount Android device (MTP)"
+
+[[keybind]]
+id = "clipboard-history"
+keys = "super + v"
+command = "cliphist list | rofi -dmenu -display-columns 2 -p clipboard | cliphist decode | xclip -selection clipboard"
+category = "archway"
+description = "Clipboard history"
+
+[[keybind]]
+id = "screenshot-region"
+keys = "super + shift + s"
+command = "archway applet screenshot region"
+category = "archway"
+description = "Screenshot: region"
+
+[[keybind]]
+id = "screenshot-full"
+keys = "Print"
+command = "archway applet screenshot full"
+category = "archway"
+description = "Screenshot: whole screen"
+
+[[keybind]]
+id = "password-manager"
+keys = "super + p"
+command = "rofi-rbw --type password --action copy"
+category = "archway"
+description = "Password manager (rbw)"
+
+[[keybind]]
+id = "power-menu"
+keys = "super + shift + q"
+command = "archway applet power --rofi"
+category = "system"
+description = "Power menu"
+
+# AGENTS.md §10.2 lists both Super+L (lock) and Super+H/J/K/L (focus), which is
+# a conflict; the validation test caught it. hjkl navigation wins, so locking
+# moves to Super+Escape (and Super+Shift+Q remains the power menu).
+[[keybind]]
+id = "lock"
+keys = "super + Escape"
+command = "i3lock -c 0B0F14 -n"
+category = "system"
+description = "Lock screen"
+
+[[keybind]]
+id = "reload-wm"
+keys = "super + alt + r"
+command = "bspc wm -r"
+category = "system"
+description = "Reload window manager"
+
+[[keybind]]
+id = "logout"
+keys = "super + shift + e"
+command = "bspc quit"
+category = "system"
+description = "Log out of bspwm"
+
+[[keybind]]
+id = "cheatsheet"
+keys = "super + slash"
+command = "kitty --class floating-term -e archway keys list"
+category = "system"
+description = "Keybind cheatsheet"
+
+[[keybind]]
+id = "volume-up"
+keys = "XF86AudioRaiseVolume"
+command = "pamixer -i 5 && dunstify -t 800 -h int:value:$(pamixer --get-volume) volume $(pamixer --get-volume)%"
+category = "media"
+description = "Volume up"
+
+[[keybind]]
+id = "volume-down"
+keys = "XF86AudioLowerVolume"
+command = "pamixer -d 5 && dunstify -t 800 -h int:value:$(pamixer --get-volume) volume $(pamixer --get-volume)%"
+category = "media"
+description = "Volume down"
+
+[[keybind]]
+id = "volume-mute"
+keys = "XF86AudioMute"
+command = "pamixer -t && dunstify -t 800 'mute' $(pamixer --get-mute)"
+category = "media"
+description = "Toggle mute"
+
+[[keybind]]
+id = "media-play"
+keys = "XF86AudioPlay"
+command = "playerctl play-pause"
+category = "media"
+description = "Play / pause"
+
+[[keybind]]
+id = "media-next"
+keys = "XF86AudioNext"
+command = "playerctl next"
+category = "media"
+description = "Next track"
+
+[[keybind]]
+id = "media-prev"
+keys = "XF86AudioPrev"
+command = "playerctl previous"
+category = "media"
+description = "Previous track"
+
+[[keybind]]
+id = "brightness-up"
+keys = "XF86MonBrightnessUp"
+command = "brightnessctl set +5%"
+category = "media"
+description = "Brightness up"
+
+[[keybind]]
+id = "brightness-down"
+keys = "XF86MonBrightnessDown"
+command = "brightnessctl set 5%-"
+category = "media"
+description = "Brightness down"

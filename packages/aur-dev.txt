@@ -1,0 +1,9 @@
+# Developer-profile AUR packages. Each has a documented reason; zero groups.
+# Names verified against the AUR RPC; everything available officially lives in
+# official-dev.txt instead.
+
+# API / database clients missing from the official repositories
+grpcurl               # gRPC introspection from the shell
+litecli               # SQLite client with completion and syntax colours
+usql                  # one CLI for PostgreSQL, MySQL, SQLite and MSSQL
+hadolint-bin          # Dockerfile linter (prebuilt, avoids a Haskell build)

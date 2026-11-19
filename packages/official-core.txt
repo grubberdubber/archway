@@ -1,0 +1,75 @@
+# Official repositories only. Every name verified with `pacman -Si`.
+# Re-verify with: archway pkg check
+
+# Base system (a fresh Arch install already has most of this; --needed keeps it safe)
+base
+base-devel
+sudo
+git
+curl
+wget
+gnupg
+archlinux-keyring
+pacman-contrib
+reflector
+man-db
+man-pages
+bash-completion
+less
+which
+file
+findutils
+grep
+sed
+gawk
+procps-ng
+psmisc
+util-linux
+rsync
+unzip
+zip
+tar
+xz
+zstd
+7zip
+
+# Dotfile engine (ADR-001)
+chezmoi
+
+# Shell + prompt + history + navigation
+zsh
+starship
+tmux
+fzf
+zoxide
+atuin
+direnv
+sheldon
+
+# Modern CLI replacements
+ripgrep
+fd
+bat
+eza
+git-delta
+jq
+yq
+btop
+fastfetch
+tree
+hyperfine
+tokei
+tealdeer
+ouch
+trash-cli
+
+# Clipboard history (X11: greenclip in aur-core; this is the Wayland-ready CLI)
+cliphist
+
+# Secrets (ADR-008)
+rbw
+rofi-rbw
+
+# Lint/format for the repo itself
+shellcheck
+shfmt

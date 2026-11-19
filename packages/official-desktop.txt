@@ -1,0 +1,55 @@
+# bspwm desktop stack (v0.1, X11) — official repositories.
+# The lock screen is i3lock-color (aur-core), which provides `i3lock`.
+
+# X11 + window manager
+xorg-server
+xorg-xinit
+xorg-xrandr
+xorg-xsetroot
+xorg-xprop
+bspwm
+sxhkd
+picom
+polybar
+rofi
+dunst
+feh
+xdotool
+wmctrl
+xclip
+maim
+slop
+brightnessctl
+playerctl
+pamixer
+
+# Terminal
+kitty
+
+# Audio, network, Bluetooth
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+pavucontrol
+networkmanager
+network-manager-applet
+bluez
+bluez-utils
+blueman
+libnotify
+
+# MTP / removable media
+simple-mtpfs
+udisks2
+gvfs
+gvfs-mtp
+
+# XDG / session integration
+xdg-utils
+xdg-user-dirs
+xdg-desktop-portal
+xdg-desktop-portal-gtk
+polkit-gnome
+gnome-keyring
+libsecret
