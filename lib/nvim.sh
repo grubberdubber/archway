@@ -113,6 +113,7 @@ nvim_status() {
 # Resolve a tag against upstream and record commit + tarball SHA256.
 nvim_pin() {
   local tag=$1 url tarball tmp commit sha
+  require_not_root
   [[ -n $tag ]] || die "usage: archway nvim pin <tag>" "$EX_USAGE"
   require_cmd git curl sha256sum
   url=$(lock_get url)
@@ -186,6 +187,7 @@ nvim_backup_existing() {
 }
 
 nvim_install() {
+  require_not_root
   nvim_lock_verified || die "Neovim pin is not verified. Run: archway nvim pin <tag>" "$EX_PREFLIGHT"
   nvim_requirements || die "Neovim prerequisites are not satisfied" "$EX_PREFLIGHT"
 
@@ -285,6 +287,7 @@ nvim_update() {
 }
 
 nvim_rollback() {
+  require_not_root
   local previous
   previous=$(state_get "$NVIM_STATE_FILE" previous_commit || true)
   if [[ -z $previous ]]; then

@@ -130,7 +130,9 @@ needs_lock() {
 
 main() {
   local cmd=${1:-help}
-  require_not_root
+  # Read-only commands (version, doctor, theme validate, keys check, pkg check)
+  # must work as root so CI containers can run them. Mutating commands call
+  # require_not_root themselves.
   log_init
   log_rotate
   install_traps

@@ -280,6 +280,7 @@ EOF
 
 theme_set() {
   local id=$1
+  require_not_root
   theme_validate "$id" || die "theme '$id' failed validation" "$EX_FAIL"
 
   ensure_dirs "$THEME_D_DIR"

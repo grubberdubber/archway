@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Read-only commands (`doctor`, `theme validate`, `keys check`, `pkg check`)
+  now run as root, so CI containers can use them. Only mutating commands
+  refuse root.
+- `doctor` no longer reports a user's existing Neovim checkout as a critical
+  failure when Archway does not manage it; it is a warning until ownership is
+  recorded by `archway nvim install`.
+
 ## [0.1.0] — Mount
 
 First functional skeleton. The desktop slice is `bspwm` on X11 with `kitty`,

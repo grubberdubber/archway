@@ -51,7 +51,8 @@ doctor_run() {
     doctor_add "platform" warn "not Arch Linux (unsupported, proceed carefully)"
   fi
   if ((EUID == 0)); then
-    doctor_add "user" fail "running as root; archway must run as your user"
+    # Containers and CI legitimately run as root; only writes are refused.
+    doctor_add "user" warn "running as root: read-only checks only, install/update are blocked"
   else
     doctor_add "user" ok "non-root user ($(id -un))"
   fi
@@ -113,11 +114,17 @@ doctor_run() {
   else
     doctor_add "nvim.pin" warn "unpinned placeholder (archway nvim pin <tag>)"
   fi
+  # A user's own Neovim repo is not a defect. Only a checkout Archway manages
+  # (recorded in nvim.conf) is held to the clean/pinned standard.
+  local managed_commit
+  managed_commit=$(state_get "$NVIM_STATE_FILE" commit || true)
   if [[ -d $NVIM_DIR/.git ]]; then
-    if nvim_checkout_clean; then
-      doctor_add "nvim.checkout" ok "clean"
+    if [[ -z $managed_commit ]]; then
+      doctor_add "nvim.checkout" warn "existing checkout, not managed by Archway (install backs it up first)"
+    elif nvim_checkout_clean; then
+      doctor_add "nvim.checkout" ok "clean at $managed_commit"
     else
-      doctor_add "nvim.checkout" fail "local changes in $NVIM_DIR"
+      doctor_add "nvim.checkout" fail "local changes in a managed checkout: $NVIM_DIR"
     fi
   else
     doctor_add "nvim.checkout" warn "not installed yet"

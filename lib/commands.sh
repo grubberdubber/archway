@@ -171,6 +171,7 @@ cmd_backup() {
       backup_list
       ;;
     create | *)
+      require_not_root
       section "Backup"
       local path count=0
       while IFS= read -r path; do
@@ -188,6 +189,7 @@ cmd_backup() {
 
 cmd_restore() {
   parse_common_flags "$@"
+  require_not_root
   local id=${ARGS[0]:-}
   if [[ -z $id ]]; then
     ui_header "Available backups"
@@ -206,6 +208,7 @@ cmd_restore() {
 
 cmd_rollback() {
   parse_common_flags "$@"
+  require_not_root
   local latest
   latest=$(backup_latest) || die "no backups available" "$EX_FAIL"
   ui_header "Rollback"
@@ -312,6 +315,7 @@ EOF
 # ------------------------------------------------------------------ pin -----
 cmd_pin() {
   parse_common_flags "$@"
+  require_not_root
   local version=${ARGS[0]:-}
   [[ -n $version ]] || die "usage: archway pin <version> (or --unpin)" "$EX_USAGE"
   if [[ $version == --unpin ]]; then
@@ -353,6 +357,7 @@ EOF
     ARGS=("${ARGS[@]:1}")
   done
 
+  require_not_root
   ui_header "Uninstall"
   ui_kv "managed manifest" "$MANAGED_MANIFEST"
   local count=0
