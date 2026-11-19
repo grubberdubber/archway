@@ -12,12 +12,11 @@ DOTFILES_SRC="$ARCHWAY_ROOT/dotfiles"
 archway_config_paths() {
   local p
   for p in \
-    "$XDG_CONFIG_HOME/bspwm" \
-    "$XDG_CONFIG_HOME/sxhkd" \
+    "$XDG_CONFIG_HOME/hypr" \
+    "$XDG_CONFIG_HOME/waybar" \
+    "$XDG_CONFIG_HOME/swaync" \
     "$XDG_CONFIG_HOME/kitty" \
-    "$XDG_CONFIG_HOME/polybar" \
     "$XDG_CONFIG_HOME/rofi" \
-    "$XDG_CONFIG_HOME/dunst" \
     "$XDG_CONFIG_HOME/tmux" \
     "$XDG_CONFIG_HOME/zsh" \
     "$XDG_CONFIG_HOME/starship.toml"; do
@@ -223,6 +222,15 @@ cmd_install() {
   terminal=${terminal:-$(profile_get "$profile" terminal)}
   shell=${shell:-$(profile_get "$profile" shell)}
 
+  if [[ $wm != hyprland ]]; then
+    die "unsupported compositor '$wm': Hyprland is the only first-class desktop (AGENTS.md ADR-002)" "$EX_USAGE"
+  fi
+  if have hyprctl; then
+    local compat_status compat_detail
+    IFS=$'\t' read -r compat_status compat_detail < <(compat_check hyprland)
+    [[ $compat_status == ok ]] || warn "$compat_detail"
+  fi
+
   theme_exists "$theme" || die "unknown theme: $theme" "$EX_USAGE"
   theme_validate "$theme" || die "theme '$theme' failed validation; fix the palette before installing" "$EX_PREFLIGHT"
   keys_validate > /dev/null || die "keybinds are invalid; run 'archway keys validate'" "$EX_PREFLIGHT"
@@ -305,8 +313,9 @@ cmd_install() {
   fi
 
   ui_header "Next steps"
-  ui_item "log in to bspwm, or run 'archway doctor' again"
+  ui_item "log out and pick the Hyprland session (started through uwsm)"
   ui_item "Super + / shows every keybind"
+  ui_item "hyprctl reload applies config changes without ending the session"
   ui_item "archway update keeps this machine current (no re-clone)"
   ui_item "archway rollback restores the last backup"
   ((dry_requested)) && ui_note "this was a dry-run: nothing was written"
@@ -322,7 +331,7 @@ Usage:
 
 Options:
   --profile <minimal|developer|security|full>   default: developer
-  --wm <bspwm>                                  default: from the profile
+  --wm <hyprland>                               only Hyprland is supported (ADR-002)
   --terminal <kitty|ghostty|wezterm|alacritty>  default: from the profile
   --shell <zsh|fish|bash>                       default: from the profile
   --theme <id>                                  default: android-mount

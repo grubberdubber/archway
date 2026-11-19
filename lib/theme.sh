@@ -17,10 +17,11 @@ THEME_REQUIRED_KEYS=(
 # module -> stable filename inside $THEME_D_DIR
 declare -gA THEME_TARGETS=(
   [kitty]=kitty.conf
-  [bspwm]=bspwm.sh
-  [polybar]=polybar.ini
+  [hyprland]=hyprland.conf
+  [waybar]=waybar.css
+  [swaync]=swaync.css
+  [hyprlock]=hyprlock.conf
   [rofi]=rofi.rasi
-  [dunst]=dunst.conf
   [tmux]=tmux.conf
   [starship]=starship.toml
   [fzf]=fzf.sh
@@ -213,8 +214,12 @@ _sed_escape() { printf '%s' "$1" | sed -e 's/[\\/&|]/\\&/g'; }
 theme_render_file() {
   local src=$1 dest=$2
   [[ -f $src ]] || die "template not found: $src" "$EX_FAIL"
-  local sedscript='' key
+  local sedscript='' key bare
   for key in "${!PALETTE[@]}"; do
+    # @key:hex@ yields the value without the leading '#', for apps whose
+    # colour syntax is ARGB (Hyprland, hyprlock) instead of CSS hex.
+    bare=${PALETTE[$key]#\#}
+    sedscript+="s|@${key}:hex@|$(_sed_escape "$bare")|g;"
     sedscript+="s|@${key}@|$(_sed_escape "${PALETTE[$key]}")|g;"
   done
   if ((DRY_RUN)); then
@@ -304,18 +309,24 @@ theme_set() {
   ok "theme '$id' is active; new shells pick up the rest"
 }
 
-# dunst only reads drop-ins from ~/.config/dunst/dunstrc.d and bat only finds
-# custom themes under ~/.config/bat/themes, so those two artifacts are published
-# to their native locations. Everything else is included from theme.d/.
+# waybar, swaync and bat only read assets from their own config trees, so those
+# artifacts are published next to them and imported from the tracked config.
+# Everything else is sourced from theme.d/ by absolute path.
 theme_publish_generated() {
-  local dunst_dir="$XDG_CONFIG_HOME/dunst/dunstrc.d"
+  local waybar_dir="$XDG_CONFIG_HOME/waybar"
+  local swaync_dir="$XDG_CONFIG_HOME/swaync"
   local bat_dir="$XDG_CONFIG_HOME/bat/themes"
   local f
 
-  if [[ -f $THEME_D_DIR/dunst.conf ]]; then
-    mkdir -p -- "$dunst_dir"
-    cp -f -- "$THEME_D_DIR/dunst.conf" "$dunst_dir/90-android-mount.conf"
-    record_managed "$dunst_dir/90-android-mount.conf" theme
+  if [[ -f $THEME_D_DIR/waybar.css ]]; then
+    mkdir -p -- "$waybar_dir"
+    cp -f -- "$THEME_D_DIR/waybar.css" "$waybar_dir/theme.css"
+    record_managed "$waybar_dir/theme.css" theme
+  fi
+  if [[ -f $THEME_D_DIR/swaync.css ]]; then
+    mkdir -p -- "$swaync_dir"
+    cp -f -- "$THEME_D_DIR/swaync.css" "$swaync_dir/theme.css"
+    record_managed "$swaync_dir/theme.css" theme
   fi
   for f in "$THEME_D_DIR"/*.tmTheme; do
     [[ -e $f ]] || continue
@@ -339,21 +350,22 @@ render_theme_metadata() {
 
 theme_reload() {
   if ((DRY_RUN)); then
-    ui_note "[dry-run] would reload kitty, bspwm, polybar, dunst, tmux"
+    ui_note "[dry-run] would reload Hyprland, waybar, swaync, kitty, tmux"
     return 0
   fi
-  if have bspc && [[ -n ${DISPLAY:-} ]]; then
-    # shellcheck disable=SC1090,SC1091 # generated file, path built at runtime
-    source "$THEME_D_DIR/bspwm.sh" 2> /dev/null || true
+  # Never restart or kill the compositor: a config reload is enough, and the
+  # user's session must survive a theme change (AGENTS.md §8.2).
+  if have hyprctl && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+    hyprctl reload > /dev/null 2>&1 || true
   fi
   if have kitty && [[ -n ${KITTY_LISTEN_ON:-} ]]; then
     kitty @ set-colors --all --configured "$THEME_D_DIR/kitty.conf" 2> /dev/null || true
   fi
-  if have polybar-msg; then
-    polybar-msg cmd restart > /dev/null 2>&1 || true
+  if have pkill; then
+    pkill -SIGUSR2 -x waybar > /dev/null 2>&1 || true
   fi
-  if have dunstctl; then
-    dunstctl reload > /dev/null 2>&1 || true
+  if have swaync-client; then
+    swaync-client -rs > /dev/null 2>&1 || true
   fi
   if have tmux && tmux list-sessions > /dev/null 2>&1; then
     tmux setenv -g ARCHWAY_THEME_DIR "$THEME_D_DIR"

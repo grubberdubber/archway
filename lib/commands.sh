@@ -132,7 +132,7 @@ archway keys — single-source keybinds
 Usage:
   archway keys list
   archway keys search <text>
-  archway keys generate     # writes sxhkdrc + docs/keybinds.md
+  archway keys generate     # writes the Hyprland binds + docs/keybinds.md
   archway keys validate     # duplicates, reserved chords, empty commands
   archway keys check        # are the generated files up to date? (CI)
 EOF

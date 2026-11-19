@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm
+  is out of scope. Packages, profiles, applets, keybinds, theme modules and the
+  session config were migrated: `hypr`, `waybar`, `swaync`, `hyprlock`,
+  `hypridle` and `hyprpaper` replace `bspwm`, `sxhkd`, `polybar`, `dunst`,
+  `picom` and `i3lock-color`.
+- Keybinds now generate native Hyprland `bind`/`binde` lines with dispatchers
+  (`killactive`, `movefocus`, `workspace`, ...) instead of shelling out to
+  `bspc`. Media keys use `binde` so holding them repeats.
+- Clipboard, screenshots and locking are Wayland-native: `cliphist` + `wl-copy`,
+  `grim`/`slurp` + `wl-copy`, `hyprlock`.
+- `desktops/hyprland/compat.toml` declares the supported Hyprland range and
+  `archway doctor` warns when the running compositor is older than the minimum
+  or newer than the tested version (ADR-014).
+- The theme publishes `waybar/theme.css` and `swaync/theme.css` next to their
+  configs, and drives Hyprland/hyprlock colours through `@key:hex@` tokens for
+  ARGB syntax.
+- `archway install` rejects any compositor other than `hyprland` instead of
+  silently planning an unsupported desktop.
+
 ### Fixed
 
 - Read-only commands (`doctor`, `theme validate`, `keys check`, `pkg check`)

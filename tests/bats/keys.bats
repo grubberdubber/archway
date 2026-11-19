@@ -55,11 +55,26 @@ EOF
   assert_contains "$output" "reserved"
 }
 
-@test "generated sxhkdrc is in sync with the source" {
+@test "generated Hyprland binds are in sync with the source" {
   run keys_check
   assert_eq 0 "$status"
 }
 
-@test "sxhkdrc uses tab-indented commands" {
-  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/sxhkd/sxhkdrc" $'\tkitty'
+@test "binds emit native Hyprland dispatchers, not shell wrappers" {
+  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" \
+    "bind = SUPER, Q, killactive"
+  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" \
+    "bind = SUPER, Return, exec, kitty"
+}
+
+@test "media keys repeat and use wayland clipboard" {
+  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" \
+    "binde = , XF86AudioRaiseVolume"
+  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" "wl-copy"
+}
+
+@test "chord split maps modifiers and keysym names" {
+  assert_eq "SUPER SHIFT|Q" "$(keys_split_chord 'super + shift + q')"
+  assert_eq "|Print" "$(keys_split_chord 'Print')"
+  assert_eq "CTRL ALT|Escape" "$(keys_split_chord 'ctrl + alt + Escape')"
 }

@@ -1,27 +1,34 @@
-# bspwm desktop stack (v0.1, X11) — official repositories.
-# The lock screen is i3lock-color (aur-core), which provides `i3lock`.
+# Hyprland (Wayland) desktop stack (v0.1) — official repositories only.
+# X11/bspwm is out of scope (AGENTS.md ADR-002); xorg-xwayland stays for legacy
+# clients but no X11 session, bar or compositor is installed.
 
-# X11 + window manager
-xorg-server
-xorg-xinit
-xorg-xrandr
-xorg-xsetroot
-xorg-xprop
-bspwm
-sxhkd
-picom
-polybar
+# Compositor and session
+hyprland
+uwsm
+xorg-xwayland
+xdg-desktop-portal
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+hyprpolkitagent
+polkit-gnome
+
+# Bar, launcher, notifications, lock, idle, wallpaper
+waybar
 rofi
-dunst
-feh
-xdotool
-wmctrl
-xclip
-maim
-slop
+swaync
+hyprlock
+hypridle
+hyprpaper
 brightnessctl
 playerctl
 pamixer
+libnotify
+wl-clipboard
+
+# Capture and sharing (Wayland-native; no maim/slop/xclip)
+grim
+slurp
+satty
 
 # Terminal
 kitty
@@ -37,7 +44,6 @@ network-manager-applet
 bluez
 bluez-utils
 blueman
-libnotify
 
 # MTP / removable media (simple-mtpfs is AUR; see aur-core.txt)
 udisks2
@@ -47,8 +53,5 @@ gvfs-mtp
 # XDG / session integration
 xdg-utils
 xdg-user-dirs
-xdg-desktop-portal
-xdg-desktop-portal-gtk
-polkit-gnome
 gnome-keyring
 libsecret

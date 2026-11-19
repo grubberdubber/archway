@@ -13,19 +13,21 @@ without a backup, a manifest entry and your explicit consent.
 ./bin/archway install --dry-run
 
 # then, when you agree with the plan
-./bin/archway install --profile developer --wm bspwm --terminal kitty
+./bin/archway install --profile developer --wm hyprland --terminal kitty
 ```
 
 ## What you get
 
-- **bspwm** + `sxhkd` + **polybar** + **rofi** + **dunst** + `picom` (X11, v0.1)
+- **Hyprland** (Wayland, started through `uwsm`) + **waybar** + **rofi** +
+  **swaync** + `hyprlock`/`hypridle` + XDG portals; `sway` is the planned fallback
 - **kitty** terminal, native modular **zsh** (no Oh-My-Zsh), `starship`, `tmux`
 - **Neovim** from the pinned [`grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config)
 - The **Android Mount** theme: hand-written Material-You-inspired dark palette,
   WCAG AA checked, propagated to every enabled application
 - **Android Mount applet**: mount/unmount MTP devices from Rofi, safely
-- Single-source keybinds that generate `sxhkdrc` and the cheatsheet
-- `archway doctor`, `archway update`, `archway rollback`
+- Single-source keybinds that generate the Hyprland binds and the cheatsheet
+- `archway doctor` (including Hyprland version compatibility), `archway update`,
+  `archway rollback`
 
 ## Why updating does not mean re-cloning
 
@@ -72,7 +74,8 @@ Every command supports `--help`; mutating commands support `--dry-run` and
 ## Safety model
 
 - Never root; refuses to run with `EUID=0`.
-- `~/.zshrc`, `~/.config/bspwm`, `~/.config/nvim` and friends are never
+- `~/.zshrc`, `~/.config/hypr`, `~/.config/waybar`, `~/.config/nvim` and
+  friends are never
   overwritten silently: backup → manifest → consent, or explicit `--adopt`.
 - Configs are additive. The zsh config lives in `~/.config/zsh` and is loaded
   with one line you add yourself.
@@ -107,8 +110,8 @@ GPL-3.0-or-later. See [`LICENSE`](LICENSE).
 
 ## Español
 
-Archway instala un escritorio bspwm keyboard-first en Arch Linux con un solo
-comando, lo actualiza sin reinstalar (`archway update`) y lo revierte
+Archway instala un escritorio Hyprland (Wayland) keyboard-first en Arch Linux
+con un solo comando, lo actualiza sin reinstalar (`archway update`) y lo revierte
 (`archway rollback`). Todo cambio en tu `$HOME` pasa por backup, manifiesto y
 consentimiento explícito. La primera prueba física se hace en una laptop
 ajena, nunca en producción.

@@ -12,56 +12,56 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + shift + Return` | Floating scratchpad terminal | `kitty --class floating-term` |
 | `super + d` | Application launcher | `rofi -show drun` |
 | `super + e` | File manager (yazi) | `kitty --class floating-term -e yazi` |
-| `super + b` | Web browser | `exec ${BROWSER:-firefox}` |
+| `super + b` | Web browser | `${BROWSER:-firefox}` |
 | `super + shift + p` | Run a command (archway, system tools) | `rofi -show run -display-name 'Archway'` |
 
 ## Windows
 
 | Key | Action | Command |
 |---|---|---|
-| `super + q` | Close focused window | `bspc node -c` |
-| `super + f` | Toggle fullscreen | `bspc node -t ~fullscreen` |
-| `super + shift + f` | Toggle floating | `bspc node -t ~floating` |
+| `super + q` | Close focused window | `hyprctl dispatch killactive` |
+| `super + f` | Toggle fullscreen | `hyprctl dispatch fullscreen 0` |
+| `super + shift + f` | Toggle floating | `hyprctl dispatch togglefloating` |
 
 ## Navigation
 
 | Key | Action | Command |
 |---|---|---|
-| `super + h` | Focus west | `bspc node -f west` |
-| `super + j` | Focus south | `bspc node -f south` |
-| `super + k` | Focus north | `bspc node -f north` |
-| `super + l` | Focus east | `bspc node -f east` |
-| `super + shift + h` | Swap window west | `bspc node -s west` |
-| `super + shift + j` | Swap window south | `bspc node -s south` |
-| `super + shift + k` | Swap window north | `bspc node -s north` |
-| `super + shift + l` | Swap window east | `bspc node -s east` |
-| `super + alt + h` | Shrink horizontally | `bspc node -z right -20 0 \|\| bspc node -z left -20 0` |
-| `super + alt + j` | Shrink vertically | `bspc node -z bottom 0 20 \|\| bspc node -z top 0 20` |
-| `super + alt + k` | Grow vertically | `bspc node -z top 0 -20 \|\| bspc node -z bottom 0 -20` |
-| `super + alt + l` | Grow horizontally | `bspc node -z left 20 0 \|\| bspc node -z right 20 0` |
+| `super + h` | Focus west | `hyprctl dispatch movefocus l` |
+| `super + j` | Focus south | `hyprctl dispatch movefocus d` |
+| `super + k` | Focus north | `hyprctl dispatch movefocus u` |
+| `super + l` | Focus east | `hyprctl dispatch movefocus r` |
+| `super + shift + h` | Move window west | `hyprctl dispatch movewindow l` |
+| `super + shift + j` | Move window south | `hyprctl dispatch movewindow d` |
+| `super + shift + k` | Move window north | `hyprctl dispatch movewindow u` |
+| `super + shift + l` | Move window east | `hyprctl dispatch movewindow r` |
+| `super + alt + h` | Grow horizontally | `hyprctl dispatch resizeactive 20 0` |
+| `super + alt + j` | Grow vertically | `hyprctl dispatch resizeactive 0 20` |
+| `super + alt + k` | Shrink vertically | `hyprctl dispatch resizeactive 0 -20` |
+| `super + alt + l` | Shrink horizontally | `hyprctl dispatch resizeactive -20 0` |
 
 ## Workspaces
 
 | Key | Action | Command |
 |---|---|---|
-| `super + 1` | Workspace 1 | `bspc desktop -f 1` |
-| `super + 2` | Workspace 2 | `bspc desktop -f 2` |
-| `super + 3` | Workspace 3 | `bspc desktop -f 3` |
-| `super + 4` | Workspace 4 | `bspc desktop -f 4` |
-| `super + 5` | Workspace 5 | `bspc desktop -f 5` |
-| `super + 6` | Workspace 6 | `bspc desktop -f 6` |
-| `super + 7` | Workspace 7 | `bspc desktop -f 7` |
-| `super + 8` | Workspace 8 | `bspc desktop -f 8` |
-| `super + 9` | Workspace 9 | `bspc desktop -f 9` |
-| `super + shift + 1` | Move window to workspace 1 (follow) | `bspc node -d 1 --follow` |
-| `super + shift + 2` | Move window to workspace 2 (follow) | `bspc node -d 2 --follow` |
-| `super + shift + 3` | Move window to workspace 3 (follow) | `bspc node -d 3 --follow` |
-| `super + shift + 4` | Move window to workspace 4 (follow) | `bspc node -d 4 --follow` |
-| `super + shift + 5` | Move window to workspace 5 (follow) | `bspc node -d 5 --follow` |
-| `super + shift + 6` | Move window to workspace 6 (follow) | `bspc node -d 6 --follow` |
-| `super + shift + 7` | Move window to workspace 7 (follow) | `bspc node -d 7 --follow` |
-| `super + shift + 8` | Move window to workspace 8 (follow) | `bspc node -d 8 --follow` |
-| `super + shift + 9` | Move window to workspace 9 (follow) | `bspc node -d 9 --follow` |
+| `super + 1` | Workspace 1 | `hyprctl dispatch workspace 1` |
+| `super + 2` | Workspace 2 | `hyprctl dispatch workspace 2` |
+| `super + 3` | Workspace 3 | `hyprctl dispatch workspace 3` |
+| `super + 4` | Workspace 4 | `hyprctl dispatch workspace 4` |
+| `super + 5` | Workspace 5 | `hyprctl dispatch workspace 5` |
+| `super + 6` | Workspace 6 | `hyprctl dispatch workspace 6` |
+| `super + 7` | Workspace 7 | `hyprctl dispatch workspace 7` |
+| `super + 8` | Workspace 8 | `hyprctl dispatch workspace 8` |
+| `super + 9` | Workspace 9 | `hyprctl dispatch workspace 9` |
+| `super + shift + 1` | Move window to workspace 1 | `hyprctl dispatch movetoworkspace 1` |
+| `super + shift + 2` | Move window to workspace 2 | `hyprctl dispatch movetoworkspace 2` |
+| `super + shift + 3` | Move window to workspace 3 | `hyprctl dispatch movetoworkspace 3` |
+| `super + shift + 4` | Move window to workspace 4 | `hyprctl dispatch movetoworkspace 4` |
+| `super + shift + 5` | Move window to workspace 5 | `hyprctl dispatch movetoworkspace 5` |
+| `super + shift + 6` | Move window to workspace 6 | `hyprctl dispatch movetoworkspace 6` |
+| `super + shift + 7` | Move window to workspace 7 | `hyprctl dispatch movetoworkspace 7` |
+| `super + shift + 8` | Move window to workspace 8 | `hyprctl dispatch movetoworkspace 8` |
+| `super + shift + 9` | Move window to workspace 9 | `hyprctl dispatch movetoworkspace 9` |
 
 ## Archway
 
@@ -69,7 +69,7 @@ Press `Super + /` at any time to open this list in a floating terminal.
 |---|---|---|
 | `super + space` | Theme selector | `rofi -show theme -modi 'theme:archway applet theme-selector'` |
 | `super + shift + m` | Mount / unmount Android device (MTP) | `archway applet android-mount --rofi` |
-| `super + v` | Clipboard history | `cliphist list \| rofi -dmenu -display-columns 2 -p clipboard \| cliphist decode \| xclip -selection clipboard` |
+| `super + v` | Clipboard history | `cliphist list \| rofi -dmenu -display-columns 2 -p clipboard \| cliphist decode \| wl-copy` |
 | `super + shift + s` | Screenshot: region | `archway applet screenshot region` |
 | `Print` | Screenshot: whole screen | `archway applet screenshot full` |
 | `super + p` | Password manager (rbw) | `rofi-rbw --type password --action copy` |
@@ -79,18 +79,18 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | Key | Action | Command |
 |---|---|---|
 | `super + shift + q` | Power menu | `archway applet power --rofi` |
-| `super + Escape` | Lock screen | `i3lock -c 0B0F14 -n` |
-| `super + alt + r` | Reload window manager | `bspc wm -r` |
-| `super + shift + e` | Log out of bspwm | `bspc quit` |
+| `super + Escape` | Lock screen | `hyprlock` |
+| `super + alt + r` | Reload Hyprland config | `hyprctl dispatch reload` |
+| `super + shift + e` | Log out of the session | `command -v uwsm >/dev/null 2>&1 && uwsm stop \|\| hyprctl dispatch exit` |
 | `super + slash` | Keybind cheatsheet | `kitty --class floating-term -e archway keys list` |
 
 ## Media
 
 | Key | Action | Command |
 |---|---|---|
-| `XF86AudioRaiseVolume` | Volume up | `pamixer -i 5 && dunstify -t 800 -h int:value:$(pamixer --get-volume) volume $(pamixer --get-volume)%` |
-| `XF86AudioLowerVolume` | Volume down | `pamixer -d 5 && dunstify -t 800 -h int:value:$(pamixer --get-volume) volume $(pamixer --get-volume)%` |
-| `XF86AudioMute` | Toggle mute | `pamixer -t && dunstify -t 800 'mute' $(pamixer --get-mute)` |
+| `XF86AudioRaiseVolume` | Volume up | `pamixer -i 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%` |
+| `XF86AudioLowerVolume` | Volume down | `pamixer -d 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%` |
+| `XF86AudioMute` | Toggle mute | `pamixer -t && notify-send -t 800 -h string:x-canonical-private-synchronous:volume 'mute' $(pamixer --get-mute)` |
 | `XF86AudioPlay` | Play / pause | `playerctl play-pause` |
 | `XF86AudioNext` | Next track | `playerctl next` |
 | `XF86AudioPrev` | Previous track | `playerctl previous` |

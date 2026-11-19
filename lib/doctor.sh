@@ -100,9 +100,30 @@ doctor_run() {
     doctor_add "keybinds" fail "invalid (archway keys validate)"
   fi
   if keys_check > /dev/null 2>&1; then
-    doctor_add "keybinds.generated" ok "sxhkdrc and docs are in sync"
+    doctor_add "keybinds.generated" ok "Hyprland binds and docs are in sync"
   else
     doctor_add "keybinds.generated" warn "generated files are stale (archway keys generate)"
+  fi
+
+  # 5b. Compositor and session components (ADR-013, ADR-014)
+  if [[ -f $COMPAT_FILE ]]; then
+    local hypr_status hypr_detail
+    IFS=$'\t' read -r hypr_status hypr_detail < <(compat_check hyprland)
+    doctor_add "hyprland" "$hypr_status" "$hypr_detail"
+  else
+    doctor_add "hyprland" warn "desktops/hyprland/compat.toml is missing"
+  fi
+  local missing_session=() c
+  for c in waybar swaync hyprlock hypridle; do have "$c" || missing_session+=("$c"); done
+  if ((${#missing_session[@]})); then
+    doctor_add "session" warn "missing: ${missing_session[*]}"
+  else
+    doctor_add "session" ok "waybar, swaync, hyprlock, hypridle present"
+  fi
+  if have uwsm; then
+    doctor_add "uwsm" ok "session can be started through uwsm"
+  else
+    doctor_add "uwsm" warn "uwsm missing; start Hyprland through uwsm for systemd integration"
   fi
 
   # 6. Package manifests

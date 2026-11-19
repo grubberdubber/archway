@@ -63,7 +63,7 @@ tealdeer
 ouch
 trash-cli
 
-# Clipboard history (X11: greenclip in aur-core; this is the Wayland-ready CLI)
+# Clipboard history (Wayland; wl-clipboard is in official-desktop)
 cliphist
 
 # Secrets (ADR-008)

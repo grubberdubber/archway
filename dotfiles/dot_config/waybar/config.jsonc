@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Archway waybar — Hyprland modules only. Colours live in theme.css, which
+// `archway theme set` publishes from the palette.
+{
+  "layer": "top",
+  "position": "top",
+  "height": 40,
+  "spacing": 4,
+  "margin-top": 0,
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-center": ["clock"],
+  "modules-right": ["pulseaudio", "backlight", "battery", "network", "bluetooth", "tray"],
+
+  "hyprland/workspaces": {
+    "format": "{id}",
+    "on-click": "activate",
+    "all-outputs": true
+  },
+  "hyprland/window": {
+    "max-length": 60,
+    "separate-outputs": true
+  },
+  "clock": {
+    "format": "{:%H:%M}",
+    "format-alt": "{:%a %d %b  %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "muted",
+    "format-icons": ["low", "medium", "high"],
+    "on-click": "pavucontrol",
+    "scroll-step": 5
+  },
+  "backlight": {
+    "format": "{percent}%",
+    "scroll-step": 5
+  },
+  "battery": {
+    "states": {
+      "warning": 20,
+      "critical": 10
+    },
+    "format": "{capacity}% {icon}",
+    "format-charging": "{capacity}% +",
+    "format-icons": ["low", "medium", "high"]
+  },
+  "network": {
+    "format-wifi": "wifi {essid}",
+    "format-ethernet": "eth",
+    "format-disconnected": "offline",
+    "tooltip-format": "{ifname} via {gwaddr}",
+    "on-click": "nm-connection-editor"
+  },
+  "bluetooth": {
+    "format": "bt",
+    "format-disabled": "",
+    "format-connected": "bt {num_connections}",
+    "tooltip-format": "{controller_alias}\t{controller_address}",
+    "on-click": "blueman-manager"
+  },
+  "tray": {
+    "icon-size": 16,
+    "spacing": 8
+  }
+}

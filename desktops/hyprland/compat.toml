@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Hyprland compatibility policy (AGENTS.md ADR-014).
+#
+# `archway doctor` compares the running compositor against these bounds and
+# warns when the installed version is older than `minimum` or newer than
+# `tested`. Stable releases only use official repository packages; -git
+# variants are tolerated on the edge channel alone.
+
+schema = 1
+
+[hyprland]
+minimum = "0.50.0"
+tested = "0.57.2"
+
+[hyprlock]
+minimum = "0.9.0"
+tested = "0.9.7"
+
+[hypridle]
+minimum = "0.1.6"
+tested = "0.1.8"
+
+[hyprpaper]
+minimum = "0.7.0"
+tested = "0.8.5"
+
+[xdg-desktop-portal-hyprland]
+minimum = "1.3.0"
+tested = "1.5.0"

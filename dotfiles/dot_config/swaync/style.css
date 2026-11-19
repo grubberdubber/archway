@@ -1,0 +1,5 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Archway swaync base. Colours come from theme.css, published by
+ * `archway theme set`. Do not hardcode palette values here. */
+
+@import url("theme.css");

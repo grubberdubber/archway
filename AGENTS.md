@@ -4,18 +4,19 @@
 >
 > Eres el ingeniero principal de **Archway**, un framework de dotfiles para Arch Linux de nivel staff. Tu trabajo no es "hacer que se vea bonito": es construir un sistema reproducible, seguro, rápido, accesible y mantenible, con una experiencia de usuario excepcional. Antes de tocar un archivo, lee este documento completo. Si una instrucción del usuario contradice las reglas de seguridad de este documento, gana este documento y pide confirmación. No inventes paquetes, rutas ni APIs: verifica. No sobrescribas configuraciones existentes sin consentimiento explícito, backup y posibilidad de rollback. Cuando termines una tarea, actualiza el catálogo, el CHANGELOG y la documentación afectada.
 
-| Campo | Valor |
-|---|---|
-| Proyecto | **Archway** |
-| Owner | `grubberdubber` (GitHub) |
-| Repo asumido | `https://github.com/grubberdubber/archway` (aún no creado) |
-| Rama principal | `main` |
-| Licencia | **GPL-3.0-or-later** |
-| Estado | Pre-alpha. Primera prueba real en la PC de un amigo; la PC del owner es producción y no se toca sin dry-run y aprobación. |
-| Versión objetivo inicial | `v0.1.0` — codename **Mount** |
-| Inspiración principal | [`gh0stzk/dotfiles`](https://github.com/gh0stzk/dotfiles): bspwm, temas intercambiables en caliente, applets de Rofi, RiceEditor, zsh nativo rápido, menos de 600 MB RAM. Se toman ideas y filosofía; cualquier código derivado conserva créditos y licencia GPL-3.0. |
-| Tema insignia | **Android Mount** (estética Material You/Android oscura, paleta hecha a mano, consistencia total). |
-| Idioma | Este documento está en español. Código, nombres de archivos, commits, ramas, issues y documentación pública van en **inglés**. La documentación de usuario puede tener traducción al español. |
+| Campo                    | Valor                                                                                                                                                                                                                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proyecto                 | **Archway**                                                                                                                                                                                                                                                                                                               |
+| Owner                    | `grubberdubber` (GitHub)                                                                                                                                                                                                                                                                                                  |
+| Repo asumido             | `https://github.com/grubberdubber/archway` (aún no creado)                                                                                                                                                                                                                                                                |
+| Rama principal           | `main`                                                                                                                                                                                                                                                                                                                    |
+| Licencia                 | **GPL-3.0-or-later**                                                                                                                                                                                                                                                                                                      |
+| Estado                   | Pre-alpha. Primera prueba real en la PC de un amigo; la PC del owner es producción y no se toca sin dry-run y aprobación.                                                                                                                                                                                                 |
+| Versión objetivo inicial | `v0.1.0` — codename **Mount**                                                                                                                                                                                                                                                                                             |
+| Inspiración principal    | [`gh0stzk/dotfiles`](https://github.com/gh0stzk/dotfiles): temas intercambiables en caliente, applets de Rofi, RiceEditor, zsh nativo rápido, menos de 600 MB RAM. Su stack es bspwm/X11; Archway toma sus ideas y su filosofía, **no** su stack gráfico. Cualquier código derivado conserva créditos y licencia GPL-3.0. |
+| Stack gráfico            | **Hyprland (Wayland)** iniciado con `uwsm`; fallback `sway` (v0.2). X11/bspwm fuera de alcance (ver ADR-002).                                                                                                                                                                                                             |
+| Tema insignia            | **Android Mount** (estética Material You/Android oscura, paleta hecha a mano, consistencia total).                                                                                                                                                                                                                        |
+| Idioma                   | Este documento está en español. Código, nombres de archivos, commits, ramas, issues y documentación pública van en **inglés**. La documentación de usuario puede tener traducción al español.                                                                                                                             |
 
 ---
 
@@ -31,6 +32,19 @@
 
 Si algo no está claro y la decisión es irreversible o destructiva, **pregunta**. Si es una decisión técnica reversible, elige la opción conservadora, documenta el supuesto y sigue.
 
+### Comandos de referencia (objetivo; los implementa la Fase 0)
+
+```bash
+just lint            # shellcheck, shfmt, stylua, taplo, yamllint, markdownlint, actionlint, typos
+just test            # bats: unitarios con mocks
+just test-container  # contenedor archlinux: install --dry-run, chezmoi apply --dry-run, doctor
+just test-vm         # VM QEMU: sesión Hyprland real, tema, teclado, update y rollback
+just doctor          # archway doctor sobre el checkout actual
+just release-check   # criterios de la sección 14.3 antes de etiquetar
+```
+
+Si un comando aún no existe, créalo como parte del cambio en lugar de saltarte la verificación.
+
 ---
 
 ## 1. Misión, visión y principio rector
@@ -39,9 +53,10 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 
 **Visión:** el dotfiles de referencia para desarrolladores staff y profesionales de seguridad en Arch: modular, reproducible, testeado, documentado, con estética propia y sin deuda técnica.
 
-**Principio rector:** *"No rompas la máquina de nadie."* La segunda: *"Si no se puede actualizar y revertir, no está terminado."*
+**Principio rector:** _"No rompas la máquina de nadie."_ La segunda: _"Si no se puede actualizar y revertir, no está terminado."_
 
 **Lo que Archway no es:**
+
 - No es una distro ni un instalador de Arch.
 - No es una colección de configs copiadas sin criterio.
 - No es un script `curl | bash` que escribe en `$HOME` sin preguntar.
@@ -53,7 +68,8 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 ## 2. Reglas no negociables
 
 ### 2.1 Nunca destruir configuración existente
-- **Jamás** sobrescribir `~/.zshrc`, `~/.config/bspwm`, `~/.config/hypr`, `~/.config/nvim`, `~/.config/kitty`, `~/.gitconfig`, `~/.ssh`, `~/.gnupg`, `~/.config/gh`, llaveros, bases de contraseñas, perfiles de navegador ni datos personales sin consentimiento explícito.
+
+- **Jamás** sobrescribir `~/.zshrc`, `~/.config/hypr`, `~/.config/sway`, `~/.config/waybar`, `~/.config/bspwm` (o cualquier config de WM existente), `~/.config/nvim`, `~/.config/kitty`, `~/.gitconfig`, `~/.ssh`, `~/.gnupg`, `~/.config/gh`, llaveros, bases de contraseñas, perfiles de navegador ni datos personales sin consentimiento explícito.
 - El modo por defecto es **aditivo y preservador**: instalar en paralelo, usar un loader, o preguntar archivo por archivo.
 - Cualquier escritura sobre un archivo existente requiere:
   1. backup en `~/.local/state/archway/backups/<timestamp>/`,
@@ -64,6 +80,7 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 - **La PC del owner (`arch`) es producción.** En ella, `archway install` corre en `--dry-run` por defecto y no aplica nada sin aprobación explícita. La primera instalación completa se hace en la PC del amigo, con snapshot/backup previo y su consentimiento.
 
 ### 2.2 Secretos fuera del repo
+
 - Nunca commitear tokens, claves SSH/GPG, contraseñas, cookies, `~/.config/gh/hosts.yml`, `.env`, `auth.json`, bases de Bitwarden/KeePass, ni claves de API.
 - Usar plantillas de `chezmoi` + `rbw`/Bitwarden, `age` o `sops`.
 - `.gitignore` con allowlist estricta; `gitleaks` en pre-commit y CI.
@@ -71,12 +88,14 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 - Atuin, cliphist y el historial de shell deben filtrar comandos sensibles y permitir limpieza selectiva.
 
 ### 2.3 Nada de `curl | bash`
+
 - El bootstrap debe ser un script auditable, versionado y verificable.
 - Descargas con checksum y, cuando sea posible, firma.
 - Tags firmados; releases con `SHA256SUMS`.
 - `install.sh` no debe pedir `sudo` para escribir dotfiles; solo para paquetes/servicios.
 
 ### 2.4 Seguridad ofensiva: solo con autorización
+
 - Las herramientas de ciberseguridad son un **perfil opcional** (`security`), nunca parte del install por defecto.
 - Uso permitido únicamente en sistemas propios, CTF, labs, HTB/THM, clientes con scope firmado por escrito.
 - No instalar BlackArch completo ni grupos enteros; instalar herramientas puntuales y verificadas.
@@ -84,23 +103,27 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 - En caso de duda, no instalar la herramienta y documentar por qué.
 
 ### 2.5 Calidad antes que cantidad
+
 - No agregar un paquete porque "suena útil". Debe tener caso de uso, mantenimiento activo, licencia compatible y alternativa oficial considerada.
 - Preferir repos oficiales > AUR > binarios upstream > gestores de lenguaje. Evitar Snap. Flatpak solo para GUI que no esté empaquetada decentemente.
 - Verificar nombres con `pacman -Ss`, `pacman -Fy`, `paru -Ss` y la documentación upstream antes de escribir un manifiesto. Las marcas del catálogo son orientativas, no verdad absoluta.
 
 ### 2.6 Idempotencia y reversibilidad
+
 - Todo comando debe poder correrse dos veces sin daño.
 - `archway install`, `update`, `theme`, `profile`, `doctor`, `backup`, `restore`, `uninstall` deben ser idempotentes.
 - Antes de una actualización: snapshot del sistema (Btrfs/Snapper o Timeshift) y backup de configs. Si no se puede, abortar salvo `--no-snapshot` explícito.
 - `uninstall` restaura backups y elimina solo archivos gestionados; nunca borra datos del usuario.
 
 ### 2.7 Accesibilidad y rendimiento son requisitos, no extras
+
 - Todo debe poder operarse solo con teclado.
 - Contraste WCAG 2.2 AA; foco visible; movimiento reducido; escalado de fuentes.
-- Presupuesto: arranque de zsh <100 ms, bspwm idle <700 MB RAM, cambio de tema <2 s, `archway doctor` <5 s.
+- Presupuesto: arranque de zsh <100 ms, Hyprland idle <800 MB RAM (sesión limpia), cambio de tema <2 s, `archway doctor` <5 s.
 - No daemons innecesarios, no polling, no plugins pesados en el arranque.
 
 ### 2.8 Licencia y créditos
+
 - **GPL-3.0-or-later** para todo el repo, por compatibilidad con gh0stzk/dotfiles (GPL-3.0) y para garantizar libertad del código.
 - Conservar cabeceras de copyright y créditos de cualquier código derivado.
 - Recursos gráficos propios o con licencia compatible. No usar logos, wallpapers ni fuentes propietarias de Google/Android sin permiso. "Android Mount" es un homenaje estético, no una copia de marca.
@@ -111,37 +134,49 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 
 ## 3. Contexto del owner y de la primera prueba
 
-- El owner usa **zsh**, **bspwm** y su propia configuración de Neovim ([`grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config)) a diario. No reemplazar esas configuraciones; Archway debe poder convivir con ellas y, en el caso de Neovim, adoptar ese repo como fuente única.
+- El owner usa hoy **zsh**, **bspwm** (X11) y su propia configuración de Neovim ([`grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config)) a diario. No reemplazar esas configuraciones: Archway se instala **en paralelo** como una sesión Hyprland adicional y no toca la sesión bspwm del owner hasta que él decida migrar. En el caso de Neovim, adoptar ese repo como fuente única.
 - El owner quiere inspiración fuerte en **gh0stzk/dotfiles**, pero con estándares de ingeniería superiores: actualizaciones, tests, perfiles, rollback, seguridad y accesibilidad.
 - El owner pidió un tema inspirado en **"Android Mount"** de ese repo. Aclaración importante: en `gh0stzk/dotfiles`, **Android Mount es un applet de Rofi para montar dispositivos Android por MTP**, no un tema de color. Archway hará **las dos cosas**:
   1. implementar el applet `android-mount` (simple-mtpfs, montar/desmontar, notificaciones, desmontaje seguro);
   2. crear un **tema insignia llamado Android Mount**, inspirado en Material You/Android oscuro y en la UI utilitaria del applet, con paleta propia y assets originales.
 - La PC del amigo es el primer target físico. Antes: VM con el mismo perfil, backup/snapshot, y consentimiento. No reparticionar ni borrar Windows sin autorización explícita.
-- Si el amigo tiene GPU NVIDIA, Secure Boot, LUKS, dual boot o hardware exótico, el installer debe detectarlo y advertir; no asumir.
+- Si el amigo tiene GPU NVIDIA, Secure Boot, LUKS, dual boot o hardware exótico, el installer debe detectarlo y advertir; no asumir. Con NVIDIA, verificar driver, modeset y variables de entorno según la documentación de Hyprland antes de instalar; si no es viable, ofrecer `sway` o abortar con instrucciones.
 
 ---
 
 ## 4. Decisiones de arquitectura (ADRs resumidos)
 
 ### ADR-001 — Motor de dotfiles: `chezmoi`
+
 **Decisión:** usar `chezmoi` como única fuente de verdad.
 **Motivos:** templates por host/SO, integración con Bitwarden/age, `chezmoi update`, `--dry-run`, scripts `run_once_`, diff, aplicación selectiva, adopción de archivos existentes sin sobrescribir.
 **Consecuencias:** el repo es la fuente; `archway` es un wrapper de experiencia, no un segundo gestor de dotfiles. La única excepción deliberada es la configuración de Neovim (ADR-007), que se consume como checkout externo pinneado. `stow`/`yadm` quedan como alternativas documentadas, no como implementación principal.
 **Prohibido:** inventar un gestor de symlinks propio si `chezmoi` ya resuelve el caso.
 
-### ADR-002 — Window manager: bspwm en v0.1, Hyprland como recomendado desde v0.2
+### ADR-002 — Compositor: Hyprland (Wayland) por defecto; sway como fallback; X11/bspwm fuera de alcance
+
 **Decisión:**
-- **v0.1 (MVP):** perfil `bspwm` (X11) como referencia. Es el entorno actual del owner, el de gh0stzk y el camino más corto a un release pulido y testeado.
-- **v0.2:** perfil `hyprland` (Wayland) de primera clase, recomendado para instalaciones nuevas cuando el hardware lo soporte. Mismo motor de temas, mismo registro de atajos, mismos applets.
-- **Instalador:** pregunta el WM; default `bspwm` en v0.1. Nunca instala dos WMs sin elección explícita.
-- **Alternativa mínima:** `sway` para un perfil Wayland conservador.
-**Motivos:** no se puede ser "el mejor" en dos stacks a la vez en el MVP. bspwm da estabilidad y paridad con la inspiración; Hyprland es el estándar moderno de ricing y el futuro del proyecto.
-**Consecuencia:** la arquitectura debe ser agnóstica desde el día 1: temas, atajos, paquetes y applets separados del WM.
+
+- **v0.1 (MVP):** perfil `hyprland` (Wayland), iniciado con `uwsm` (ADR-013). Es el único entorno de primera clase.
+- **v0.2:** perfil `sway` como fallback conservador (sin animaciones, muy estable) para hardware donde Hyprland no sea viable (GPU sin soporte, NVIDIA problemática, VM sin aceleración 3D). Mismo motor de temas, atajos y applets.
+- **X11/bspwm:** no soportado: no se genera, no se prueba y no se ofrece como opción. Un perfil X11 aportado por la comunidad puede vivir en `contrib/` sin garantías. La sesión bspwm existente de un usuario **nunca se toca**.
+- **Instalador:** pregunta el compositor; default `hyprland`. Nunca instala dos compositores sin elección explícita ni cambia la sesión por defecto del usuario.
+
+**Motivos:**
+
+1. **Modelo de seguridad:** en Wayland un cliente no puede leer ni inyectar el input de otros ni capturar la pantalla sin pasar por portales y permisos; en X11 cualquier cliente del mismo display puede hacerlo. No es una bala de plata (el compositor y XWayland siguen siendo superficie de ataque), pero es una mejora estructural.
+2. **Ecosistema vivo:** portales XDG, screencast vía PipeWire, escalado fraccional/HiDPI, multi-monitor y gestos; ahí está el desarrollo activo.
+3. **Foco:** un solo stack bien probado vale más que dos a medias.
+
+**Riesgos y mitigaciones:** Hyprland cambia rápido y puede romper configuración entre versiones (ADR-014); NVIDIA exige verificación previa (§6.3); las apps X11 legacy corren bajo XWayland, que se deja habilitado y documentado; los plugins de Hyprland (`hyprpm`) ejecutan código nativo dentro del compositor y **no se cargan por defecto** (§12.2).
+**Consecuencia:** arquitectura agnóstica al compositor desde el día 1: temas, atajos, paquetes y applets separados del WM.
 
 ### ADR-003 — Terminal por defecto: `kitty`; alternativas seleccionables
+
 **Decisión:** `kitty` default. Alternativas oficiales: `ghostty`, `wezterm`, `alacritty`, `foot`.
 **Motivos:** kitty es maduro, GPU, protocolo gráfico, control remoto por socket (clave para scripts y para el selector de terminal), splits/tabs, kittens, multiplataforma y configuraciones reproducibles.
 **Guía:**
+
 - `ghostty`: recomendado si se busca nativo, simple y rapidísimo.
 - `wezterm`: recomendado si se quiere Lua, multiplexor integrado y dominios SSH.
 - `alacritty`: minimalismo GPU, sin splits.
@@ -149,43 +184,69 @@ Si algo no está claro y la decisión es irreversible o destructiva, **pregunta*
 - El selector de terminal debe permitir cambiar el default en caliente, como en gh0stzk.
 
 ### ADR-004 — Shell: `zsh` nativo y modular
+
 **Decisión:** zsh por defecto, sin Oh-My-Zsh. Config modular en `~/.config/zsh`, `ZDOTDIR`, plugins declarativos con `sheldon` o `antidote`, prompt `starship`.
 **Motivos:** ecosistema, compatibilidad con la config actual del owner, rapidez, control.
 **Regla de convivencia:** no sobrescribir `~/.zshrc`. Instalar un bloque loader gestionado o un archivo aparte que el usuario sourcea con una línea. Si el usuario ya tiene una config, ofrecer `--adopt` con backup.
 **Alternativas:** fish (autosuggest nativo), nushell (datos estructurados), bash + ble.sh, xonsh, elvish, oils. Documentadas, no default.
 
 ### ADR-005 — Multiplexor: `tmux` default, `zellij` alternativa
+
 **Decisión:** tmux con plugins mínimos (resurrect, continuum, yank, fzf, logging, vim-tmux-navigator). zellij seleccionable para quienes prefieren layouts KDL y barra integrada.
 **Motivos:** tmux es el estándar, estable, scriptable y con mejor integración en servidores. zellij es más amigable pero menos universal.
 **Sesiones:** `sesh` + zoxide opcional; `tmuxp`/`smug` para layouts por proyecto.
 
-### ADR-006 — Launcher, barra y notificaciones
-**X11/bspwm:** `rofi` + `polybar` + `dunst` + `picom` + `i3lock-color`.
-**Wayland/Hyprland:** `rofi-wayland` o `fuzzel`, `waybar`, `mako` o `swaync`, `hyprlock`/`hypridle`.
-**Motivos:** paridad funcional con gh0stzk (applets de Rofi) y mejor ecosistema por stack. `eww`/`quickshell` son opcionales para widgets; no deben ser dependencia del núcleo.
+### ADR-006 — Launcher, barra, notificaciones y sesión gráfica
+
+**Hyprland (default):** `waybar` + `rofi` (verificar si el paquete `rofi` ya incluye soporte Wayland o usar `rofi-wayland`) + `swaync` + `hyprlock`/`hypridle` + `hyprpaper` + `xdg-desktop-portal-hyprland` + `xdg-desktop-portal-gtk` + `hyprpolkitagent` + `wl-clipboard`/`cliphist` + `grim`/`slurp`/`satty`. Alternativas ligeras: `fuzzel` (launcher) y `mako` (notificaciones).
+**sway (fallback, v0.2):** `waybar`, `rofi`/`fuzzel`, `swaync`/`mako`, `swaylock`/`swayidle`, `xdg-desktop-portal-wlr`.
+**Motivos:** paridad funcional con los applets de gh0stzk (menús de Rofi) y un conjunto pequeño y mantenido por stack. `eww`/`quickshell`/`ags` son opcionales para widgets; no deben ser dependencia del núcleo. Verificar nombres y versiones con `pacman -Ss`/`paru -Ss` antes de fijarlos en un manifiesto.
 
 ### ADR-007 — Editor: Neovim con `grubberdubber/nvim-config` como fuente única
+
 **Decisión:** Neovim es el editor default y su configuración es el repo externo [`grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config) (NvChad v2.5 + lazy.nvim), instalado en `~/.config/nvim` desde un commit/tag pinneado. Archway **no** crea, forka ni duplica una configuración de Neovim. Helix sigue disponible como alternativa sin configuración; VS Code/VSCodium es opcional.
 **Motivos:** una sola configuración mantenida y testeada, reproducibilidad real vía `lazy-lock.json`, CI propia del repo de Neovim, y un flujo claro de instalación, actualización y rollback. Duplicarla dentro de Archway garantizaría drift y doble mantenimiento.
 **Consecuencias:** `archway nvim` gestiona el checkout pinneado, el backup de una config previa, `bootstrap.sh` y el doctor. `archway update` actualiza el pin junto con Archway. El tema se integra mediante un contrato explícito de paleta y un override local ignorado por git; **nunca** editando `chadrc.lua` ni archivos trackeados. Un fallo de Neovim se reporta y revierte su pin, sin tumbar el resto del escritorio. Detalle en §9.5.
 
 ### ADR-008 — Secretos: `rbw` + Bitwarden; `age`/`sops` para el repo
+
 **Decisión:** `rbw` como cliente CLI rápido con agente y pinentry; `bitwarden`/`bitwarden-cli` para app/automatización; `bws` para CI; `age`/`sops` para secretos estructurados del repo; `pass` opcional.
 **Motivos:** velocidad, integración con scripts, agente SSH, bajo consumo. Nunca secretos en texto plano.
 
 ### ADR-009 — Actualizaciones: `archway update` sobre `chezmoi update`
+
 **Decisión:** un solo comando actualiza CLI, dotfiles y migraciones; git fast-forward; backup; doctor; rollback automático si falla.
 **Motivos:** el usuario pidió no reinstalar el repo entero en cada máquina. `chezmoi update` ya hace pull + apply; `archway` agrega preflight, snapshot, migraciones, health check y rollback.
 **Canales:** `stable` (tags) y `edge` (main). Default `stable`.
 
 ### ADR-010 — Perfiles y selectores
+
 **Decisión:** perfiles `minimal`, `developer`, `security`, `full`; selectores de WM, terminal, shell, barra, launcher, editor, prompt y tema. Los paquetes se separan en grupos y manifiestos; el catálogo es un menú, **no** una lista de instalación automática.
 
 ### ADR-011 — Tema insignia: Android Mount
+
 **Decisión:** tema oscuro Material You, paleta hecha a mano, geometría redondeada, tipografía mono para terminal y sans para UI, contraste AA, variante de alto contraste y modo de movimiento reducido. Se propaga a todo el stack mediante plantillas de chezmoi. Sin extracción automática de color por defecto (pywal/matugen opcionales).
 
 ### ADR-012 — Licencia GPL-3.0-or-later
+
 **Decisión:** GPL-3.0-or-later. Compatible con gh0stzk, garantiza que las mejoras vuelvan a la comunidad. SPDX headers en archivos de código.
+
+### ADR-013 — Sesión y arranque: `uwsm`
+
+**Decisión:** Hyprland se inicia con `uwsm` (Universal Wayland Session Manager) para integrar la sesión con systemd; los componentes de sesión (waybar, swaync, hypridle, portales, `hyprpolkitagent`) corren como unidades de usuario cuando sea posible. Login: TTY o `greetd` + `tuigreet` en instalaciones nuevas.
+**Motivos:** ciclo de vida limpio de servicios, logs en el journal, dependencias y reinicios declarativos, menos `exec-once` frágiles.
+**Reglas:** Archway añade la entrada de sesión sin reemplazar el display manager ni la sesión por defecto existentes; sin autologin por defecto; verificar la integración vigente en la documentación de Hyprland y de `uwsm` antes de implementarla.
+
+### ADR-014 — Política de compatibilidad con Hyprland
+
+**Decisión:** Hyprland evoluciona rápido y puede romper su sintaxis u opciones entre versiones. Archway declara en `desktops/hyprland/compat.toml` la versión mínima y la última probada de Hyprland y de su ecosistema (`hyprlock`, `hypridle`, `hyprpaper`, `xdg-desktop-portal-hyprland`).
+**Reglas:**
+
+- `archway doctor` compara `hyprctl version` con `compat.toml` y avisa si la versión instalada es más nueva que la probada o menor que la mínima.
+- Los cambios de sintaxis entre versiones se resuelven con una migración numerada (§8.4), nunca con parches manuales.
+- La config generada se valida antes de aplicarla (por ejemplo con el modo de verificación de configuración de Hyprland, si la versión lo ofrece); si falla, no se aplica y se conserva la anterior.
+- El canal `stable` usa solo paquetes de repos oficiales; `hyprland-git` solo se tolera en `edge`.
+- Una actualización de `pacman` que cambie Hyprland puede romper la sesión: por eso existen snapshot previo y `archway rollback`.
 
 ---
 
@@ -218,8 +279,9 @@ archway/
 │   ├── security/
 │   └── full/
 ├── desktops/
-│   ├── bspwm/
-│   └── hyprland/              # v0.2
+│   ├── hyprland/              # v0.1 (default)
+│   │   └── compat.toml        # versión mínima y probada de Hyprland y su ecosistema
+│   └── sway/                  # v0.2 (fallback)
 ├── packages/
 │   ├── official-core.txt
 │   ├── official-desktop.txt
@@ -239,18 +301,20 @@ archway/
 │   │   ├── palette.toml
 │   │   ├── theme.toml
 │   │   ├── walls/
-│   │   ├── bspwm/
 │   │   ├── hyprland/
+│   │   ├── sway/
 │   │   ├── kitty/
 │   │   ├── ghostty/
 │   │   ├── wezterm/
 │   │   ├── alacritty/
 │   │   ├── foot/
 │   │   ├── rofi/
-│   │   ├── polybar/
 │   │   ├── waybar/
-│   │   ├── dunst/
+│   │   ├── swaync/
 │   │   ├── mako/
+│   │   ├── hyprlock/
+│   │   ├── gtk/
+│   │   ├── qt/
 │   │   ├── nvim/             # artefacto de contrato, no config viva
 │   │   ├── bat/
 │   │   ├── eza/
@@ -275,7 +339,7 @@ archway/
 │   ├── keybinds/
 │   └── terminal-selector/
 ├── keybinds/
-│   └── keybinds.toml          # fuente única -> sxhkd/hypr/docs
+│   └── keybinds.toml          # fuente única -> hypr/sway/docs
 ├── scripts/
 │   ├── bootstrap/
 │   ├── migrations/
@@ -292,9 +356,10 @@ archway/
 ```
 
 **Reglas de arquitectura:**
+
 - La lógica vive en `lib/` y `bin/archway`; los configs no contienen lógica de instalación.
 - Los temas son datos + plantillas; no scripts ad-hoc por app.
-- Los atajos se definen una vez en `keybinds/keybinds.toml` y se generan `sxhkdrc`, config de Hyprland, cheatsheet y docs. Un test verifica duplicados y conflictos.
+- Los atajos se definen una vez en `keybinds/keybinds.toml` y se generan la config de Hyprland (y sway), cheatsheet y docs. Un test verifica duplicados y conflictos.
 - Los applets son scripts pequeños, con `--help`, sin dependencias ocultas, y se declaran en un manifiesto.
 - La config de Neovim es un checkout externo pinneado en `deps/nvim-config.lock`; no se copia a `dotfiles/`, no se convierte en submódulo y no se edita en runtime. Los overrides viven en archivos locales ignorados por el repo upstream.
 - Nada de rutas absolutas con username; usar `$HOME`, XDG y `chezmoi` templates.
@@ -306,26 +371,27 @@ archway/
 
 ### 6.1 Comandos obligatorios
 
-| Comando | Descripción |
-|---|---|
-| `archway install` | Preflight, selección de perfil/componentes, paquetes, backup, chezmoi apply, `nvim-config`, doctor. `--dry-run` disponible; default seguro. |
-| `archway update` | Pull fast-forward, snapshot, backup, migraciones, apply, doctor, rollback si falla. `--check`, `--to <tag>`, `--channel stable\|edge`, `--offline`. |
-| `archway rollback` | Restaura el último backup consistente y el estado anterior. |
-| `archway doctor` | Diagnóstico: dependencias, symlinks, paquetes, shell startup, temas, servicios, seguridad, accesibilidad, Neovim (`nvim-config`, contrato de tema; `checkhealth` con `--deep`). |
-| `archway theme` | `list`, `current`, `set <id>`, `preview <id>`, `validate`. Aplica en caliente. |
-| `archway nvim` | `install`, `update [--to <tag>]`, `status`, `doctor`, `rollback`: gestiona el checkout pinneado de `grubberdubber/nvim-config`. |
-| `archway profile` | `list`, `current`, `set <id>`, `add/remove <group>`. Aditivo, nunca destructivo. |
-| `archway pkg` | `list`, `search`, `why <pkg>`, `export`, `import`, `check`. |
-| `archway keys` | Lista/busca atajos; genera cheatsheet; valida conflictos. |
-| `archway backup` | Crea backup manual de configs gestionadas. |
-| `archway restore` | Restaura un backup con confirmación. |
-| `archway uninstall` | Elimina solo lo gestionado y restaura backups; no borra datos. |
-| `archway version` | Versión, commit, canal, host, perfil, tema y commit de `nvim-config`. |
-| `archway self-update` | Actualiza el checkout y el CLI (parte de update). |
+| Comando               | Descripción                                                                                                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `archway install`     | Preflight, selección de perfil/componentes, paquetes, backup, chezmoi apply, `nvim-config`, doctor. `--dry-run` disponible; default seguro.                                     |
+| `archway update`      | Pull fast-forward, snapshot, backup, migraciones, apply, doctor, rollback si falla. `--check`, `--to <tag>`, `--channel stable\|edge`, `--offline`.                             |
+| `archway rollback`    | Restaura el último backup consistente y el estado anterior.                                                                                                                     |
+| `archway doctor`      | Diagnóstico: dependencias, symlinks, paquetes, shell startup, temas, servicios, seguridad, accesibilidad, Neovim (`nvim-config`, contrato de tema; `checkhealth` con `--deep`). |
+| `archway theme`       | `list`, `current`, `set <id>`, `preview <id>`, `validate`. Aplica en caliente.                                                                                                  |
+| `archway nvim`        | `install`, `update [--to <tag>]`, `status`, `doctor`, `rollback`: gestiona el checkout pinneado de `grubberdubber/nvim-config`.                                                 |
+| `archway profile`     | `list`, `current`, `set <id>`, `add/remove <group>`. Aditivo, nunca destructivo.                                                                                                |
+| `archway pkg`         | `list`, `search`, `why <pkg>`, `export`, `import`, `check`.                                                                                                                     |
+| `archway keys`        | Lista/busca atajos; genera cheatsheet; valida conflictos.                                                                                                                       |
+| `archway backup`      | Crea backup manual de configs gestionadas.                                                                                                                                      |
+| `archway restore`     | Restaura un backup con confirmación.                                                                                                                                            |
+| `archway uninstall`   | Elimina solo lo gestionado y restaura backups; no borra datos.                                                                                                                  |
+| `archway version`     | Versión, commit, canal, host, perfil, tema y commit de `nvim-config`.                                                                                                           |
+| `archway self-update` | Actualiza el checkout y el CLI (parte de update).                                                                                                                               |
 
 ### 6.2 Contrato de comportamiento
+
 - Todos los comandos: `--help`, `--dry-run` (donde aplique), `--yes`, `--verbose`, `--quiet`, `--no-color`, `--json` (para doctor/pkg/version/nvim status).
-- Códigos de salida estables: `0` éxito, `1` error general, `2` uso inválido, `3` preflight fallido, `4` usuario canceló, `5` rollback ejecutado.
+- Códigos de salida estables: `0` éxito, `1` error general, `2` uso inválido, `3` preflight fallido, `4` usuario canceló, `5` rollback ejecutado, `10` actualización disponible (solo `update --check`).
 - Logs en `~/.local/state/archway/logs/<timestamp>.log`; rotación simple.
 - Estado en `~/.local/state/archway/`; config de usuario en `~/.config/archway/`; cache en `~/.cache/archway/`; datos en `~/.local/share/archway/`.
 - Lock con `flock` para evitar ejecuciones concurrentes.
@@ -336,10 +402,11 @@ archway/
 - Sin dependencias no declaradas: `bash`, `coreutils`, `git`, `chezmoi`, `pacman`; `gum`/`fzf` opcionales con fallback.
 
 ### 6.3 Preflight mínimo
+
 1. Arch Linux x86_64 (o derivado con advertencia), `systemd`, no root.
 2. Conexión a internet y mirrors funcionales.
 3. Espacio libre mínimo (configurable, default 10 GB).
-4. Detección de GPU, RAM, disco, filesystem, Secure Boot, LUKS, sesión actual, multi-monitor.
+4. Detección de GPU (Intel/AMD/NVIDIA) y driver, RAM, disco, filesystem, Secure Boot, LUKS, tipo de sesión actual (TTY/X11/Wayland), display manager, multi-monitor y HiDPI. Si el WM es Hyprland: verificar GPU/driver y la versión disponible contra `desktops/hyprland/compat.toml`; si no es viable, ofrecer `sway`.
 5. Detección de configs existentes y plan de convivencia.
 6. Si el editor es Neovim: versión ≥ 0.12.5, estado de `~/.config/nvim`, herramientas del bootstrap y validez de `deps/nvim-config.lock`.
 7. Verificación de que el repo/tag existe y la firma/checksum es válida.
@@ -350,39 +417,43 @@ archway/
 ## 7. Flujo de instalación (diseño obligatorio)
 
 ### 7.1 Modos
+
 - `archway install --dry-run`: muestra plan, paquetes, archivos que tocaría, backups y comandos; no escribe nada.
 - `archway install --safe` (default): modo aditivo; no sobrescribe configs existentes; crea loaders; pregunta archivo por archivo si hace falta.
 - `archway install --adopt`: adopta archivos existentes en chezmoi, con backup y confirmación; pensado para migrar una config propia.
 - `archway install --fresh`: solo para máquinas nuevas o VMs; aun así hace backup si detecta algo.
-- `archway install --profile developer --wm bspwm --terminal kitty --shell zsh --theme android-mount --editor neovim`.
+- `archway install --profile developer --wm hyprland --terminal kitty --shell zsh --theme android-mount --editor neovim`.
 - `--editor neovim` instala el pin de `nvim-config`; `--no-nvim` lo omite explícitamente. Un fallo de Neovim no cancela el resto del escritorio salvo que el usuario pida atomicidad.
 - `--yes` para automatización/CI; nunca implica `--force`.
 
 ### 7.2 Secuencia
+
 1. **Preflight** y detección de hardware/software.
 2. **Selección** interactiva (perfil, WM, terminal, shell, barra, launcher, editor, tema, extras). Defaults sensatos; resumen final.
 3. **Snapshot/backup**: si Btrfs + Snapper, snapshot; si Timeshift, snapshot; si no, backup de configs y advertencia. Abortar si el usuario no acepta el riesgo.
 4. **Paquetes**: `pacman -Syu` primero (nunca instalación parcial), luego `pacman -S --needed` de oficiales, luego AUR con `paru`/`yay` revisando PKGBUILDs. Sin `--noconfirm` en AUR.
 5. **Dotfiles**: `chezmoi init --source <repo> --apply` con datos del host; plantillas renderizadas; archivos existentes preservados/backupeados.
 6. **Neovim (`nvim-config`)**: si el editor es `neovim`, verificar requisitos, hacer backup de `~/.config/nvim`, clonar/checkout del commit pinneado, ejecutar el bootstrap de forma idempotente y validar `checkhealth`. Si ya existe el checkout del repo, adoptarlo sin pisar cambios locales; si es una config ajena, pedir consentimiento explícito. Detalle en §9.5.
-7. **Servicios**: habilitar solo lo necesario (NetworkManager, bluetooth si aplica, keyd si se eligió, fstrim.timer, paccache.timer, reflector.timer). Nunca habilitar servicios ofensivos.
+7. **Servicios y sesión**: habilitar solo lo necesario (NetworkManager, bluetooth si aplica, keyd si se eligió, fstrim.timer, paccache.timer, reflector.timer) y, para Hyprland, las unidades de usuario de la sesión (portales, `hyprpolkitagent`, waybar, swaync, hypridle) vía `uwsm`. Instalar la entrada de sesión Hyprland **sin** cambiar el display manager ni la sesión por defecto existentes: el usuario elige la sesión en el login. Nunca habilitar servicios ofensivos.
 8. **Shell**: si se cambia el shell default, preguntar y usar `chsh`; si no, solo instalar config y mostrar cómo activarla.
 9. **Keyd/teclado**: solo si el usuario elige la capa numpad; backup de `/etc/keyd/default.conf`; `keyd reload`; validar que no rompe el layout.
-10. **Tema**: aplicar `android-mount`; recargar barra, terminal, WM, dunst/mako y el override de Neovim.
+10. **Tema**: aplicar `android-mount`; recargar barra, terminal, WM, notificaciones (swaync/mako) y el override de Neovim.
 11. **Doctor**: correr `archway doctor`; si falla algo crítico, ofrecer rollback.
 12. **Post-install**: imprimir próximos pasos, atajos, cómo actualizar, cómo desinstalar, dónde están los logs; no reiniciar automáticamente.
 
 ### 7.3 Instalación en la PC del amigo (primera prueba física)
+
 Checklist obligatorio antes de ejecutar:
+
 - [ ] El amigo está de acuerdo y sabe qué se va a instalar.
 - [ ] Backup de sus datos importantes (fotos, documentos, licencias, saves).
 - [ ] USB live de Arch a mano para rescate.
 - [ ] Snapshot/backup del sistema si ya tiene Linux; si tiene Windows, no tocar sus particiones.
 - [ ] Espacio libre verificado; Secure Boot y BitLocker considerados.
 - [ ] Red estable, mirrors actualizados.
-- [ ] GPU detectada (Intel/AMD/NVIDIA) y driver elegido.
-- [ ] Perfil `developer` + `bspwm` + `kitty` para la primera prueba (no `security`, no `full`).
-- [ ] Tema `android-mount`, barra `polybar`, launcher `rofi`.
+- [ ] GPU detectada (Intel/AMD/NVIDIA) y driver elegido; si es NVIDIA, validar Hyprland en VM/live antes y tener `sway` o TTY como plan B.
+- [ ] Perfil `developer` + `hyprland` + `kitty` para la primera prueba (no `security`, no `full`).
+- [ ] Tema `android-mount`, barra `waybar`, launcher `rofi`, notificaciones `swaync`.
 - [ ] Probar en VM con el mismo perfil primero.
 - [ ] Pin de `nvim-config` probado en VM; backup de `~/.config/nvim` si ya existía.
 - [ ] Después del install: `archway doctor`, atajos, clipboard, tema, audio, Wi-Fi, Bluetooth, suspensión, reinicio, segundo arranque.
@@ -395,9 +466,11 @@ Checklist obligatorio antes de ejecutar:
 ## 8. Flujo de actualización (el requisito clave del owner)
 
 ### 8.1 Objetivo
+
 Actualizar cualquier máquina a la última versión del repo **sin reinstalar** y **sin perder overrides locales**.
 
 ### 8.2 `archway update` paso a paso
+
 1. Verificar que el checkout está limpio. Si hay cambios locales en archivos gestionados, abortar y mostrar `chezmoi diff`; ofrecer `--merge`, `--stash` o cancelar.
 2. `git fetch --tags --prune`; elegir tag estable más reciente (o `--to`). Verificar firma si existe; verificar commit.
 3. Fast-forward only. Si divergió, abortar; nunca `git reset --hard` sin confirmación.
@@ -405,12 +478,13 @@ Actualizar cualquier máquina a la última versión del repo **sin reinstalar** 
 5. Ejecutar migraciones numeradas pendientes (`scripts/migrations/NNNN-*.sh`), idempotentes, registradas en estado.
 6. `chezmoi apply` (o `chezmoi update`). Si un archivo fue modificado localmente y no es template, chezmoi pedirá resolución; nunca sobrescribir a ciegas.
 7. **nvim-config**: si Neovim está habilitado, verificar que el checkout está limpio, hacer fetch y checkout del commit pinneado por la nueva versión de Archway (nunca `reset --hard` con cambios locales), restaurar plugins desde `lazy-lock.json`, correr el bootstrap si cambió y validar `checkhealth`. Si falla, restaurar el pin anterior y reportar; no revertir el escritorio completo por Neovim.
-8. Recargar servicios/componentes afectados: WM, barra, terminal, notificaciones, shell (nuevo shell), tema.
+8. Recargar componentes afectados con `hyprctl reload` y recargas por señal/IPC de barra, terminal, notificaciones y tema; **nunca** reiniciar ni matar el compositor durante el update (la sesión del usuario debe sobrevivir). Si cambió el paquete del compositor, avisar que se aplica en el próximo login.
 9. `archway doctor`. Si falla un check crítico: rollback automático a snapshot/backup, restaurar checkout al tag anterior, reportar.
 10. Escribir estado: versión, commit, timestamp, resultado, log; incluir el commit de `nvim-config` en `~/.local/state/archway/nvim.toml`.
-11. Notificar al usuario (dunstify/mako) solo si se ejecutó desde GUI/timer; en CLI, imprimir resumen.
+11. Notificar al usuario (`notify-send`; swaync/mako) solo si se ejecutó desde GUI/timer; en CLI, imprimir resumen.
 
 ### 8.3 Canales y pinning
+
 - `stable`: tags firmados; default.
 - `edge`: `main`; para el owner/desarrolladores; advierte inestabilidad.
 - `archway pin v0.2.0`: fija la versión por host; `update` respeta el pin salvo `--unpin`.
@@ -419,17 +493,20 @@ Actualizar cualquier máquina a la última versión del repo **sin reinstalar** 
 - Timer systemd opcional `archway-update-check.timer` que solo notifica; **nunca** actualiza solo sin consentimiento.
 
 ### 8.4 Migraciones
+
 - Numeradas `0001-...sh`, `0002-...sh`; se ejecutan una vez; guardan un sello en `~/.local/state/archway/migrations`.
 - Deben ser idempotentes, con backup y mensaje claro.
 - Si una migración falla, se detiene todo y se hace rollback; no continuar con el resto.
 - Toda ruptura de compatibilidad requiere migración + nota en CHANGELOG + bump de versión menor/mayor según SemVer.
 
 ### 8.5 Actualización de paquetes del sistema
+
 - Archway no reemplaza a `pacman`/`paru`; puede ofrecer `archway pkg update` como wrapper consciente, pero el usuario debe poder actualizar por su cuenta.
 - `topgrade` es opcional y no debe actualizar dotfiles por su cuenta; si se usa, excluir `chezmoi`/`archway` o configurarlo para llamar a `archway update`.
 - `pacman-contrib`, `reflector`, `paccache`, `pacdiff`, `rebuild-detector`, `arch-audit` deben estar en el perfil de mantenimiento.
 
 ### 8.6 Rollback
+
 - Guardar snapshot ID y backup path antes de tocar nada.
 - `archway rollback` restaura configs y, si es posible, el snapshot del sistema; muestra qué se va a hacer y pide confirmación.
 - Un rollback fallido debe dejar instrucciones manuales y logs; nunca empeorar el estado.
@@ -439,6 +516,7 @@ Actualizar cualquier máquina a la última versión del repo **sin reinstalar** 
 ## 9. Sistema de temas y tema insignia Android Mount
 
 ### 9.1 Filosofía
+
 - Paletas **hechas a mano**, no extraídas de wallpapers por defecto. Igual que gh0stzk: consistencia, legibilidad y control.
 - Un solo `palette.toml` es la fuente de verdad; las plantillas generan todo.
 - `pywal`, `wallust` y `matugen` son opcionales (`archway theme dynamic`), nunca default.
@@ -447,9 +525,11 @@ Actualizar cualquier máquina a la última versión del repo **sin reinstalar** 
 - Validación automática: contraste AA, claves requeridas, sintaxis de cada app, preview renderizado.
 
 ### 9.2 Identidad "Android Mount"
+
 **Concepto:** la densidad informativa y el filo de gh0stzk + la suavidad de Material You + la utilidad del applet Android Mount. Oscuro, técnico, elegante, sin ser juguete.
 
 **Paleta base (dark):**
+
 ```toml
 [palette]
 bg          = "#0B0F14"
@@ -468,10 +548,12 @@ success     = "#81C995"
 selection   = "#8AB4F8"
 selection_bg= "#1F2A3A"
 ```
+
 **Light variant (opcional):** fondo `#F7F9FC`, superficie `#FFFFFF`, texto `#1B1F24`, primary `#1A73E8`, secondary `#1E8E3E`, bordes `#DADCE0`.
 **High contrast:** fondo `#000000`, texto `#FFFFFF`, primary `#9ECBFF`, bordes `#6B7280`, foco `#FFFFFF`.
 
 **Geometría y estilo:**
+
 - Radios: 12 px en ventanas/cards, 8 px en inputs, 999 px solo en pills/badges.
 - Bordes: 1 px; foco: 2 px con color `primary` y offset 2 px.
 - Sombras suaves, sin blur excesivo; transparencias solo en superficies, nunca en texto.
@@ -481,23 +563,25 @@ selection_bg= "#1F2A3A"
 - Tipografía: `JetBrainsMono Nerd Font` para terminal/código; `Inter` o `Noto Sans` para UI; fallback `Noto Sans`, `Noto Color Emoji`.
 - Wallpapers originales inspirados en Material You (abstractos, gradientes, formas), licencia compatible; nada de assets propietarios de Google.
 
-**Propagación obligatoria:** bspwm, hyprland, picom, polybar, waybar, rofi, dunst, mako, kitty, ghostty, wezterm, alacritty, foot, nvim (vía `nvim-config`), bat, eza, fzf, delta, btop, lazygit, yazi, starship, tmux, zellij, GTK3/4, Qt5/6, Firefox (tema propio), zathura, mpv, cava, ncmpcpp/rmpc, i3lock-color, hyprlock, swaylock.
+**Propagación obligatoria:** hyprland (bordes, gaps, colores), waybar, rofi, swaync/mako, hyprlock, hyprpaper, kitty, ghostty, wezterm, alacritty, foot, nvim (vía `nvim-config`), bat, eza, fzf, delta, btop, lazygit, yazi, starship, tmux, zellij, GTK3/4, Qt5/6 (qt6ct/kvantum), Firefox (tema propio), zathura, mpv, cava, ncmpcpp/rmpc, y `swaylock` en el perfil fallback.
 **Regla:** si un módulo no está habilitado, no se genera; si está habilitado y no recibe el tema, es un bug. En Neovim el mecanismo es el contrato de §9.5; si el hook falta, `archway theme set` aplica el resto, marca Neovim como fallo crítico y sale con código `1`, sin editar archivos trackeados.
 
 ### 9.3 Applet Android Mount
+
 - Script POSIX/bash en `applets/android-mount/`, con `--help`, `--dry-run`, `--json`.
-- Dependencias: `simple-mtpfs`, `rofi`/`fuzzel`, `libnotify`/`dunstify`, `udisks2`; detectar y avisar si faltan.
+- Dependencias: `simple-mtpfs`, `rofi`/`fuzzel`, `libnotify`, `udisks2`; detectar y avisar si faltan.
 - Funciones: listar dispositivos MTP, montar en `~/Android_Mount/<device>`, desmontar con `fusermount -u`, notificar éxito/error, no montar dos veces, no borrar el punto de montaje si falla.
 - Integración: atajo `Super+Shift+M`, applet en Rofi, estado en barra (opcional).
 - Seguridad: nunca `sudo`, nunca montar en `/mnt` global, validar nombres de dispositivo, escapar rutas, no seguir symlinks.
 - Test: mock de `simple-mtpfs`/`mount`/`fusermount` en `tests/bats`.
 
 ### 9.4 Selector de temas
+
 - `Super+Space` abre selector con previews (Rofi/Walker).
 - `archway theme set android-mount` aplica y persiste por host.
 - `archway theme preview <id>` aplica temporalmente y revierte al cerrar/Timeout.
 - Estado en `~/.config/archway/theme.toml`; nunca en el repo.
-- Recarga: `bspwm` reload, `hyprctl reload`, `kitty @ set-colors`, `tmux source-file`, `dunstctl reload`, `makoctl reload`, `pkill -USR1` según app.
+- Recarga (verificar cada comando contra la versión instalada): `hyprctl reload`, `pkill -SIGUSR2 waybar`, `kitty @ set-colors` (requiere control remoto habilitado por socket), `tmux source-file`, `swaync-client -R -rs` o `makoctl reload`, y el IPC del daemon de wallpaper elegido.
 - Neovim: el override de tema se aplica al próximo arranque; nunca se recarga a la fuerza una sesión con buffers sin guardar.
 
 ### 9.5 Integración de Neovim (`grubberdubber/nvim-config`)
@@ -505,12 +589,14 @@ selection_bg= "#1F2A3A"
 **Fuente única.** La configuración de Neovim es [`github.com/grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config), no una copia dentro de Archway. Stack: NvChad v2.5, base46 y lazy.nvim; Neovim **0.12.5+**; terminal kitty con true color y Nerd Font; `bootstrap.sh`; versiones de plugins fijadas por `lazy-lock.json`. Licencia **Unlicense** (dominio público, compatible con GPL-3.0-or-later); crédito obligatorio en `CREDITS.md`. Archway **no** forka, no vendoriza y no mantiene una segunda config de Neovim.
 
 **Por qué checkout pinneado y no `chezmoi external` ni submódulo:**
+
 - `bootstrap.sh`, `lazy.nvim` y `lazy-lock.json` necesitan un checkout git real, con `git status` y commits verificables.
 - `chezmoi external` refresca el contenido y puede pisar cambios locales sin el flujo de backup/consentimiento de Archway.
 - Un submódulo ata el historial de Archway al de nvim-config y complica releases independientes.
 - Archway mantiene `deps/nvim-config.lock` con `url`, `tag`, `commit`, `sha256` (tarball de release o árbol exportado), `tested_neovim` y `schema`. Cada release de Archway apunta a un tag/commit concreto; `main` solo se usa en canal `edge` y con advertencia.
 
 **Instalación (`archway nvim install`):**
+
 1. **Preflight:** `nvim --version` ≥ 0.12.5; `git`, `make`, `cargo`, `ripgrep`, `fd`, `nodejs`, `tree-sitter-cli` 0.25.x. Si falta algo, listar y abortar sin instalar a medias; no usar `pacman -S` sin pasar por el flujo normal de paquetes.
 2. **Config existente:** si `~/.config/nvim` no existe, continuar. Si es el checkout del repo correcto, adoptarlo y verificar que esté limpio. Si es una config ajena, backup en `~/.local/state/archway/backups/<timestamp>/`, confirmación explícita y opción de conservarla/cambiarla. Nunca `mv` ni `rm -rf` silenciosos.
 3. **Checkout:** clonar en `~/.config/nvim` o reutilizar el checkout; `git checkout <commit>` del lock; verificar commit, `lazy-lock.json` y ausencia de cambios locales trackeados.
@@ -519,6 +605,7 @@ selection_bg= "#1F2A3A"
 6. **Estado:** guardar commit instalado, fecha y resultado en `~/.local/state/archway/nvim.toml`. El contenido de `~/.config/nvim` no se copia al repo de Archway.
 
 **Actualización y rollback:**
+
 - `archway update` mueve el pin junto con la release de Archway; `archway nvim update [--to <tag>]` actualiza solo Neovim.
 - Checkout limpio obligatorio: si hay cambios locales, abortar y ofrecer `--stash`/diff; jamás `git reset --hard` ni `git clean -fd` sin confirmación.
 - Restaurar plugins desde `lazy-lock.json`; no actualizar plugins por fuera del lock en producción.
@@ -526,6 +613,7 @@ selection_bg= "#1F2A3A"
 - `archway uninstall` restaura el backup de Neovim si Archway reemplazó una config previa; si el checkout fue adoptado, lo deja en su sitio y solo elimina el estado gestionado. Nunca borra `~/.config/nvim` sin consentimiento.
 
 **Contrato de tema (Android Mount):**
+
 - `themes/android-mount/nvim/` guarda el artefacto de referencia y los metadatos de contraste; **no** es una copia viva de la config.
 - Upstream debe exponer `lua/themes/android-mount.lua` con todas las claves de `base_30`/`base_16` y la llamada final a `require("base46").override_theme`, derivadas de `themes/android-mount/palette.toml`.
 - Upstream debe exponer un hook local ignorado por git (p. ej. `lua/archway.lua`, añadido a `.gitignore` upstream), cargado al final de `init.lua`, que acepte `return { theme = "android-mount" }`. `archway theme set android-mount` escribe **solo** ese archivo local y avisa a Neovim; nunca edita `chadrc.lua` ni archivos trackeados.
@@ -540,51 +628,55 @@ selection_bg= "#1F2A3A"
 ## 10. Teclado, atajos y accesibilidad
 
 ### 10.1 Principios
+
 - **Super** como modificador principal; `hjkl` para navegación; consistencia entre WM y apps.
-- Un solo registro de atajos (`keybinds/keybinds.toml`) genera `sxhkdrc`, Hyprland, cheatsheet y docs.
+- Un solo registro de atajos (`keybinds/keybinds.toml`) genera la config de Hyprland (y sway), cheatsheet y docs.
 - Sin conflictos: test que detecta duplicados y combinaciones reservadas.
 - Descubribilidad: `Super+/` abre cheatsheet buscable; `archway keys` en CLI; hints en la barra.
 - Todo accionable por teclado; el mouse es opcional, nunca obligatorio.
 
-### 10.2 Mapa base (v0.1, bspwm)
-| Atajo | Acción |
-|---|---|
-| `Super+Return` | Terminal |
-| `Super+Shift+Return` | Terminal flotante (scratchpad) |
-| `Super+Q` | Cerrar ventana |
-| `Super+D` | Launcher |
-| `Super+E` | Gestor de archivos (Yazi/Thunar) |
-| `Super+B` | Navegador |
-| `Super+L` | Bloquear |
-| `Super+Shift+Q` | Menú de energía |
-| `Super+Space` | Selector de tema |
-| `Super+Alt+W` | Selector de wallpaper |
-| `Super+Shift+S` | Screenshot (región/ventana/pantalla) |
-| `Super+V` | Historial de portapapeles |
-| `Super+P` | Gestor de contraseñas (rbw/rofi-rbw) |
-| `Super+Shift+M` | Android Mount |
-| `Super+N` | Notificaciones |
-| `Super+M` | Música (mpd/ncmpcpp/rmpc) |
-| `Super+Ctrl+N` | Notas rápidas |
-| `Super+Tab` | Cambiar workspace/ventana |
-| `Super+1..9` | Workspaces |
-| `Super+Shift+1..9` | Mover ventana a workspace |
-| `Super+H/J/K/L` | Foco |
-| `Super+Shift+H/J/K/L` | Mover ventana |
-| `Super+Alt+H/J/K/L` | Redimensionar |
-| `Super+F` | Fullscreen |
-| `Super+Shift+F` | Flotante |
-| `Super+Alt+R` | Recargar WM |
-| `Super+Shift+E` | Salir/cerrar sesión |
-| `Super+/` | Cheatsheet |
-| `Print` | Screenshot completo |
-| `Super+Shift+P` | Paleta de comandos de Archway |
+### 10.2 Mapa base (v0.1, Hyprland)
+
+| Atajo                 | Acción                               |
+| --------------------- | ------------------------------------ |
+| `Super+Return`        | Terminal                             |
+| `Super+Shift+Return`  | Terminal flotante (scratchpad)       |
+| `Super+Q`             | Cerrar ventana                       |
+| `Super+D`             | Launcher                             |
+| `Super+E`             | Gestor de archivos (Yazi/Thunar)     |
+| `Super+B`             | Navegador                            |
+| `Super+Escape`        | Bloquear                             |
+| `Super+Shift+Q`       | Menú de energía                      |
+| `Super+Space`         | Selector de tema                     |
+| `Super+Alt+W`         | Selector de wallpaper                |
+| `Super+Shift+S`       | Screenshot (región/ventana/pantalla) |
+| `Super+V`             | Historial de portapapeles            |
+| `Super+P`             | Gestor de contraseñas (rbw/rofi-rbw) |
+| `Super+Shift+M`       | Android Mount                        |
+| `Super+N`             | Notificaciones                       |
+| `Super+M`             | Música (mpd/ncmpcpp/rmpc)            |
+| `Super+Ctrl+N`        | Notas rápidas                        |
+| `Super+Tab`           | Cambiar workspace/ventana            |
+| `Super+1..9`          | Workspaces                           |
+| `Super+Shift+1..9`    | Mover ventana a workspace            |
+| `Super+H/J/K/L`       | Foco                                 |
+| `Super+Shift+H/J/K/L` | Mover ventana                        |
+| `Super+Alt+H/J/K/L`   | Redimensionar                        |
+| `Super+F`             | Fullscreen                           |
+| `Super+Shift+F`       | Flotante                             |
+| `Super+Alt+R`         | Recargar WM                          |
+| `Super+Shift+E`       | Salir/cerrar sesión                  |
+| `Super+/`             | Cheatsheet                           |
+| `Print`               | Screenshot completo                  |
+| `Super+Shift+P`       | Paleta de comandos de Archway        |
 
 Las teclas de función/medios (volumen, brillo, play/pause) se mapean con `XF86Audio*`, `XF86MonBrightness*`, etc. En laptops, `Fn` debe seguir funcionando; no secuestrar teclas del firmware.
 
 ### 10.3 Capa numpad de una mano (keyd)
+
 Objetivo: mantener CapsLock como tap=Esc y hold=numpad; la mano derecha escribe números.
 `/etc/keyd/default.conf` (propuesta; el installer debe fusionar, no sobrescribir):
+
 ```ini
 [ids]
 *
@@ -609,20 +701,22 @@ p = -
 y = *
 h = /
 ```
+
 - `capslock` tap = Esc; hold = capa numpad.
 - Añadir una capa `nav` en otra tecla (p. ej. `rightalt = overload(nav, compose)`) con `h/j/k/l` = flechas, `u/i` = Home/End, `n/m` = PgDn/PgUp, `,`/`.` = Insert/Delete. No romper AltGr.
-- `keyd reload` tras cambios; test manual en TTY y en X11/Wayland.
+- `keyd reload` tras cambios; test manual en TTY y en la sesión Wayland.
 - Alternativas documentadas: `kanata` (home-row mods, tap-dance), `interception-tools` + `caps2esc`, `xremap`, `kmonad`, `evremap`, `input-remapper` (GUI).
 - No activar keyd por defecto sin preguntar; puede chocar con remaps existentes y con algunos juegos.
-- En Wayland, `wev` para depurar eventos; en X11, `xev`.
+- Usar `wev` para depurar eventos de teclado (`xev` solo aplica a apps XWayland).
 
 ### 10.4 Accesibilidad
+
 - Contraste mínimo 4.5:1 para texto normal, 3:1 para texto grande/UI; verificar con script.
 - Foco visible en todos los componentes; navegación completa por teclado en Rofi/Walker/Waybar.
 - Escalado de fuentes 100–200%; layouts que no se rompan; `GDK_SCALE`/`QT_SCALE_FACTOR` documentados.
-- Movimiento reducido: `animations = false` en Hyprland, `picom` sin fading, transiciones instantáneas.
+- Movimiento reducido: animaciones de Hyprland desactivadas (modo `reduce_motion`) y transiciones instantáneas en barra y notificaciones.
 - Variante de alto contraste del tema; no depender solo del color (usar iconos/texto).
-- Soporte de lector de pantalla: no romper Orca; etiquetas accesibles en widgets propios; test básico con `orca` si está disponible.
+- Soporte de lector de pantalla: no romper Orca (verificar AT-SPI/Orca en la sesión Wayland y documentar limitaciones conocidas); etiquetas accesibles en widgets propios; test básico con `orca` si está disponible.
 - Teclado: layout US/ES detectado, no forzado; `compose:ralt` opcional para acentos; dead keys documentadas; no romper teclas de medios.
 - Documentación en lenguaje claro; cheat sheet imprimible; ayuda contextual.
 - Sticky keys / slow keys / bounce keys: documentar cómo activarlos (no implementarlos a mano si el DE ya los provee).
@@ -632,22 +726,24 @@ h = /
 ## 11. Perfiles, selectores y política de paquetes
 
 ### 11.1 Perfiles
-| Perfil | Incluye | Público |
-|---|---|---|
-| `minimal` | WM, terminal, shell, editor, core CLI, tema, barra, launcher | Cualquiera; VM; hardware modesto |
-| `developer` | minimal + toolchains, Git, containers, DB/API, LSPs, linters, AI opcional | Desarrolladores |
-| `security` | developer + herramientas ofensivas/defensivas/forenses, lab, wordlists | Pentesters/CTF, solo con autorización |
-| `full` | todo lo anterior + media, virtualización, extras | Power users; no recomendado para primer install |
 
-**Default:** `developer` (sin `security`). La primera prueba en la PC del amigo usa `developer` + `bspwm` + `kitty`.
+| Perfil      | Incluye                                                                   | Público                                         |
+| ----------- | ------------------------------------------------------------------------- | ----------------------------------------------- |
+| `minimal`   | WM, terminal, shell, editor, core CLI, tema, barra, launcher              | Cualquiera; VM; hardware modesto                |
+| `developer` | minimal + toolchains, Git, containers, DB/API, LSPs, linters, AI opcional | Desarrolladores                                 |
+| `security`  | developer + herramientas ofensivas/defensivas/forenses, lab, wordlists    | Pentesters/CTF, solo con autorización           |
+| `full`      | todo lo anterior + media, virtualización, extras                          | Power users; no recomendado para primer install |
+
+**Default:** `developer` (sin `security`). La primera prueba en la PC del amigo usa `developer` + `hyprland` + `kitty`.
 
 ### 11.2 Selectores
-- **WM:** `bspwm` (v0.1), `hyprland` (v0.2), `sway` (mínimo).
+
+- **WM:** `hyprland` (default, Wayland), `sway` (fallback, v0.2). X11/bspwm no soportado.
 - **Terminal:** `kitty` (default), `ghostty`, `wezterm`, `alacritty`, `foot`.
 - **Shell:** `zsh` (default), `fish`, `bash`, `nushell`.
-- **Barra:** `polybar` (X11), `waybar` (Wayland), `eww` (opcional).
-- **Launcher:** `rofi` (X11), `rofi-wayland`/`fuzzel` (Wayland), `walker`/`vicinae` (opcional).
-- **Notificaciones:** `dunst` (X11), `mako`/`swaync` (Wayland).
+- **Barra:** `waybar` (default), `eww`/`quickshell`/`ags` (opcionales).
+- **Launcher:** `rofi` (default), `fuzzel` (ligero), `walker`/`vicinae` (opcionales).
+- **Notificaciones:** `swaync` (default), `mako` (minimalista).
 - **Editor:** `neovim` (default, con `nvim-config` pinneado), `helix`, `vscodium`, `code`. En v0.1 no se ofrecen configuraciones alternativas de Neovim; la única fuente es `grubberdubber/nvim-config`.
 - **Prompt:** `starship` (default), `pure`, `powerlevel10k`.
 - **Multiplexor:** `tmux` (default), `zellij`, `none`.
@@ -657,6 +753,7 @@ h = /
 Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<componente>`, y no instalar alternativas no elegidas.
 
 ### 11.3 Política de paquetes
+
 1. **Repos oficiales** primero. Verificar con `pacman -Ss`/`pacman -Fy`.
 2. **AUR** solo si no hay oficial y el paquete está mantenido; revisar PKGBUILD, votos, comentarios, fecha de actualización. `paru` default, `yay` fallback.
 3. **Binarios upstream** solo si están firmados/checksum y no hay paquete decente; instalar en `~/.local/bin` u `/opt` con consentimiento.
@@ -667,6 +764,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 8. **Auditoría:** `arch-audit`, `rebuild-detector`, `pacdiff`, `namcap` para PKGBUILDs propios.
 
 ### 11.4 Manifiestos
+
 - `packages/official-*.txt`: un paquete por línea, comentarios con `#`.
 - `packages/aur-*.txt`: un paquete por línea; comentario obligatorio con motivo y estado de mantenimiento.
 - `packages/optional/*.txt`: grupos opcionales (gaming, media, virtualization, security-lab, AI).
@@ -679,6 +777,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 ## 12. Seguridad, privacidad y ciberseguridad
 
 ### 12.1 Principios
+
 - **Consentimiento y legalidad primero.** El perfil `security` muestra un aviso claro y requiere aceptación explícita.
 - **Mínimo privilegio:** no root para herramientas de usuario; capabilities solo cuando sea imprescindible; no SUID innecesario.
 - **Aislamiento:** laboratorio en VM/contenedor (Kali/BlackArch distrobox, Exegol, QEMU) para prácticas; no mezclar el escritorio daily con servicios ofensivos.
@@ -686,8 +785,10 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - **Datos sensibles:** nunca en historial, clipboard, logs, temas ni repo.
 
 ### 12.2 Hardening por defecto (perfil developer)
+
 - Firewall activo: `nftables` (default) o `ufw`; política deny incoming, allow outgoing; SSH solo si se instala.
-- SSH endurecido: solo claves, sin root, `MaxAuthTries 3`, `ClientAliveInterval 30`, `HashKnownHosts yes`, `ControlMaster auto`, `ControlPersist 10m`, `IdentitiesOnly yes`.
+- SSH **cliente** (`~/.ssh/config`): `IdentitiesOnly yes`, `HashKnownHosts yes`, `AddKeysToAgent yes`, `ServerAliveInterval 30`, `ControlMaster auto`, `ControlPersist 10m`; claves `ed25519` en Bitwarden o YubiKey.
+- SSH **servidor** (solo si se instala `sshd`): solo claves, `PermitRootLogin no`, `PasswordAuthentication no`, `MaxAuthTries 3`, `ClientAliveInterval 30`, firewall restringido.
 - LUKS recomendado en instalaciones nuevas; `systemd-cryptenroll` con TPM2/FIDO2 opcional.
 - Secure Boot opcional con `sbctl`; documentar implicaciones con NVIDIA/`nvidia-dkms`.
 - `systemd-resolved` o `unbound`/`dnscrypt-proxy` para DNS; DoT/DoH opcional.
@@ -695,8 +796,11 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - Actualizaciones: snapshot antes de `pacman -Syu`; no actualizar a ciegas en producción.
 - `usbguard` opcional; `firejail`/`bubblewrap` para apps no confiables; `opensnitch` opcional.
 - No desactivar AppArmor/SELinux, no `setenforce 0`, no abrir puertos "para probar".
+- **Wayland y aislamiento:** captura y compartir pantalla solo vía portales (`xdg-desktop-portal-hyprland`); usar el sistema de permisos de Hyprland para screencopy y plugins si la versión lo soporta (verificar documentación); no cargar plugins de `hyprpm` por defecto; no ejecutar aplicaciones gráficas con `sudo` (usar polkit/`pkexec`); revisar qué apps corren bajo XWayland.
+- **Bloqueo de pantalla:** `hypridle` + `hyprlock` al inactivar, al suspender y al cerrar la tapa; sin autologin por defecto.
 
 ### 12.3 Perfil security (opt-in)
+
 - Instalar solo las herramientas elegidas, no grupos completos.
 - Kali/BlackArch en distrobox o VM; no como sistema principal.
 - Wordlists (`seclists`) en `~/.local/share/wordlists` con licencia y tamaño advertido.
@@ -705,6 +809,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - Aviso legal visible en `archway install --profile security` y en `archway doctor`.
 
 ### 12.4 Privacidad
+
 - Sin telemetría; sin analytics; sin llamadas a servicios externos salvo actualizaciones/paquetes.
 - Bitwarden/rbw con lock; no autocompletar en terminal sin confirmación.
 - Atuin: sync cifrado opcional; filtros de comandos sensibles; no sincronizar por defecto.
@@ -718,6 +823,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 ## 13. Estándares de código y calidad
 
 ### 13.1 Shell
+
 - `#!/usr/bin/env bash` para scripts complejos; `#!/bin/sh` POSIX para bootstrap mínimo.
 - `set -Eeuo pipefail`; `IFS=$'\n\t'` cuando aplique.
 - Funciones en `snake_case`; constantes en `UPPER_SNAKE_CASE`; variables locales con `local`.
@@ -728,6 +834,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - Tests con `bats`; fixtures; mocks para `pacman`, `paru`, `chezmoi`, `systemctl`.
 
 ### 13.2 Lua/TOML/YAML/Markdown
+
 - Lua (Neovim/Wezterm): `stylua` (2 espacios, 120 columnas); módulos con tablas; no globales.
 - TOML: `taplo fmt` y `taplo lint`; claves en `snake_case`.
 - YAML: `yamllint`; 2 espacios; sin tabs; comillas cuando sea necesario.
@@ -736,6 +843,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - Git: Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`); commits atómicos; firma SSH/GPG; sin `--no-verify` salvo emergencia documentada.
 
 ### 13.3 Configuración
+
 - XDG Base Directory; nada de dotfiles sueltos en `$HOME` si se puede evitar.
 - Sin secretos; sin rutas absolutas de usuario; sin `~` dentro de archivos que se expanden mal.
 - Comentarios solo donde aportan; no comentar lo obvio; documentar decisiones no evidentes.
@@ -744,14 +852,16 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - Temas: claves requeridas; plantillas; validación; preview.
 
 ### 13.4 Rendimiento
+
 - Medir con `hyperfine`, `zprof`, `/usr/bin/time -v`, `systemd-analyze`.
 - zsh: lazy-load plugins pesados; `compinit` una vez; cache de completions; evitar `oh-my-zsh`.
-- WM: scripts event-driven; no loops `while true` con `sleep 1`; usar `sxhkd`/`hyprctl`/DBus.
+- WM: scripts event-driven; no loops `while true` con `sleep 1`; usar `hyprctl`/IPC de Hyprland/DBus/units de systemd (user).
 - Barra: módulos con intervalos razonables; no comandos caros cada segundo.
 - Tema: generación incremental; no re-renderizar todo si solo cambia un color.
 - Instalador: paralelizar descargas cuando sea seguro; cachear; no recompilar AUR innecesariamente.
 
 ### 13.5 Seguridad de código
+
 - Validar entradas; nunca `eval` con datos de usuario; escapar rutas; `--` en comandos.
 - No usar `curl` sin `--fail --location --proto '=https' --tlsv1.2`; verificar checksums.
 - `mktemp` con permisos 700; archivos de estado 600 si contienen datos sensibles.
@@ -764,9 +874,10 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 ## 14. Testing, CI y validación
 
 ### 14.1 Pirámide de tests
+
 - **Unitarios:** funciones de `lib/` con `bats`; mocks de comandos del sistema.
 - **Integración:** contenedor `archlinux:latest` con usuario no-root; instalar perfil `minimal`, correr `archway doctor`, `chezmoi apply --dry-run`, `archway update --check`.
-- **Sistema:** VM QEMU con UEFI, GPU virtual, disco Btrfs y ext4; instalar y arrancar sesión bspwm; probar teclado, clipboard, tema, audio, red.
+- **Sistema:** VM QEMU con UEFI, GPU virtual, disco Btrfs y ext4; instalar y arrancar sesión Hyprland (virtio-gpu con aceleración 3D); probar teclado, clipboard, tema, audio, red.
 - **Neovim:** instalar el pin de `nvim-config` en una VM limpia; `Lazy! restore`, `checkhealth`, arranque sin errores y contrato de tema (`palette.toml` ↔ `lua/themes/android-mount.lua`, hook `lua/archway.lua`). Probar también el rollback al commit anterior.
 - **Hardware:** PC del amigo (primera), luego PC del owner; checklist y logs.
 - **Regresión visual:** screenshots de temas/apps clave; comparación perceptual (opcional).
@@ -774,6 +885,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - **Rendimiento:** benchmarks con umbrales; fallar CI si se degrada >20%.
 
 ### 14.2 CI (GitHub Actions)
+
 - `lint`: shellcheck, shfmt, stylua, taplo, yamllint, markdownlint, actionlint, typos, editorconfig-checker.
 - `test`: container Arch, bats, dry-run, doctor.
 - `package-check`: existencia de paquetes oficiales; AUR vía RPC con cache; fallo solo en paquetes core, warning en opcionales.
@@ -784,13 +896,14 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 - `act` para correr local; no secretos en PRs de forks; `GITHUB_TOKEN` read-only; acciones pinneadas por SHA.
 
 ### 14.3 Criterios de aceptación de release
+
 - Instalación limpia en VM Arch desde cero <15 min (sin contar descargas grandes).
 - `archway doctor` sin errores críticos.
 - `archway update` desde la versión anterior sin pérdida de datos.
 - `archway rollback` restaura correctamente.
 - Neovim arranca sin errores críticos con el pin de `nvim-config`; `checkhealth` limpio y tema `android-mount` activo o fallo explícito documentado.
 - Cambio de tema en caliente <2 s (Neovim aplica el override en el siguiente arranque, sin recargar sesiones con buffers sin guardar).
-- zsh startup <100 ms; bspwm idle <700 MB.
+- zsh startup <100 ms; Hyprland idle <800 MB (sesión limpia).
 - Sin secretos; gitleaks limpio.
 - Contraste AA; navegación teclado completa.
 - README, CHANGELOG, keybinds y troubleshooting actualizados.
@@ -833,33 +946,37 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 ## 17. Roadmap
 
 ### Fase 0 — Fundaciones (semana 1)
+
 - Repo, LICENSE, README mínimo, AGENTS.md, `.editorconfig`, `.gitignore`.
 - CLI skeleton (`archway version/help`), logging, strict mode, backup/restore, doctor básico.
 - CI de lint + container Arch + bats.
 - Definir manifiestos core y perfil `minimal`.
 - Definir `deps/nvim-config.lock` y abrir los PR upstream necesarios (`bootstrap.sh --skip-packages`, paleta `android-mount`, hook local).
 
-### Fase 1 — MVP bspwm + Android Mount (semanas 2–4)
-- bspwm + sxhkd + polybar + rofi + dunst + picom + i3lock-color.
+### Fase 1 — MVP Hyprland + Android Mount (semanas 2–4)
+
+- Hyprland (vía `uwsm`) + waybar + rofi + swaync + hyprlock/hypridle + hyprpaper + portales + `hyprpolkitagent`.
 - kitty + zsh nativo + starship + tmux + `nvim-config` pinneado (bootstrap, `checkhealth`, tema).
-- Tema Android Mount completo (terminal, WM, barra, rofi, dunst, Neovim vía contrato `nvim-config`, CLI tools).
+- Tema Android Mount completo (terminal, compositor, barra, rofi, notificaciones, Neovim vía contrato `nvim-config`, CLI tools).
 - Applets: terminal selector, clipboard, screenshot, wallpaper, power, android-mount, password.
-- `archway install/update/theme/doctor/rollback` funcionales.
+- `archway install/update/theme/doctor/rollback` funcionales; `desktops/hyprland/compat.toml` y checks de §6.3.
 - Probar en VM y en la PC del amigo; release `v0.1.0`.
 
-### Fase 2 — Hyprland + paridad Wayland (semanas 5–8)
-- Hyprland + waybar + rofi-wayland/fuzzel + mako/swaync + hyprlock/hypridle.
-- Mismo tema, mismos atajos, mismos applets.
-- `sway` como fallback mínimo.
+### Fase 2 — Fallback y robustez (semanas 5–8)
+
+- Perfil `sway` como fallback mínimo con el mismo tema, atajos y applets.
+- Matriz de hardware (Intel/AMD/NVIDIA, laptops, multi-monitor, HiDPI) y control automático de compatibilidad de Hyprland.
 - Matugen/wallust opcionales; variantes light/high-contrast.
 
 ### Fase 3 — Profundidad developer/security (semanas 9–12)
+
 - Perfiles developer/security; toolchains; contenedores; DB/API; IA opcional.
 - Laboratorio Kali/BlackArch en distrobox; guías legales; hardening.
 - `archway pkg` completo; export/import; auditoría.
 - Benchmarks, accesibilidad, documentación.
 
 ### Fase 4 — Madurez y release 1.0
+
 - Migraciones estables; canales; pinning; SBOM opcional.
 - Test matrix ampliada; hardware variado; NVIDIA/AMD/Intel; laptops.
 - Empaquetado AUR de `archway` (opcional) y script de instalación.
@@ -870,6 +987,7 @@ Cada selector debe: validar dependencias, explicar trade-offs, permitir `--no-<c
 ## 18. Definición de terminado (DoD)
 
 Una tarea está terminada solo si:
+
 - [ ] El cambio está implementado y es idempotente.
 - [ ] Tiene tests (unitarios/integración) o justificación de por qué no.
 - [ ] `shellcheck`, `shfmt`, `stylua`, `taplo`, `yamllint`, `markdownlint` pasan.
@@ -892,7 +1010,7 @@ Una tarea está terminada solo si:
 - `curl ... | bash` o `wget ... | sh`.
 - `sudo` para dotfiles o para `chezmoi`.
 - `rm -rf "$HOME/..."` sin guardas; `rm -rf /` disfrazado.
-- Sobrescribir `.zshrc`/`bspwm`/`nvim` sin backup ni consentimiento.
+- Sobrescribir `.zshrc`/configs de WM (`hypr`, `sway`, `bspwm`)/`nvim` sin backup ni consentimiento.
 - Forkear, copiar o "mejorar" `nvim-config` dentro de Archway; editar archivos trackeados de `~/.config/nvim`; actualizar plugins fuera de `lazy-lock.json`.
 - `--noconfirm` en AUR; compilar PKGBUILDs sin revisar.
 - Instalar BlackArch completo, grupos enteros o repos no verificados.
@@ -905,13 +1023,16 @@ Una tarea está terminada solo si:
 - Temas que rompen contraste o no respetan reduced motion.
 - "Arreglos" manuales en la PC de otra persona sin registrar el cambio.
 - Prometer funciones que no están implementadas o testeadas.
+- Cargar plugins de Hyprland (`hyprpm`) por defecto, o instalar plugins sin pinnear y auditar.
+- Reiniciar o matar el compositor durante `archway update`; reemplazar el display manager o la sesión por defecto del usuario.
+- Soportar a medias X11/bspwm: o es un perfil mantenido y probado, o no existe.
 
 ---
 
 ## 20. Decisiones abiertas (confirmar con el owner)
 
 1. **Repo/URL final:** se asume `github.com/grubberdubber/archway`; confirmar antes de publicar.
-2. **Default WM v0.1:** bspwm (propuesto). ¿Acepta que Hyprland sea v0.2?
+2. **Default WM v0.1:** Hyprland (Wayland, vía `uwsm`), con `sway` como fallback en v0.2; X11/bspwm fuera de alcance. ¿Ok?
 3. **Nombre del tema:** `android-mount` (display "Android Mount"). ¿Ok?
 4. **Perfil default:** `developer`; ¿o `minimal` para la primera prueba?
 5. **AUR helper:** `paru` default, `yay` fallback. ¿Ok?
@@ -922,6 +1043,9 @@ Una tarea está terminada solo si:
 10. **Marca:** ¿logo/wordmark de Archway? Pendiente; no bloquear MVP.
 11. **Pin de `nvim-config`:** se propone tag `vX.Y.Z` por release (no commit de `main`); confirmar cadencia y política de tags firmados.
 12. **Tema en Neovim:** requiere PR upstream para `lua/themes/android-mount.lua` y el hook local ignorado; sin eso, `v0.1.0` no declara paridad total del tema con Neovim y `doctor` lo reporta.
+13. **Política de versiones de Hyprland:** `compat.toml` con mínima y probada; `stable` solo con paquete oficial (ADR-014). ¿Ok?
+14. **Login:** TTY + `uwsm`, o `greetd` + `tuigreet` en instalaciones nuevas, sin tocar el display manager existente (ADR-013). ¿Ok?
+15. **NVIDIA:** soportada solo tras verificación en VM/live; si falla, `sway` o abortar con instrucciones. ¿Ok?
 
 Si el owner no responde, el agente debe usar la opción propuesta, documentarla y seguir; no bloquear el MVP por decisiones estéticas.
 
@@ -958,6 +1082,7 @@ h = /
 ```
 
 Capa de navegación opcional (no activar por defecto; puede chocar con AltGr):
+
 ```ini
 [main]
 rightalt = overload(nav, compose)
@@ -976,6 +1101,7 @@ m = pageup
 ```
 
 Notas:
+
 - `keyd` funciona en X11, Wayland y TTY.
 - Backup de `/etc/keyd/default.conf` antes de tocar; `keyd reload` para aplicar.
 - Probar en TTY y en sesión gráfica; algunos juegos leen evdev directo y pueden ignorar keyd.
@@ -1034,6 +1160,7 @@ Notas:
 ## Anexo C — Checklist de instalación en una PC ajena
 
 **Antes**
+
 - [ ] Consentimiento verbal/escrito y expectativas claras.
 - [ ] Backup de datos personales y verificación de restauración.
 - [ ] USB live de Arch + otro USB con Archway release.
@@ -1041,12 +1168,13 @@ Notas:
 - [ ] Espacio libre; no tocar particiones ajenas.
 - [ ] Red, mirrors, hora, locale, teclado.
 - [ ] GPU/RAM/disco detectados; driver elegido.
-- [ ] Perfil `developer`, WM `bspwm`, terminal `kitty`, tema `android-mount`.
+- [ ] Perfil `developer`, WM `hyprland`, terminal `kitty`, tema `android-mount`.
 - [ ] `nvim-config` pinneado; backup de `~/.config/nvim` si ya existía.
 - [ ] Snapshot/backup del sistema si ya hay Linux.
 - [ ] Plan de rollback escrito.
 
 **Durante**
+
 - [ ] `archway install --dry-run` y revisar plan.
 - [ ] Ejecutar install; no interrumpir pacman.
 - [ ] Revisar logs si algo falla; no improvisar `rm -rf`.
@@ -1057,6 +1185,7 @@ Notas:
 - [ ] Reiniciar y verificar segundo arranque.
 
 **Después**
+
 - [ ] Entregar cheatsheet y comandos básicos.
 - [ ] Explicar cómo actualizar, desinstalar y pedir ayuda.
 - [ ] Registrar issues/feedback.
@@ -1070,6 +1199,7 @@ Notas:
 > **Importante:** este catálogo es una **lista de candidatos**, no una orden de instalación. El installer solo instala lo que el perfil/selector elija. Ningún agente debe hacer `pacman -S` de todo esto.
 >
 > **Notación orientativa:**
+>
 > - Sin marca: probablemente en repos oficiales de Arch. Verificar igual.
 > - `†`: AUR o paquete de terceros; revisar PKGBUILD y mantenimiento.
 > - `‡`: BlackArch o herramienta ofensiva de laboratorio; solo perfil `security`, con autorización.
@@ -1079,16 +1209,19 @@ Notas:
 > **Regla de oro:** antes de agregar un paquete a un manifiesto, verificar con `pacman -Ss <nombre>`, `pacman -Fy <nombre>`, `paru -Ss <nombre>` y la documentación upstream. Si el nombre cambió, corregir el catálogo y anotarlo en CHANGELOG. Si no existe o está abandonado, no incluirlo.
 
 ### 21.1 Base del sistema, arranque y mantenimiento mínimo
+
 `base`, `base-devel`, `linux`, `linux-lts`, `linux-headers`, `linux-lts-headers`, `linux-firmware`, `intel-ucode`/`amd-ucode`, `sudo`, `git`, `curl`, `wget`, `gnupg`, `archlinux-keyring`, `pacman`, `pacman-contrib`, `reflector`, `paru†`, `yay†`, `man-db`, `man-pages`, `texinfo`, `bash-completion`, `zsh`, `tmux`, `openssh`, `rsync`, `unzip`, `zip`, `tar`, `xz`, `zstd`, `7zip`, `less`, `which`, `file`, `findutils`, `grep`, `sed`, `gawk`, `procps-ng`, `psmisc`, `util-linux`, `e2fsprogs`, `dosfstools`, `ntfs-3g`, `exfatprogs`, `btrfs-progs`, `xfsprogs`, `f2fs-tools`, `mdadm`, `lvm2`, `cryptsetup`, `smartmontools`, `nvme-cli`, `hdparm`, `sdparm`, `parted`, `gptfdisk`, `gparted`, `ddrescue`, `testdisk`, `sleuthkit`, `clamav`, `rkhunter`, `lynis`, `arch-audit`, `aide`, `audit`, `usbguard`, `firejail`, `apparmor`, `nftables`, `ufw`, `iptables-nft`, `fail2ban`, `crowdsec†`, `opensnitch†`, `dnscrypt-proxy`, `unbound`, `wireguard-tools`, `openvpn`, `tailscale`, `tor`, `torbrowser-launcher`, `mullvad-vpn†`, `proton-vpn†`, `macchanger`, `ethtool`, `iw`, `wpa_supplicant`, `networkmanager`, `network-manager-applet`, `bluez`, `bluez-utils`, `blueman`, `pipewire`, `pipewire-pulse`, `pipewire-alsa`, `pipewire-jack`, `wireplumber`, `pavucontrol`, `alsa-utils`, `sof-firmware`, `fwupd`, `power-profiles-daemon`, `tlp`, `auto-cpufreq†`, `thermald`, `cpupower`, `earlyoom`, `zram-generator`, `ananicy-cpp†`, `irqbalance`, `systemd`, `systemd-sysvcompat`, `systemd-boot`/`grub`/`refind`, `efibootmgr`, `os-prober`, `plymouth`, `mkinitcpio`, `dracut`, `sbctl`, `tpm2-tools`, `systemd-cryptenroll` (parte de systemd), `snapper`, `snap-pac`, `grub-btrfs†`, `timeshift†`, `btrfs-assistant†`, `btrfsmaintenance†`, `topgrade`, `rebuild-detector†`, `downgrade†`, `informant†`, `arch-update†`, `wikiman†`, `arch-wiki-docs`, `pkgfile`, `pacseek†`, `expac`, `pacutils`, `namcap`, `devtools`, `aurutils†`, `rate-mirrors†`, `chaotic-aur` (repo opcional), `reflector.timer`, `paccache.timer`, `fstrim.timer`.
 
 ### 21.2 Terminales, multiplexores y sesiones
+
 **Emuladores:** `kitty`, `alacritty`, `wezterm`, `ghostty`, `foot`, `rio`, `st†`, `konsole`, `yakuake`, `guake`, `tilix`, `terminator`, `cool-retro-term`, `xterm`, `urxvt`, `contour†`, `blackbox-terminal†`, `tabby†`, `hyper†`, `wezterm-git†`, `kitty-git†`.
 **Multiplexores:** `tmux`, `zellij`, `screen`, `byobu`, `abduco`, `dvtm`, `sesh†`, `tmuxp`, `tmuxinator†`, `smug†`, `mosh`, `autossh`, `et†` (Eternal Terminal), `tmate`, `reptyr`.
 **Grabación y demos:** `asciinema`, `agg†`, `vhs†`, `termsvg†`, `freeze†`.
 **Utilidades de terminal:** `gum`, `glow`, `mods†`, `bat`, `moar†`, `lnav`, `moreutils`, `parallel`, `pv`, `viddy†`, `entr`, `watch`, `script`, `expect` para automatización interactiva, `tmux-logging` (plugin), `tmux-resurrect`, `tmux-continuum`, `tmux-yank`, `tmux-thumbs`, `tmux-fzf`, `vim-tmux-navigator`.
-**Scratchpad:** terminal flotante por WM; en bspwm con reglas, en Hyprland con `special workspace`; no requiere paquete extra.
+**Scratchpad:** terminal flotante por compositor; en Hyprland con `special workspace`, en sway con scratchpad; no requiere paquete extra.
 
 ### 21.3 Shells, prompts y plugins
+
 **Shells:** `zsh`, `fish`, `nushell`, `xonsh`, `elvish`, `oils-for-unix†`, `bash`, `dash`.
 **Prompts:** `starship`, `oh-my-posh†`, `zsh-theme-powerlevel10k`, `tide†` (fish), `pure†`, `spaceship-prompt†`, `zsh-autosuggestions`, `zsh-syntax-highlighting`, `zsh-fast-syntax-highlighting†`, `zsh-completions`, `zsh-history-substring-search`, `fzf-tab†`, `zsh-autopair†`, `zsh-you-should-use†`, `zsh-abbr†`, `zsh-z†`, `zsh-navigation-tools`.
 **Gestores de plugins:** `sheldon†`, `antidote†`, `zinit†`, `antigen†`, `oh-my-zsh†` (no recomendado), `fisher†`, `fzf.fish†`, `autopair.fish†`.
@@ -1097,6 +1230,7 @@ Notas:
 **Pagers:** `bat`, `delta`, `moar†`, `lnav`, `less`, `most`, `ov†`, `peco†`.
 
 ### 21.4 Reemplazos modernos de coreutils y utilidades CLI
+
 **Listado/búsqueda:** `eza`, `lsd`, `bat`, `fd`, `ripgrep`, `ugrep`, `sd`, `choose†`, `tree`, `broot`, `fzf`.
 **Disco:** `dust`, `duf`, `ncdu`, `gdu`, `dua-cli`, `duc†`, `fclones`, `rmlint`, `jdupes`, `rmlint` + `rmlint-gui` opcional.
 **Procesos/sistema:** `procs`, `bottom`, `btop`, `htop`, `glances`, `pspg†`, `pgrep`/`pkill` (procps-ng), `lsof`, `fuser`, `pidof`.
@@ -1108,6 +1242,7 @@ Notas:
 **JSON/YAML/CSV:** ver 21.5.
 
 ### 21.5 Datos, texto, logs y formatos
+
 **JSON/YAML/XML/HTML:** `jq`, `yq`, `fx†`, `jless`, `gron`, `jaq†`, `jql†`, `dasel†`, `htmlq†`, `xmlstarlet`, `xq` (parte de `yq`), `jqp†`, `jsonnet†`, `cue†`, `nickel†`, `tomlq` (yq), `taplo`.
 **CSV/tablas:** `miller`, `qsv†`, `csvkit`, `visidata`, `xsv` (legacy), `tsv-utils†`, `sq`, `usql`.
 **Logs:** `lnav`, `goaccess`, `multitail`, `tailspin†`, `angle-grinder` (`agrind†`), `klogg†`, `journalctl` (systemd), `rsyslog`, `syslog-ng`.
@@ -1117,6 +1252,7 @@ Notas:
 **Documentos:** `pandoc`, `typst`, `tectonic`, `poppler`, `qpdf`, `pdftk`, `ocrmypdf`, `tesseract`, `zathura`, `zathura-pdf-mupdf`, `libreoffice-fresh`, `markdownlint-cli2`, `vale`, `lychee`.
 
 ### 21.6 Monitoreo, diagnóstico, red y hardware
+
 **Sistema:** `btop`, `bottom`, `htop`, `glances`, `s-tui`, `nvtop`, `iotop-c`, `powertop`, `atop`, `sysstat` (`pidstat`, `iostat`, `mpstat`), `vmstat`, `free`, `slabtop`, `smem`, `ps_mem†`.
 **Red:** `bandwhich`, `nethogs`, `iftop`, `vnstat`, `bmon`, `nload`, `trippy`, `mtr`, `gping†`, `doggo†`, `dig` (`bind`), `kdig` (`knot-utils`), `drill` (`ldns`), `whois`, `iperf3`, `speedtest-cli`, `ethtool`, `iproute2`, `ss`, `netstat` (`net-tools`), `nmap`, `masscan`, `zmap`, `rustscan†`, `arp-scan`, `netdiscover`, `nbtscan`, `hping` (`hping3`), `fping`, `tcpdump`, `tshark`/`wireshark-cli`, `wireshark-qt`, `termshark`, `ngrep`, `tcpflow`, `iftop`, `bmon`.
 **Hardware:** `fastfetch`, `neofetch` (deprecado), `inxi`, `hwinfo`, `lshw`, `dmidecode`, `lm_sensors`, `smartmontools`, `nvme-cli`, `hdparm`, `fio`, `stress-ng`, `sysstat`, `s-tui`, `turbostat†`, `cpupower`, `radeontop`, `intel-gpu-tools`, `nvtop`, `mesa-utils` (`glxinfo`), `vulkan-tools` (`vulkaninfo`), `clinfo`, `libva-utils` (`vainfo`), `vdpauinfo`, `drm_info†`, `edid-decode†`, `ddcutil`, `brightnessctl`, `i2c-tools`, `usbutils` (`lsusb`), `pciutils` (`lspci`), `usbguard`, `bolt` (Thunderbolt), `fwupd`.
@@ -1124,6 +1260,7 @@ Notas:
 **TUIs:** `bluetui†`, `impala†`, `wiremix†`, `nmtui`, `iwctl`, `wavemon`, `btop`, `bottom`, `glances`, `s-tui`, `nvtop`, `lazydocker`, `k9s`, `lazygit`, `gitui`, `tig`, `yazi`, `ranger`, `superfile†`, `visidata`, `harlequin†`, `posting†`, `aerc`, `neomutt`, `himalaya`, `newsboat`, `ncmpcpp`, `rmpc†`, `cmus`, `cava`, `spotify-player†`, `mpv`, `yt-dlp`, `timg†`, `chafa`, `viu†`.
 
 ### 21.7 Git, GitHub y flujo de desarrollo
+
 **Git:** `git`, `github-cli` (`gh`), `glab`, `lazygit`, `gitui`, `tig`, `jujutsu` (`jj`), `git-delta`, `difftastic`, `git-cliff`, `git-absorb`, `git-lfs`, `git-crypt`, `git-filter-repo`, `git-sizer`, `git-extras`, `git-quick-stats†`, `git-town†`, `gitwatch†`, `gh-dash†`, `ghq`, `onefetch`, `act`, `pre-commit`, `lefthook`, `commitizen`, `czg†`, `commitlint†`, `gitleaks`, `trufflehog†`, `semgrep†`, `bandit`, `osv-scanner`, `pip-audit`, `checkov†`, `dependency-review` (GitHub), `renovate†`/Dependabot.
 **Config git staff:** `pull.rebase=true`, `rebase.autoSquash=true`, `rebase.autoStash=true`, `merge.conflictStyle=zdiff3`, `rerere.enabled=true`, `diff.algorithm=histogram`, `push.autoSetupRemote=true`, `fetch.prune=true`, `branch.sort=-committerdate`, firma SSH (`gpg.format=ssh`), pager `delta`, editor `nvim`.
 **Editores/IDE:** `neovim` (config oficial: `github.com/grubberdubber/nvim-config`, NvChad v2.5 + lazy.nvim, pinneada), `helix`, `vim`, `emacs`, `micro`, `kakoune`, `zed†`, `vscodium†`, `code` (propietario), `neovide†`, `jetbrains-toolbox†`, `tree-sitter-cli`, `universal-ctags`, `lua-language-server`, `rust-analyzer`, `typescript-language-server`, `bash-language-server`, `marksman`, `yaml-language-server`, `vscode-langservers-extracted†`, `clangd`, `gopls`, `pyright`, `ruff`, `stylua`, `selene†`, `luacheck`, `shellcheck`, `shfmt`, `hadolint`, `actionlint`, `markdownlint-cli2`, `vale`, `typos`, `codespell`, `editorconfig-checker`, `dprint†`, `biome†`, `eslint`, `prettier`, `oxlint†`.
@@ -1131,6 +1268,7 @@ Notas:
 **IA en terminal (opcional):** `ollama`, `ollama-cuda`/`ollama-rocm`, `llama.cpp†`, `vllm†`, `open-webui†`, `aichat†`, `mods†`, `sgpt†`, `fabric†`, `llm†`, `aider-chat†`, `claude-code†`, `opencode†`, `codex†`, `gemini-cli†`, `copilot-cli†`, `goose†`, `open-interpreter†`, `whisper.cpp†`, `faster-whisper†`, `piper-tts†`, `kokoro†`.
 
 ### 21.8 Lenguajes, toolchains, LSPs y debugging
+
 **Gestores de versiones/entornos:** `mise`, `direnv`, `uv`, `pipx`, `poetry`, `pdm`, `hatch`, `rye†` (legacy), `fnm†`, `nvm†`, `corepack`, `asdf†` (legacy), `nix` (opcional), `devbox†`, `devenv†`, `nix-direnv†`, `home-manager`.
 **Rust:** `rustup`, `cargo`, `cargo-watch`, `cargo-nextest`, `cargo-audit`, `cargo-deny`, `cargo-edit`, `cargo-binstall`, `cargo-expand`, `cargo-outdated`, `cargo-udeps†`, `bacon`, `sccache`, `rust-analyzer`, `clippy`.
 **Python:** `python`, `python-pip`, `uv`, `pipx`, `poetry`, `ruff`, `pyright`, `ipython`, `pytest`, `mypy`, `black` (legacy), `isort` (legacy), `bandit`, `pip-audit`, `memray†`, `py-spy†`, `scalene†`, `pyinstrument†`.
@@ -1142,6 +1280,7 @@ Notas:
 **Reproducibilidad:** `docker`, `podman`, `devcontainer` (VS Code), `nix`, `devenv†`, `devbox†`, `vagrant`, `packer`.
 
 ### 21.9 APIs, bases de datos y red de desarrollo
+
 **HTTP/API:** `xh`, `httpie`, `curlie†`, `hurl`, `bruno†`, `posting†`, `insomnia†`, `grpcurl`, `websocat`, `mitmproxy`, `wuzz†`, `httpstat†`, `hey†`, `oha†`, `vegeta†`, `k6†`, `wrk`, `bombardier†`, `ab` (`apache-tools`), `h2load` (`nginx`).
 **Túneles/HTTPS local:** `cloudflared`, `ngrok†`, `caddy`, `mkcert`, `nginx`, `traefik†`, `step-cli†`, `openssl`, `gnutls`, `mbedtls`, `cfssl†`, `lego†`.
 **Bases de datos:** `sqlite`, `postgresql`, `mariadb`, `redis`, `valkey†`, `mongodb†` (legacy), `mongosh†`, `duckdb`, `clickhouse`†, `pgcli`, `mycli`, `litecli`, `usql`, `lazysql†`, `harlequin†`, `dbeaver`, `beekeeper-studio†`, `redis-insight†`, `mongo-compass†`.
@@ -1149,6 +1288,7 @@ Notas:
 **Diseño/ER:** `dbdiagram`* (web), `drawio-desktop†`, `plantuml`, `mermaid-cli†`, `graphviz`, `excalidraw†`.
 
 ### 21.10 Contenedores, Kubernetes, IaC y cloud
+
 **Contenedores:** `docker`, `docker-compose`, `docker-buildx`, `podman`, `podman-compose`, `buildah`, `skopeo`, `lazydocker`, `dive`, `ctop†`, `oxker†`, `docker-bench-security†`, `hadolint`, `trivy`, `grype`, `syft`, `cosign`.
 **Kubernetes:** `kubectl`, `helm`, `k9s`, `kubectx`, `kubens`, `stern`, `kind`, `minikube`, `k3s`, `k3d†`, `kustomize`, `krew`, `kubeconform†`, `kube-bench†`, `kube-hunter†`, `kubescape†`, `conftest†`, `opa†`, `argocd†`, `fluxcd†`, `cilium-cli†`, `hubble†`, `talosctl†`, `velero†`.
 **IaC:** `opentofu`, `terraform` (legacy), `terragrunt†`, `tflint`, `ansible`, `ansible-lint`, `packer`, `vagrant`, `pulumi†`, `crossplane†`, `cloud-init`, `qemu-full`, `libvirt`, `virt-manager`, `virt-viewer`, `edk2-ovmf`, `swtpm`, `spice`, `looking-glass†`, `virtiofsd`, `distrobox`, `incus`, `lxc`, `quickemu†`, `cloud-hypervisor†`, `firecracker†`.
@@ -1193,6 +1333,7 @@ repo **BlackArch** (opcional, vía `strap.sh` verificado), imagen **Kali** en di
 `cherrytree†`, `obsidian†`, `joplin†`, `xournalpp`, `flameshot`, `grim`+`slurp`+`satty`, `asciinema`, `tmux-logging`, `script`, `scrcpy` (Android), `exiftool`, `mat2`, `gitleaks`.
 
 ### 21.12 Privacidad, cifrado, llaves y backups
+
 **Contraseñas:** `bitwarden`, `bitwarden-cli`, `rbw†`, `rofi-rbw†`, `bws†`, `keepassxc`, `pass`, `pass-otp`, `gopass†`, `vaultwarden†` (autoalojado), `keyguard†` (Android).
 **Cifrado de archivos:** `age`, `rage†`, `sops`, `gnupg`, `minisign`, `signify†`, `veracrypt`, `cryptsetup` (LUKS), `gocryptfs`, `cryptomator†`, `zulucrypt†`, `keepassxc`, `qpdf` (protección PDF), `mat2`, `exiftool`, `bleachbit`, `metadata-cleaner` (Flatpak).
 **Llaves hardware:** `yubikey-manager` (`ykman`), `yubico-authenticator†`, `pam-u2f`, `libfido2`, `oath-toolkit`, `tpm2-tools`, `systemd-cryptenroll`, `sbctl`.
@@ -1202,6 +1343,7 @@ repo **BlackArch** (opcional, vía `strap.sh` verificado), imagen **Kali** en di
 **Metadatos/limpieza:** `mat2`, `exiftool`, `bleachbit`, `qpdf`, `poppler`, `pdf-redact-tools†`, `metadata-cleaner` (Flatpak), `shred` (coreutils; usar con cuidado en SSD), `nwipe†`, `ddrescue`.
 
 ### 21.13 Ingeniería de dotfiles y reproducibilidad
+
 **Gestores:** `chezmoi` (default), `stow`, `yadm`, `vcsh†`, `dotbot†`, `rcm†`, `tuckr†`, `dotter†`, `mackup†`, `dfm†`, `home-manager` (Nix), bare repo (`git --git-dir=$HOME/.dotfiles --work-tree=$HOME`).
 **Secretos en dotfiles:** `chezmoi` + `bitwarden`/`rbw`, `age`, `sops`, `pass`, `gpg`, `gitleaks`, `trufflehog†`, `git-filter-repo`, `pre-commit`.
 **XDG y limpieza:** `xdg-ninja†`, `xdg-user-dirs`, `xdg-utils`, `shared-mime-info`, `desktop-file-utils`, `hicolor-icon-theme`, `xdg-desktop-portal`, `xdg-desktop-portal-gtk`, `xdg-desktop-portal-hyprland`/`-wlr`.
@@ -1211,34 +1353,39 @@ repo **BlackArch** (opcional, vía `strap.sh` verificado), imagen **Kali** en di
 **Presentación:** `asciinema`, `agg†`, `vhs†`, `freeze†`, `fastfetch`, `onefetch`, `silicon†`, `carbon-now-cli†`, `charm` (`gum`, `glow`).
 
 ### 21.14 Mantenimiento de Arch y paquetes
+
 `paru†`, `yay†`, `pacman-contrib`, `reflector`, `rate-mirrors†`, `pkgfile`, `pacseek†`, `expac`, `pacutils`, `namcap`, `devtools`, `aurutils†`, `arch-update†`, `informant†`, `downgrade†`, `rebuild-detector†`, `arch-audit`, `snapper`, `snap-pac`, `grub-btrfs†`, `timeshift†`, `topgrade`, `chaotic-aur` (repo opcional), `wikiman†`, `arch-wiki-docs`, `fwupd`, `earlyoom`, `zram-generator`, `ananicy-cpp†`, `paccache.timer`, `fstrim.timer`, `reflector.timer`, `systemd-tmpfiles`, `journalctl --vacuum-*`, `pacman -Qtdq`, `pactree`, `pacdiff`, `checkupdates`, `paccache -r`, `pkgbrowser†`, `octopi†`, `bauh†`, `pamac†`.
 **Reglas:** `pacman -Syu` completo antes de instalar; no actualizaciones parciales; revisar noticias de Arch; snapshot antes; `pacdiff` para `.pacnew`; `paccache` para caché; `rebuild-detector` para AUR; `arch-audit` para CVEs; `downgrade` para rollback puntual; `topgrade` opcional y sin tocar dotfiles por su cuenta.
 
 ### 21.15 Teclado, atajos, input y accesibilidad
+
 **Remapeo:** `keyd` (default), `kanata†`, `interception-tools†`, `caps2esc†`, `xremap†`, `kmonad†`, `evremap†`, `input-remapper†`, `ydotool`, `dotool†`, `wtype`, `xdotool`, `wmctrl`, `xclip`, `xsel`, `wl-clipboard`, `cliphist`, `clipse†`, `copyq`, `greenclip†`, `clipman†`, `clipcat†`, `wl-clip-persist†`.
-**Eventos/gestos:** `wev`, `libinput`, `libinput-gestures`, `fusuma†`, `touchegg†`, `sxhkd`, `swhkd†`, `wlr-which-key†`.
+**Eventos/gestos:** `wev`, `libinput`, `libinput-gestures`, `fusuma†`, `touchegg†`, `wlr-which-key†`.
 **Expansión/automatización:** `espanso`, `autokey†`, `xdotool`, `ydotool`, `wtype`, `keyd` macros, QMK/Vial (firmware de teclado), `kmonad`.
 **Layouts:** `setxkbmap`, `xkbcomp`, `compose:ralt`, `us-altgr-intl`, `Colemak-DH`, `workman`, `dvorak`, `kbdd†`, `xkblayout-state†`.
 **Accesibilidad:** `orca`, `espeak-ng`, `speech-dispatcher`, `onboard`, `mousetweaks`, `kmag`, `gnome-accessibility-themes`, `hicolor-icon-theme`, `fontconfig`, `noto-fonts`, `noto-fonts-emoji`, `ttf-dejavu`, `ttf-liberation`.
 
 ### 21.16 Escritorio, window managers y rice
-**X11/bspwm:** `bspwm`, `sxhkd`, `picom`, `polybar`, `rofi`, `dunst`, `i3lock-color`, `feh`, `nitrogen`, `xsetroot`, `xrandr`, `arandr`, `lxappearance`, `qt5ct`, `qt6ct`, `kvantum`, `nwg-look`, `gtk-engine-murrine`, `gnome-themes-extra`, `papirus-icon-theme`, `tela-icon-theme†`, `bibata-cursor-theme†`, `xorg-xinit`, `xorg-server`, `xorg-xrandr`, `xorg-xsetroot`, `xorg-xprop`, `xdotool`, `wmctrl`.
-**Wayland/Hyprland:** `hyprland`, `waybar`, `sway`, `niri†`, `river`, `labwc`, `wayfire`, `swayfx†`, `hyprpaper`, `hyprlock`, `hypridle`, `hyprpicker`, `hyprshot†`, `grimblast†`, `grim`, `slurp`, `satty`, `swappy`, `wf-recorder`, `wl-screenrec†`, `gpu-screen-recorder†`, `obs-studio`, `fuzzel`, `wofi`, `tofi`, `walker†`, `anyrun†`, `vicinae†`, `rofi-wayland`, `mako`, `swaync`, `swaylock`, `swayidle`, `wlogout`, `swaybg`, `waypaper†`, `pywal`, `wallust†`, `matugen†`, `kanshi`, `nwg-displays†`, `shikane†`, `gammastep`, `wlsunset`, `brightnessctl`, `ddcutil`, `pipewire`, `wireplumber`, `pavucontrol`, `easyeffects`, `helvum`, `qpwgraph`, `playerctl`, `bluez`, `bluetui†`, `blueman`, `networkmanager`, `iwd`, `nmtui`, `impala†`, `wiremix†`, `xdg-desktop-portal-hyprland`, `xdg-desktop-portal-wlr`, `xdg-desktop-portal-gtk`, `hyprpolkitagent`, `polkit-gnome`, `gnome-keyring`, `libsecret`.
+
+**X11 (legacy, fuera de alcance; solo referencia):** `bspwm`, `sxhkd`, `picom`, `polybar`, `dunst`, `i3lock-color`, `feh`, `nitrogen`. Archway no los instala ni los prueba y no toca una sesión X11 existente.
+**Wayland/Hyprland (soportado):** `hyprland`, `uwsm`, `xorg-xwayland`, `waybar`, `sway`, `niri†`, `river`, `labwc`, `wayfire`, `swayfx†`, `hyprpaper`, `hyprlock`, `hypridle`, `hyprpicker`, `hyprshot†`, `grimblast†`, `grim`, `slurp`, `satty`, `swappy`, `wf-recorder`, `wl-screenrec†`, `gpu-screen-recorder†`, `obs-studio`, `fuzzel`, `wofi`, `tofi`, `walker†`, `anyrun†`, `vicinae†`, `rofi-wayland`, `mako`, `swaync`, `swaylock`, `swayidle`, `wlogout`, `swaybg`, `waypaper†`, `pywal`, `wallust†`, `matugen†`, `kanshi`, `nwg-displays†`, `shikane†`, `gammastep`, `wlsunset`, `brightnessctl`, `ddcutil`, `pipewire`, `wireplumber`, `pavucontrol`, `easyeffects`, `helvum`, `qpwgraph`, `playerctl`, `bluez`, `bluetui†`, `blueman`, `networkmanager`, `iwd`, `nmtui`, `impala†`, `wiremix†`, `xdg-desktop-portal-hyprland`, `xdg-desktop-portal-wlr`, `xdg-desktop-portal-gtk`, `hyprpolkitagent`, `polkit-gnome`, `gnome-keyring`, `libsecret`.
 **Login/display:** `greetd`, `tuigreet†`, `ly†`, `sddm`, `gdm`, `lightdm`, `lemurs†`, `regreet†`.
-**Widgets:** `eww`, `ags†` (Aylur's GTK Shell), `quickshell†`, `conky`, `polybar`, `waybar`, `nwg-panel†`, `sfwbar†`.
-**Wallpapers:** `swww`, `hyprpaper`, `swaybg`, `feh`, `nitrogen`, `variety`, `waypaper†`, `wpaperd†`, `mpvpaper†`, `plasma-wallpaper` (KDE).
+**Widgets:** `eww`, `ags†` (Aylur's GTK Shell), `quickshell†`, `nwg-panel†`, `sfwbar†` (opcionales; `conky` y `polybar` son X11 y no se soportan).
+**Wallpapers:** `hyprpaper` (default), `swaybg`, `swww`, `waypaper†`, `wpaperd†`, `mpvpaper†` (verificar el nombre actual del paquete antes de fijarlo en un manifiesto).
 **Capturas/grabación:** `grim`, `slurp`, `satty`, `swappy`, `flameshot`, `maim`, `scrot`, `ksnip`, `spectacle`, `obs-studio`, `wf-recorder`, `wl-screenrec†`, `gpu-screen-recorder†`, `kooha†`, `peek†`.
 **OCR:** `tesseract`, `tesseract-data-eng`, `tesseract-data-spa`, `ocrmypdf`, `gimagereader†`, `normcap†`.
 **Audio/video:** `pipewire`, `wireplumber`, `pipewire-alsa`, `pipewire-pulse`, `pipewire-jack`, `pavucontrol`, `easyeffects`, `helvum`, `qpwgraph`, `playerctl`, `mpv`, `ffmpeg`, `gst-libav`, `gst-plugins-good`, `gst-plugins-bad`, `gst-plugins-ugly`, `libva`, `libva-intel-driver`, `intel-media-driver`, `nvidia-utils`, `vulkan-icd-loader`, `vulkan-intel`, `vulkan-radeon`, `vulkan-nouveau`.
 **Multimedia:** `mpd`, `ncmpcpp`, `rmpc†`, `cmus`, `cava`, `spotify-player†`, `ncspot†`, `yt-dlp`, `mpv`, `imagemagick`, `graphicsmagick`, `ffmpeg`, `handbrake`, `mkvtoolnix`, `mediainfo`, `exiftool`.
 
 ### 21.17 Fuentes, iconos, temas y diseño
+
 **Nerd Fonts:** `ttf-jetbrains-mono-nerd`, `ttf-firacode-nerd`, `ttf-iosevka-nerd`, `ttf-cascadia-code-nerd`, `ttf-meslo-nerd`, `ttf-commit-mono-nerd†`, `ttf-maple-mono-nf†`, `ttf-nerd-fonts-symbols`, `ttf-nerd-fonts-symbols-mono`.
 **Texto/emoji/CJK:** `noto-fonts`, `noto-fonts-emoji`, `noto-fonts-cjk`, `ttf-dejavu`, `ttf-liberation`, `ttf-roboto`, `ttf-inter†`, `adobe-source-code-pro-fonts`, `fontconfig`, `freetype2`, `harfbuzz`.
 **Temas GTK/Qt:** `catppuccin-gtk-theme†`, `rose-pine-gtk-theme†`, `gruvbox-material-gtk-theme†`, `tokyo-night-gtk-theme†`, `kanagawa-gtk-theme†`, `nordic-gtk-theme†`, `everforest-gtk-theme†`, `colloid-gtk-theme†`, `whitesur-gtk-theme†`, `qogir-gtk-theme†`, `materia-gtk-theme`, `arc-gtk-theme`, `papirus-icon-theme`, `tela-icon-theme†`, `bibata-cursor-theme†`, `catppuccin-cursors†`, `nordzy-cursors†`, `volantes-cursors†`, `qt5ct`, `qt6ct`, `kvantum`, `nwg-look`, `lxappearance`, `gnome-themes-extra`.
 **Paletas:** Catppuccin, Rosé Pine, Gruvbox, Tokyo Night, Kanagawa, Nord, Everforest, Material You/Android Mount. Usar la misma paleta en terminal, barra, editor, rofi, bat, fzf, delta, btop, lazygit, yazi y starship.
 
 ### 21.18 Productividad, notas, medios, documentos e IA
+
 **Tareas/tiempo:** `taskwarrior`, `timewarrior`, `todoman`, `khal`, `vdirsyncer`, `calcurse`, `vit†`, `taskopen†`, `topydo†`, `todo.txt-cli†`, `remind†`.
 **Notas:** `obsidian†`, `zk†`, `nb†`, `jrnl†`, `cherrytree†`, `joplin†`, `logseq†`, `trilium†`, `siyuan†`, `xournalpp`, `neuron†`, `mdbook`, `hugo`, `zola`.
 **Correo/feeds:** `aerc`, `neomutt`, `himalaya†`, `newsboat`, `notmuch`, `isync` (`mbsync`), `msmtp`, `mu`, `mu4e`, `offlineimap`, `lieer†`, `gmailieer†`, `rssguard†`, `fluent-reader†`.
@@ -1250,6 +1397,7 @@ repo **BlackArch** (opcional, vía `strap.sh` verificado), imagen **Kali** en di
 **IA local/CLI:** `ollama`, `ollama-cuda`/`ollama-rocm`, `llama.cpp†`, `vllm†`, `open-webui†`, `aichat†`, `mods†`, `sgpt†`, `fabric†`, `llm†`, `aider-chat†`, `claude-code†`, `opencode†`, `codex†`, `gemini-cli†`, `copilot-cli†`, `goose†`, `open-interpreter†`, `whisper.cpp†`, `faster-whisper†`, `piper-tts†`, `kokoro†`.
 
 ### 21.19 Red, acceso remoto, sincronización y backups
+
 **Remoto:** `openssh`, `mosh`, `sshfs`, `tailscale`, `wireguard-tools`, `openvpn`, `autossh`, `et†`, `tmate`, `teleport` (`tsh†`), `rustdesk†`, `xrdp`, `freerdp`, `remmina`, `virt-viewer`, `spice-gtk`.
 **SSH config staff:** `ControlMaster auto`, `ControlPersist 10m`, `ServerAliveInterval 30`, `ServerAliveCountMax 3`, `ProxyJump`, `IdentitiesOnly yes`, `HashKnownHosts yes`, `AddKeysToAgent yes`, `UseKeychain` (macOS), llaves `ed25519` en Bitwarden/YubiKey.
 **Sincronización:** `syncthing`, `syncthingtray†`, `rclone`, `rsync`, `unison†`, `sshfs`, `kdeconnect`, `gsconnect†`, `localsend†`, `croc†`, `magic-wormhole†`, `wormhole-william†`.
@@ -1257,17 +1405,21 @@ repo **BlackArch** (opcional, vía `strap.sh` verificado), imagen **Kali** en di
 **Discos/medios:** `ventoy` (USB), `gparted`, `ddrescue`, `smartmontools`, `balena-etcher†`, `usbimager†`, `popsicle†`, `mkusb†`, `gnome-disk-utility`, `udisks2`, `udiskie`, `gvfs`, `gvfs-mtp`, `gvfs-smb`, `gvfs-nfs`, `exfatprogs`, `ntfs-3g`, `dosfstools`, `e2fsprogs`, `btrfs-progs`, `xfsprogs`, `f2fs-tools`.
 
 ### 21.20 Hardware, impresión, Android e iOS
+
 **Hardware:** `linux-firmware`, `intel-ucode`, `amd-ucode`, `fwupd`, `bolt`, `tlp`, `thermald`, `power-profiles-daemon`, `auto-cpufreq†`, `cpupower`, `lm_sensors`, `smartmontools`, `nvme-cli`, `hdparm`, `sdparm`, `nvtop`, `radeontop`, `intel-gpu-tools`, `mesa-utils`, `vulkan-tools`, `clinfo`, `libva-utils`, `vdpauinfo`, `drm_info†`, `edid-decode†`, `ddcutil`, `brightnessctl`, `i2c-tools`, `usbutils`, `pciutils`, `dmidecode`, `hwinfo`, `lshw`, `inxi`, `fastfetch`, `btop`, `bottom`, `glances`, `s-tui`, `stress-ng`, `fio`, `sysbench`, `memtester`.
 **Impresión/escaneo:** `cups`, `cups-pdf`, `hplip`, `sane`, `simple-scan`, `xsane`, `system-config-printer`, `avahi`, `nss-mdns`, `ghostscript`, `foomatic-db`, `gutenprint`.
 **Android:** `android-tools` (`adb`, `fastboot`), `scrcpy`, `simple-mtpfs`, `gvfs-mtp`, `android-file-transfer†`, `jmtpfs†`, `mtpfs†`, `qrencode`, `zbar`, `waydroid†`, `adb-sync†`.
 **iOS:** `libimobiledevice`, `usbmuxd`, `ifuse†`, `ideviceinstaller†`, `libirecovery†`.
 
 ### 21.21 Gaming y extras opcionales
+
 `steam`, `lutris`, `heroic-games-launcher†`, `gamemode`, `mangohud`, `vkbasalt†`, `protonup-qt†`, `wine`, `winetricks`, `bottles†`, `distrobox` (para gaming en contenedor), `gamescope`, `vkd3d`, `dxvk` (parte de wine/proton), `pipewire`, `obs-studio`, `discord†`, `vesktop†`, `armcord†`, `spotify†`, `freetube†`, `mpv`, `retroarch`, `emulationstation†`, `dolphin-emu`, `pcsx2`, `rpcs3†`, `yuzu` (legacy/legal), `ryujinx` (legacy/legal), `duckstation†`.
 **Nota:** gaming no es prioridad del MVP; instalar solo si el usuario lo pide. Nada de software pirata ni ROMs.
 
 ### 21.22 Verificación de nombres y ejemplos de instalación
+
 **Verificación rápida:**
+
 ```bash
 pacman -Ss '^kitty$'          # repo oficial
 pacman -Fy kitty              # qué paquete provee un archivo
@@ -1275,27 +1427,33 @@ paru -Ss '^kitty$'            # oficial + AUR
 paru -Si kitty                # info, versión, dependencias
 pkgfile -s kitty              # qué paquete contiene un binario
 ```
+
 **Instalación por grupos (ejemplo, no ejecutar a ciegas):**
+
 ```bash
 # 1) Actualizar el sistema completo primero
 sudo pacman -Syu
 
 # 2) Núcleo oficial del perfil minimal/developer
 sudo pacman -S --needed base-devel git chezmoi kitty zsh starship tmux neovim \
-  bspwm sxhkd polybar rofi dunst picom i3lock-color \
-  fzf zoxide ripgrep fd bat eza jq yq delta btop fastfetch \
+  hyprland uwsm waybar rofi swaync hyprlock hypridle hyprpaper \
+  xdg-desktop-portal-hyprland xdg-desktop-portal-gtk hyprpolkitagent \
+  grim slurp satty wl-clipboard cliphist \
+  fzf zoxide ripgrep fd bat eza jq yq git-delta btop fastfetch \
   networkmanager pipewire wireplumber pavucontrol \
   ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji
 
 # 3) AUR (revisar PKGBUILD antes; paru pregunta)
-paru -S --needed rbw rofi-rbw carapace-bin cliphist wl-clipboard \
+paru -S --needed rbw rofi-rbw carapace-bin wl-clip-persist \
   ttf-maple-mono-nf bibata-cursor-theme
 
 # 4) Seguridad: solo herramientas elegidas, nunca el grupo completo
 paru -S --needed nmap ffuf nuclei sqlmap hashcat john hydra impacket \
   netexec bloodhound certipy enum4linux-ng
 ```
+
 **Exportar/restaurar tu sistema:**
+
 ```bash
 pacman -Qqen > pkglist-official.txt
 pacman -Qqem > pkglist-aur.txt
@@ -1303,6 +1461,7 @@ pacman -Qqem > pkglist-aur.txt
 sudo pacman -S --needed - < pkglist-official.txt
 paru -S --needed - < pkglist-aur.txt
 ```
+
 **Regla final:** si un paquete del catálogo no se puede verificar o no tiene mantenimiento, **no se instala**. La lista es una biblioteca de opciones, no una obligación.
 
 ---
@@ -1320,4 +1479,4 @@ paru -S --needed - < pkglist-aur.txt
 - [ ] La experiencia sigue siendo keyboard-first, accesible y rápida.
 - [ ] Reporté qué cambió, cómo se probó y cómo revertir.
 
-**Mantra:** *"Si no se puede instalar sin miedo, actualizar sin dolor y revertir sin drama, todavía no es Archway."*
+**Mantra:** _"Si no se puede instalar sin miedo, actualizar sin dolor y revertir sin drama, todavía no es Archway."_

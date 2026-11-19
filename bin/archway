@@ -25,6 +25,8 @@ source "$ARCHWAY_ROOT/lib/theme.sh"
 source "$ARCHWAY_ROOT/lib/keys.sh"
 # shellcheck source=packages.sh
 source "$ARCHWAY_ROOT/lib/packages.sh"
+# shellcheck source=compat.sh
+source "$ARCHWAY_ROOT/lib/compat.sh"
 # shellcheck source=migrate.sh
 source "$ARCHWAY_ROOT/lib/migrate.sh"
 # shellcheck source=nvim.sh

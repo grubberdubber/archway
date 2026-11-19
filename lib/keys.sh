@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# keys.sh — parse keybinds.toml, validate, generate sxhkdrc and the cheatsheet.
+# keys.sh — parse keybinds.toml, validate, generate the Hyprland binds and the
+# cheatsheet. Hyprland is the only compositor we generate for (AGENTS.md §10).
 # shellcheck shell=bash
 
 if [[ -n ${ARCHWAY_KEYS_LOADED:-} ]]; then return 0; fi
 ARCHWAY_KEYS_LOADED=1
 
 KEYBINDS_FILE="$ARCHWAY_ROOT/keybinds/keybinds.toml"
-SXHKDRC_TARGET="$ARCHWAY_ROOT/dotfiles/dot_config/sxhkd/sxhkdrc"
+HYPRBINDS_TARGET="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf"
 KEYDOC_TARGET="$ARCHWAY_ROOT/docs/keybinds.md"
 
-declare -ga K_ID=() K_KEYS=() K_CMD=() K_CAT=() K_DESC=()
+declare -ga K_ID=() K_KEYS=() K_CMD=() K_CAT=() K_DESC=() K_DISPATCH=() K_ARG=() K_REPEAT=()
 
 keys_parse() {
   local file=${1:-$KEYBINDS_FILE}
   [[ -r $file ]] || die "keybinds file not found: $file" "$EX_PREFLIGHT"
 
-  K_ID=() K_KEYS=() K_CMD=() K_CAT=() K_DESC=()
+  K_ID=() K_KEYS=() K_CMD=() K_CAT=() K_DESC=() K_DISPATCH=() K_ARG=() K_REPEAT=()
   local line key val idx=-1
   while IFS= read -r line || [[ -n $line ]]; do
     [[ $line =~ ^[[:space:]]*# ]] && continue
@@ -26,6 +27,7 @@ keys_parse() {
     if [[ $line == '[[keybind]]' ]]; then
       idx=$((idx + 1))
       K_ID[idx]='' K_KEYS[idx]='' K_CMD[idx]='' K_CAT[idx]='' K_DESC[idx]=''
+      K_DISPATCH[idx]='' K_ARG[idx]='' K_REPEAT[idx]=''
       continue
     fi
     ((idx < 0)) && continue
@@ -43,6 +45,9 @@ keys_parse() {
       command) K_CMD[idx]=$val ;;
       category) K_CAT[idx]=$val ;;
       description) K_DESC[idx]=$val ;;
+      dispatcher) K_DISPATCH[idx]=$val ;;
+      argument) K_ARG[idx]=$val ;;
+      repeat) K_REPEAT[idx]=$val ;;
       *) warn "unknown key in $file: $key" ;;
     esac
   done < "$file"
@@ -51,12 +56,11 @@ keys_parse() {
 }
 
 # Normalise a chord for duplicate detection: lowercase, alias ctrl->control,
-# tokens trimmed and sorted (order of modifiers is irrelevant to sxhkd).
+# tokens trimmed and sorted (modifier order is irrelevant to Hyprland).
 keys_normalize() {
   local chord=$1 token
-  local -a tokens=()
+  local -a tokens=() out=()
   IFS='+' read -r -a tokens <<< "${chord,,}"
-  local -a out=()
   for token in "${tokens[@]}"; do
     token=$(trim "$token")
     [[ -z $token ]] && continue
@@ -72,7 +76,6 @@ keys_normalize() {
 }
 
 # Combinations we refuse to bind: they belong to the kernel/firmware.
-# Modifier order is irrelevant, so match tokens rather than a sorted string.
 keys_is_reserved() {
   local chord=${1,,}
   if [[ $chord =~ (^|\+)[[:space:]]*(ctrl|control)[[:space:]]*(\+|$) ]] &&
@@ -93,8 +96,19 @@ keys_validate() {
   for i in "${!K_ID[@]}"; do
     [[ -n ${K_ID[i]} ]] || errors+=("entry #$((i + 1)) has no id")
     [[ -n ${K_KEYS[i]} ]] || errors+=("${K_ID[i]:-entry #$((i + 1))}: empty keys")
-    [[ -n ${K_CMD[i]} ]] || errors+=("${K_ID[i]:-entry #$((i + 1))}: empty command")
     [[ -n ${K_CAT[i]} ]] || errors+=("${K_ID[i]:-entry #$((i + 1))}: empty category")
+    if [[ -z ${K_CMD[i]} && -z ${K_DISPATCH[i]} ]]; then
+      errors+=("${K_ID[i]:-entry #$((i + 1))}: needs a command or a dispatcher")
+    fi
+    if [[ -n ${K_CMD[i]} && -n ${K_DISPATCH[i]} ]]; then
+      errors+=("${K_ID[i]}: command and dispatcher are mutually exclusive")
+    fi
+    if [[ -n ${K_ARG[i]} && -z ${K_DISPATCH[i]} ]]; then
+      errors+=("${K_ID[i]}: argument requires a dispatcher")
+    fi
+    if [[ -n ${K_REPEAT[i]} && ${K_REPEAT[i]} != yes && ${K_REPEAT[i]} != no ]]; then
+      errors+=("${K_ID[i]}: repeat must be 'yes' or 'no'")
+    fi
 
     [[ -z ${K_KEYS[i]} ]] && continue
     if keys_is_reserved "${K_KEYS[i]}"; then
@@ -131,18 +145,56 @@ keys_validate() {
     for e in "${errors[@]}"; do err "$e"; done
     ((${#errors[@]} == 0)) && ok "keybinds OK (${#K_ID[@]} binds)"
   fi
-  if ((${#errors[@]} == 0)); then
-    return 0
-  fi
+  ((${#errors[@]} == 0)) && return 0
   return 1
 }
 
-keys_generate_sxhkdrc() {
-  local target=${1:-$SXHKDRC_TARGET}
+# "super + shift + Q" -> "SUPER SHIFT" (mods) and "Q" (key). Single characters
+# are upper-cased; keysym names (Return, Escape, Print, slash, XF86Audio*) are
+# already in the form Hyprland expects.
+keys_split_chord() {
+  local chord=$1 token key=''
+  local -a tokens=() mods=()
+  IFS='+' read -r -a tokens <<< "$chord"
+  local last=$((${#tokens[@]} - 1)) i
+  for i in "${!tokens[@]}"; do
+    token=$(trim "${tokens[i]}")
+    [[ -z $token ]] && continue
+    if ((i == last)); then
+      if ((${#token} == 1)); then token=${token^^}; fi
+      key=$token
+      continue
+    fi
+    case ${token,,} in
+      super | mod4 | win) mods+=(SUPER) ;;
+      shift) mods+=(SHIFT) ;;
+      alt | mod1) mods+=(ALT) ;;
+      ctrl | control) mods+=(CTRL) ;;
+      *) mods+=("${token^^}") ;;
+    esac
+  done
+  printf '%s|%s' "$(
+    IFS=' '
+    printf '%s' "${mods[*]}"
+  )" "$key"
+}
+
+# Human-readable action for the cheatsheet.
+keys_action_text() {
+  local i=$1
+  if [[ -n ${K_DISPATCH[i]} ]]; then
+    printf 'hyprctl dispatch %s%s' "${K_DISPATCH[i]}" "${K_ARG[i]:+ ${K_ARG[i]}}"
+  else
+    printf '%s' "${K_CMD[i]}"
+  fi
+}
+
+keys_generate_hypr() {
+  local target=${1:-$HYPRBINDS_TARGET}
   {
     printf '# Generated by archway from keybinds/keybinds.toml. Do not edit.\n'
     printf '# Regenerate: archway keys generate\n\n'
-    local cat i
+    local cat i split mods key kw
     local -a cats=()
     while IFS= read -r cat; do cats+=("$cat"); done < <(
       for i in "${!K_CAT[@]}"; do printf '%s\n' "${K_CAT[i]}"; done | awk '!seen[$0]++'
@@ -151,9 +203,22 @@ keys_generate_sxhkdrc() {
       printf '# --- %s ---\n\n' "$cat"
       for i in "${!K_ID[@]}"; do
         [[ ${K_CAT[i]} == "$cat" ]] || continue
-        printf '%s\n' "${K_KEYS[i]}"
-        printf '\t%s\n\n' "${K_CMD[i]}"
+        split=$(keys_split_chord "${K_KEYS[i]}")
+        mods=${split%%|*}
+        key=${split#*|}
+        kw=bind
+        [[ ${K_REPEAT[i]} == yes ]] && kw=binde
+        if [[ -n ${K_DISPATCH[i]} ]]; then
+          if [[ -n ${K_ARG[i]} ]]; then
+            printf '%s = %s, %s, %s, %s\n' "$kw" "$mods" "$key" "${K_DISPATCH[i]}" "${K_ARG[i]}"
+          else
+            printf '%s = %s, %s, %s\n' "$kw" "$mods" "$key" "${K_DISPATCH[i]}"
+          fi
+        else
+          printf '%s = %s, %s, exec, %s\n' "$kw" "$mods" "$key" "${K_CMD[i]}"
+        fi
       done
+      printf '\n'
     done
   } > "$target.tmp"
   if ((DRY_RUN)); then
@@ -162,7 +227,7 @@ keys_generate_sxhkdrc() {
     return 0
   fi
   mv -f -- "$target.tmp" "$target"
-  ok "sxhkdrc written: $target"
+  ok "Hyprland binds written: $target"
 }
 
 keys_generate_doc() {
@@ -173,7 +238,7 @@ keys_generate_doc() {
     printf '# Keybinds\n\n'
     printf '<!-- Generated by `archway keys generate` from `keybinds/keybinds.toml`. Do not edit. -->\n\n'
     printf 'Press `Super + /` at any time to open this list in a floating terminal.\n\n'
-    local cat i
+    local cat i action
     local -a cats=()
     while IFS= read -r cat; do cats+=("$cat"); done < <(
       for i in "${!K_CAT[@]}"; do printf '%s\n' "${K_CAT[i]}"; done | awk '!seen[$0]++'
@@ -183,7 +248,8 @@ keys_generate_doc() {
       printf '| Key | Action | Command |\n|---|---|---|\n'
       for i in "${!K_ID[@]}"; do
         [[ ${K_CAT[i]} == "$cat" ]] || continue
-        printf '| `%s` | %s | `%s` |\n' "${K_KEYS[i]}" "${K_DESC[i]}" "${K_CMD[i]//|/\\|}"
+        action=$(keys_action_text "$i")
+        printf '| `%s` | %s | `%s` |\n' "${K_KEYS[i]}" "${K_DESC[i]}" "${action//|/\\|}"
       done
       printf '\n'
     done
@@ -200,8 +266,8 @@ keys_generate_doc() {
 
 keys_generate() {
   keys_validate || die "refusing to generate from invalid keybinds" "$EX_FAIL"
-  mkdir -p -- "$(dirname -- "$SXHKDRC_TARGET")"
-  keys_generate_sxhkdrc "$SXHKDRC_TARGET"
+  mkdir -p -- "$(dirname -- "$HYPRBINDS_TARGET")"
+  keys_generate_hypr "$HYPRBINDS_TARGET"
   keys_generate_doc "$KEYDOC_TARGET"
 }
 
@@ -218,10 +284,10 @@ keys_check() {
   keys_parse
   local tmp rc=0 file target
   tmp=$(mktemp -d)
-  keys_generate_sxhkdrc "$tmp/sxhkdrc" > /dev/null 2>&1 || true
+  keys_generate_hypr "$tmp/binds.conf" > /dev/null 2>&1 || true
   keys_generate_doc "$tmp/keybinds.md" > /dev/null 2>&1 || true
 
-  for pair in "sxhkdrc:$SXHKDRC_TARGET" "keybinds.md:$KEYDOC_TARGET"; do
+  for pair in "binds.conf:$HYPRBINDS_TARGET" "keybinds.md:$KEYDOC_TARGET"; do
     file=$tmp/${pair%%:*}
     target=${pair#*:}
     if ! keys_same_content "$file" "$target"; then
@@ -242,12 +308,14 @@ keys_check() {
 keys_list() {
   keys_parse
   if ((JSON_OUT)); then
-    local i sep=''
+    local i sep='' action
     printf '['
     for i in "${!K_ID[@]}"; do
-      printf '%s{"id":%s,"keys":%s,"command":%s,"category":%s,"description":%s}' \
-        "$sep" "$(json_str "${K_ID[i]}")" "$(json_str "${K_KEYS[i]}")" \
-        "$(json_str "${K_CMD[i]}")" "$(json_str "${K_CAT[i]}")" "$(json_str "${K_DESC[i]}")"
+      action=$(keys_action_text "$i")
+      printf '%s{"id":%s,"keys":%s,"command":%s,"dispatcher":%s,"argument":%s,"category":%s,"description":%s}' \
+        "$sep" "$(json_str "${K_ID[i]}")" "$(json_str "${K_KEYS[i]}")" "$(json_str "${K_CMD[i]}")" \
+        "$(json_str "${K_DISPATCH[i]}")" "$(json_str "${K_ARG[i]}")" \
+        "$(json_str "${K_CAT[i]}")" "$(json_str "${K_DESC[i]}")"
       sep=','
     done
     printf ']\n'
@@ -261,11 +329,12 @@ keys_list() {
 }
 
 keys_search() {
-  local pattern=$1 i found=0
+  local pattern=$1 i found=0 action
   keys_parse
   for i in "${!K_ID[@]}"; do
-    if [[ ${K_KEYS[i]}${K_DESC[i]}${K_CMD[i]}${K_CAT[i]} == *"$pattern"* ]]; then
-      printf '%-28s %-34s %s\n' "${K_KEYS[i]}" "${K_DESC[i]}" "${K_CMD[i]}"
+    action=$(keys_action_text "$i")
+    if [[ ${K_KEYS[i]}${K_DESC[i]}${action}${K_CAT[i]} == *"$pattern"* ]]; then
+      printf '%-28s %-34s %s\n' "${K_KEYS[i]}" "${K_DESC[i]}" "$action"
       found=1
     fi
   done

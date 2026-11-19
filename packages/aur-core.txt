@@ -1,4 +1,6 @@
 # AUR — one package per line, each with a reason. Reviewed PKGBUILDs only.
+# Hyprland, waybar, swaync, hyprlock, hypridle and hyprpaper are official
+# packages; never replace them with -git variants outside the edge channel.
 # Never installed with --noconfirm; paru shows the diff first.
 # Names verified against the AUR RPC. Only what the official repos lack belongs here.
 
@@ -9,12 +11,8 @@ paru
 carapace-bin          # universal completions for zsh/bash/fish/nushell
 zsh-you-should-use    # reminds you that an alias already exists
 
-# X11 clipboard history (rofi front-end; cliphist stays available for Wayland)
-greenclip             # greenclip print + rofi -modi clipboard
-
 # Android MTP mounting (AGENTS.md §9.3). Not in core/extra.
 simple-mtpfs
 
 # Theme + fonts + cursor
 bibata-cursor-theme   # cursor theme matching the palette
-i3lock-color          # scriptable lock screen; provides `i3lock`

@@ -34,11 +34,14 @@ written to `managed.tsv`.
 `archway theme set android-mount` renders every module into
 `~/.config/archway/theme.d/` and reloads running components.
 
+- Hyprland reloads in place: `hyprctl reload` (never restart the compositor).
+- waybar restarts with `pkill -SIGUSR2 -x waybar`; swaync reloads with
+  `swaync-client -rs`.
 - kitty needs `allow_remote_control socket-only` (already in the shipped config)
   and a `KITTY_LISTEN_ON` socket to hot-reload; otherwise open a new window.
-- polybar and rofi read the files on restart: `polybar-msg cmd restart`.
-- dunst and bat get native copies (`dunst/dunstrc.d/90-android-mount.conf`,
-  `bat/themes/android-mount.tmTheme`) because they cannot include arbitrary paths.
+- waybar, swaync and bat get native copies (`waybar/theme.css`,
+  `swaync/theme.css`, `bat/themes/android-mount.tmTheme`) because they load
+  assets from their own tree.
 - Neovim applies the theme on its next start, never by reloading a session with
   unsaved buffers.
 
@@ -75,8 +78,9 @@ Until then the desktop installs fine; only Neovim is skipped.
 - `super + /` opens the generated cheatsheet.
 - Applet bindings go through `archway applet <name>`, so they work from any
   checkout as long as `archway` is on `PATH` (`~/.local/bin/archway`).
-- sxhkd must be running: `pgrep -x sxhkd`. `bspc wm -r` reloads the window
-  manager and restarts it.
+- Hyprland reads `~/.config/hypr/conf.d/20-keybinds.conf`; after editing the
+  source run `archway keys generate` and then `hyprctl reload`.
+- `hyprctl binds` lists what the compositor actually registered.
 
 ## Android device is not listed
 
@@ -99,8 +103,9 @@ systemctl --user enable --now pipewire pipewire-pulse wireplumber
 
 ## NVIDIA, Secure Boot, LUKS, dual boot
 
-Archway detects and warns but does not guess. For NVIDIA install
-`nvidia`/`nvidia-dkms` yourself and verify the session before relying on it. For
+Archway detects and warns but does not guess. With NVIDIA, install
+`nvidia`/`nvidia-dkms`, verify modeset and the Hyprland environment variables on
+a VM or live USB before relying on it, and keep `sway` or a TTY as plan B. For
 Secure Boot use `sbctl`; for LUKS enrolment use `systemd-cryptenroll`. Archway
 never repartitions, never removes Windows and never changes your bootloader.
 

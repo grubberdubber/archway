@@ -33,6 +33,8 @@ setup_sandbox() {
   source "$ARCHWAY_ROOT/lib/keys.sh"
   # shellcheck source=../../lib/packages.sh
   source "$ARCHWAY_ROOT/lib/packages.sh"
+  # shellcheck source=../../lib/compat.sh
+  source "$ARCHWAY_ROOT/lib/compat.sh"
   # shellcheck source=../../lib/nvim.sh
   source "$ARCHWAY_ROOT/lib/nvim.sh"
   # shellcheck source=../../lib/doctor.sh

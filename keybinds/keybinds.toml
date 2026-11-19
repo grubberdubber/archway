@@ -2,10 +2,14 @@
 # Archway keybinds — the single source of truth.
 #
 # `archway keys generate` writes:
-#   dotfiles/dot_config/sxhkd/sxhkdrc
+#   dotfiles/dot_config/hypr/conf.d/20-keybinds.conf
 #   docs/keybinds.md
-# `archway keys validate` rejects duplicates, empty commands and reserved
+# `archway keys validate` rejects duplicates, empty actions and reserved
 # combinations. Edit here, never in the generated files.
+#
+# Each entry needs either `command` (run with `exec`) or `dispatcher` (a native
+# Hyprland dispatcher such as `killactive`). `argument` is optional.
+# `repeat = "yes"` emits `binde` so holding the key keeps firing.
 
 [[keybind]]
 id = "terminal"
@@ -38,7 +42,7 @@ description = "File manager (yazi)"
 [[keybind]]
 id = "browser"
 keys = "super + b"
-command = "exec ${BROWSER:-firefox}"
+command = "${BROWSER:-firefox}"
 category = "apps"
 description = "Web browser"
 
@@ -52,233 +56,264 @@ description = "Run a command (archway, system tools)"
 [[keybind]]
 id = "window-close"
 keys = "super + q"
-command = "bspc node -c"
+dispatcher = "killactive"
 category = "windows"
 description = "Close focused window"
 
 [[keybind]]
 id = "window-fullscreen"
 keys = "super + f"
-command = "bspc node -t ~fullscreen"
+dispatcher = "fullscreen"
+argument = "0"
 category = "windows"
 description = "Toggle fullscreen"
 
 [[keybind]]
 id = "window-floating"
 keys = "super + shift + f"
-command = "bspc node -t ~floating"
+dispatcher = "togglefloating"
 category = "windows"
 description = "Toggle floating"
 
 [[keybind]]
 id = "focus-west"
 keys = "super + h"
-command = "bspc node -f west"
+dispatcher = "movefocus"
+argument = "l"
 category = "navigation"
 description = "Focus west"
 
 [[keybind]]
 id = "focus-south"
 keys = "super + j"
-command = "bspc node -f south"
+dispatcher = "movefocus"
+argument = "d"
 category = "navigation"
 description = "Focus south"
 
 [[keybind]]
 id = "focus-north"
 keys = "super + k"
-command = "bspc node -f north"
+dispatcher = "movefocus"
+argument = "u"
 category = "navigation"
 description = "Focus north"
 
 [[keybind]]
 id = "focus-east"
 keys = "super + l"
-command = "bspc node -f east"
+dispatcher = "movefocus"
+argument = "r"
 category = "navigation"
 description = "Focus east"
 
 [[keybind]]
 id = "move-west"
 keys = "super + shift + h"
-command = "bspc node -s west"
+dispatcher = "movewindow"
+argument = "l"
 category = "navigation"
-description = "Swap window west"
+description = "Move window west"
 
 [[keybind]]
 id = "move-south"
 keys = "super + shift + j"
-command = "bspc node -s south"
+dispatcher = "movewindow"
+argument = "d"
 category = "navigation"
-description = "Swap window south"
+description = "Move window south"
 
 [[keybind]]
 id = "move-north"
 keys = "super + shift + k"
-command = "bspc node -s north"
+dispatcher = "movewindow"
+argument = "u"
 category = "navigation"
-description = "Swap window north"
+description = "Move window north"
 
 [[keybind]]
 id = "move-east"
 keys = "super + shift + l"
-command = "bspc node -s east"
+dispatcher = "movewindow"
+argument = "r"
 category = "navigation"
-description = "Swap window east"
+description = "Move window east"
 
 [[keybind]]
 id = "resize-west"
 keys = "super + alt + h"
-command = "bspc node -z right -20 0 || bspc node -z left -20 0"
-category = "navigation"
-description = "Shrink horizontally"
-
-[[keybind]]
-id = "resize-south"
-keys = "super + alt + j"
-command = "bspc node -z bottom 0 20 || bspc node -z top 0 20"
-category = "navigation"
-description = "Shrink vertically"
-
-[[keybind]]
-id = "resize-north"
-keys = "super + alt + k"
-command = "bspc node -z top 0 -20 || bspc node -z bottom 0 -20"
-category = "navigation"
-description = "Grow vertically"
-
-[[keybind]]
-id = "resize-east"
-keys = "super + alt + l"
-command = "bspc node -z left 20 0 || bspc node -z right 20 0"
+dispatcher = "resizeactive"
+argument = "20 0"
 category = "navigation"
 description = "Grow horizontally"
 
 [[keybind]]
+id = "resize-south"
+keys = "super + alt + j"
+dispatcher = "resizeactive"
+argument = "0 20"
+category = "navigation"
+description = "Grow vertically"
+
+[[keybind]]
+id = "resize-north"
+keys = "super + alt + k"
+dispatcher = "resizeactive"
+argument = "0 -20"
+category = "navigation"
+description = "Shrink vertically"
+
+[[keybind]]
+id = "resize-east"
+keys = "super + alt + l"
+dispatcher = "resizeactive"
+argument = "-20 0"
+category = "navigation"
+description = "Shrink horizontally"
+
+[[keybind]]
 id = "workspace-1"
 keys = "super + 1"
-command = "bspc desktop -f 1"
+dispatcher = "workspace"
+argument = "1"
 category = "workspaces"
 description = "Workspace 1"
 
 [[keybind]]
 id = "workspace-2"
 keys = "super + 2"
-command = "bspc desktop -f 2"
+dispatcher = "workspace"
+argument = "2"
 category = "workspaces"
 description = "Workspace 2"
 
 [[keybind]]
 id = "workspace-3"
 keys = "super + 3"
-command = "bspc desktop -f 3"
+dispatcher = "workspace"
+argument = "3"
 category = "workspaces"
 description = "Workspace 3"
 
 [[keybind]]
 id = "workspace-4"
 keys = "super + 4"
-command = "bspc desktop -f 4"
+dispatcher = "workspace"
+argument = "4"
 category = "workspaces"
 description = "Workspace 4"
 
 [[keybind]]
 id = "workspace-5"
 keys = "super + 5"
-command = "bspc desktop -f 5"
+dispatcher = "workspace"
+argument = "5"
 category = "workspaces"
 description = "Workspace 5"
 
 [[keybind]]
 id = "workspace-6"
 keys = "super + 6"
-command = "bspc desktop -f 6"
+dispatcher = "workspace"
+argument = "6"
 category = "workspaces"
 description = "Workspace 6"
 
 [[keybind]]
 id = "workspace-7"
 keys = "super + 7"
-command = "bspc desktop -f 7"
+dispatcher = "workspace"
+argument = "7"
 category = "workspaces"
 description = "Workspace 7"
 
 [[keybind]]
 id = "workspace-8"
 keys = "super + 8"
-command = "bspc desktop -f 8"
+dispatcher = "workspace"
+argument = "8"
 category = "workspaces"
 description = "Workspace 8"
 
 [[keybind]]
 id = "workspace-9"
 keys = "super + 9"
-command = "bspc desktop -f 9"
+dispatcher = "workspace"
+argument = "9"
 category = "workspaces"
 description = "Workspace 9"
 
 [[keybind]]
 id = "send-workspace-1"
 keys = "super + shift + 1"
-command = "bspc node -d 1 --follow"
+dispatcher = "movetoworkspace"
+argument = "1"
 category = "workspaces"
-description = "Move window to workspace 1 (follow)"
+description = "Move window to workspace 1"
 
 [[keybind]]
 id = "send-workspace-2"
 keys = "super + shift + 2"
-command = "bspc node -d 2 --follow"
+dispatcher = "movetoworkspace"
+argument = "2"
 category = "workspaces"
-description = "Move window to workspace 2 (follow)"
+description = "Move window to workspace 2"
 
 [[keybind]]
 id = "send-workspace-3"
 keys = "super + shift + 3"
-command = "bspc node -d 3 --follow"
+dispatcher = "movetoworkspace"
+argument = "3"
 category = "workspaces"
-description = "Move window to workspace 3 (follow)"
+description = "Move window to workspace 3"
 
 [[keybind]]
 id = "send-workspace-4"
 keys = "super + shift + 4"
-command = "bspc node -d 4 --follow"
+dispatcher = "movetoworkspace"
+argument = "4"
 category = "workspaces"
-description = "Move window to workspace 4 (follow)"
+description = "Move window to workspace 4"
 
 [[keybind]]
 id = "send-workspace-5"
 keys = "super + shift + 5"
-command = "bspc node -d 5 --follow"
+dispatcher = "movetoworkspace"
+argument = "5"
 category = "workspaces"
-description = "Move window to workspace 5 (follow)"
+description = "Move window to workspace 5"
 
 [[keybind]]
 id = "send-workspace-6"
 keys = "super + shift + 6"
-command = "bspc node -d 6 --follow"
+dispatcher = "movetoworkspace"
+argument = "6"
 category = "workspaces"
-description = "Move window to workspace 6 (follow)"
+description = "Move window to workspace 6"
 
 [[keybind]]
 id = "send-workspace-7"
 keys = "super + shift + 7"
-command = "bspc node -d 7 --follow"
+dispatcher = "movetoworkspace"
+argument = "7"
 category = "workspaces"
-description = "Move window to workspace 7 (follow)"
+description = "Move window to workspace 7"
 
 [[keybind]]
 id = "send-workspace-8"
 keys = "super + shift + 8"
-command = "bspc node -d 8 --follow"
+dispatcher = "movetoworkspace"
+argument = "8"
 category = "workspaces"
-description = "Move window to workspace 8 (follow)"
+description = "Move window to workspace 8"
 
 [[keybind]]
 id = "send-workspace-9"
 keys = "super + shift + 9"
-command = "bspc node -d 9 --follow"
+dispatcher = "movetoworkspace"
+argument = "9"
 category = "workspaces"
-description = "Move window to workspace 9 (follow)"
+description = "Move window to workspace 9"
 
 [[keybind]]
 id = "theme-selector"
@@ -297,7 +332,7 @@ description = "Mount / unmount Android device (MTP)"
 [[keybind]]
 id = "clipboard-history"
 keys = "super + v"
-command = "cliphist list | rofi -dmenu -display-columns 2 -p clipboard | cliphist decode | xclip -selection clipboard"
+command = "cliphist list | rofi -dmenu -display-columns 2 -p clipboard | cliphist decode | wl-copy"
 category = "archway"
 description = "Clipboard history"
 
@@ -331,27 +366,27 @@ description = "Power menu"
 
 # AGENTS.md §10.2 lists both Super+L (lock) and Super+H/J/K/L (focus), which is
 # a conflict; the validation test caught it. hjkl navigation wins, so locking
-# moves to Super+Escape (and Super+Shift+Q remains the power menu).
+# stays on Super+Escape (AGENTS.md was corrected to match).
 [[keybind]]
 id = "lock"
 keys = "super + Escape"
-command = "i3lock -c 0B0F14 -n"
+command = "hyprlock"
 category = "system"
 description = "Lock screen"
 
 [[keybind]]
 id = "reload-wm"
 keys = "super + alt + r"
-command = "bspc wm -r"
+dispatcher = "reload"
 category = "system"
-description = "Reload window manager"
+description = "Reload Hyprland config"
 
 [[keybind]]
 id = "logout"
 keys = "super + shift + e"
-command = "bspc quit"
+command = "command -v uwsm >/dev/null 2>&1 && uwsm stop || hyprctl dispatch exit"
 category = "system"
-description = "Log out of bspwm"
+description = "Log out of the session"
 
 [[keybind]]
 id = "cheatsheet"
@@ -363,21 +398,23 @@ description = "Keybind cheatsheet"
 [[keybind]]
 id = "volume-up"
 keys = "XF86AudioRaiseVolume"
-command = "pamixer -i 5 && dunstify -t 800 -h int:value:$(pamixer --get-volume) volume $(pamixer --get-volume)%"
+command = "pamixer -i 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%"
 category = "media"
 description = "Volume up"
+repeat = "yes"
 
 [[keybind]]
 id = "volume-down"
 keys = "XF86AudioLowerVolume"
-command = "pamixer -d 5 && dunstify -t 800 -h int:value:$(pamixer --get-volume) volume $(pamixer --get-volume)%"
+command = "pamixer -d 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%"
 category = "media"
 description = "Volume down"
+repeat = "yes"
 
 [[keybind]]
 id = "volume-mute"
 keys = "XF86AudioMute"
-command = "pamixer -t && dunstify -t 800 'mute' $(pamixer --get-mute)"
+command = "pamixer -t && notify-send -t 800 -h string:x-canonical-private-synchronous:volume 'mute' $(pamixer --get-mute)"
 category = "media"
 description = "Toggle mute"
 
@@ -408,6 +445,7 @@ keys = "XF86MonBrightnessUp"
 command = "brightnessctl set +5%"
 category = "media"
 description = "Brightness up"
+repeat = "yes"
 
 [[keybind]]
 id = "brightness-down"
@@ -415,3 +453,4 @@ keys = "XF86MonBrightnessDown"
 command = "brightnessctl set 5%-"
 category = "media"
 description = "Brightness down"
+repeat = "yes"

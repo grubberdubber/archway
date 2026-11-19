@@ -14,7 +14,7 @@ Usage:
   power.sh [--rofi] [--dry-run]
   power.sh --action <lock|logout|suspend|reboot|poweroff>
 
-Actions: lock, logout (bspwm), suspend, reboot, poweroff.
+Actions: lock (hyprlock), logout (uwsm/Hyprland), suspend, reboot, poweroff.
 Every destructive action asks for confirmation unless it came from the menu
 (which shows the exact command before running it).
 EOF
@@ -38,22 +38,25 @@ run_action() {
   local action=$1
   case $action in
     lock)
-      command -v i3lock > /dev/null 2>&1 || {
-        notify "lock unavailable" "install i3lock-color"
+      command -v hyprlock > /dev/null 2>&1 || {
+        notify "lock unavailable" "install hyprlock"
         return 1
       }
       [[ $DRY_RUN == 1 ]] && {
-        echo "[dry-run] i3lock -c 0B0F14 -n"
+        echo "[dry-run] hyprlock"
         return 0
       }
-      exec i3lock -c 0B0F14 -n
+      exec hyprlock
       ;;
     logout)
       [[ $DRY_RUN == 1 ]] && {
-        echo "[dry-run] bspc quit"
+        echo "[dry-run] uwsm stop || hyprctl dispatch exit"
         return 0
       }
-      exec bspc quit
+      if command -v uwsm > /dev/null 2>&1; then
+        exec uwsm stop
+      fi
+      exec hyprctl dispatch exit
       ;;
     suspend | reboot | poweroff)
       local verb=$action
@@ -81,8 +84,8 @@ menu() {
   }
   local choice
   choice=$(printf '%s\n' \
-    "lock        i3lock" \
-    "logout      bspc quit" \
+    "lock        hyprlock" \
+    "logout      uwsm stop" \
     "suspend     systemctl suspend" \
     "reboot      systemctl reboot" \
     "poweroff    systemctl poweroff" |
