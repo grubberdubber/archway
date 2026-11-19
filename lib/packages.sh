@@ -96,9 +96,13 @@ pkg_check() {
   require_cmd pacman
   local missing=() p
   local -a pkgs=()
-  local official_index
+  local official_index repo
   official_index=$(mktemp)
-  pacman -Sl core extra multilib 2> /dev/null | awk '{print $2}' | sort -u > "$official_index"
+  # Iterate repos individually: multilib is not configured in every container,
+  # and one unavailable repo must not fail the whole check under pipefail.
+  for repo in core extra multilib; do
+    pacman -Sl "$repo" 2> /dev/null | awk '{print $2}' || true
+  done | sort -u > "$official_index"
 
   mapfile -t pkgs < <(
     manifest_packages official-core
