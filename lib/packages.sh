@@ -89,24 +89,33 @@ pkg_export() {
   ok "exported package lists to $dest"
 }
 
-# Verify every official package exists. Requires network + pacman; opt-in.
+# Verify every official package exists in core/extra/multilib ONLY. `pacman -Si`
+# also matches chaotic-aur and blackarch when the developer has those repos
+# enabled, which silently turns a broken official manifest into a green check.
 pkg_check() {
   require_cmd pacman
   local missing=() p
   local -a pkgs=()
+  local official_index
+  official_index=$(mktemp)
+  pacman -Sl core extra multilib 2> /dev/null | awk '{print $2}' | sort -u > "$official_index"
+
   mapfile -t pkgs < <(
     manifest_packages official-core
     manifest_packages official-desktop
     manifest_packages official-dev
+    manifest_packages official-sec
     manifest_packages fonts
   )
   if ((${#pkgs[@]} == 0)); then
     warn "no packages found in manifests"
+    rm -f -- "$official_index"
     return 0
   fi
   for p in "${pkgs[@]}"; do
-    pacman -Si -- "$p" > /dev/null 2>&1 || missing+=("$p")
+    grep -qxF -- "$p" "$official_index" || missing+=("$p")
   done
+  rm -f -- "$official_index"
   if ((${#missing[@]})); then
     err "not found in the official repositories: ${missing[*]}"
     return 1

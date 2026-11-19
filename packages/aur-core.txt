@@ -12,6 +12,9 @@ zsh-you-should-use    # reminds you that an alias already exists
 # X11 clipboard history (rofi front-end; cliphist stays available for Wayland)
 greenclip             # greenclip print + rofi -modi clipboard
 
+# Android MTP mounting (AGENTS.md §9.3). Not in core/extra.
+simple-mtpfs
+
 # Theme + fonts + cursor
 bibata-cursor-theme   # cursor theme matching the palette
 i3lock-color          # scriptable lock screen; provides `i3lock`

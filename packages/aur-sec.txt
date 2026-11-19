@@ -1,6 +1,18 @@
 # Security-profile AUR packages. Authorised labs only. No BlackArch groups.
 # Names verified against the AUR RPC. Prefer official repos when a package migrates.
 
+# Web and recon tooling that is not in core/extra
+ffuf
+feroxbuster
+whatweb
+steghide
+
+# Forensics / network security
+zeek
+suricata
+aide
+grype
+
 # Modern recon tooling (ProjectDiscovery and friends)
 nuclei
 subfinder

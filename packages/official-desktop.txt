@@ -39,8 +39,7 @@ bluez-utils
 blueman
 libnotify
 
-# MTP / removable media
-simple-mtpfs
+# MTP / removable media (simple-mtpfs is AUR; see aur-core.txt)
 udisks2
 gvfs
 gvfs-mtp

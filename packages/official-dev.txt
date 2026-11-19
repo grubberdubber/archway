@@ -54,7 +54,7 @@ httpie
 websocat
 sqlite
 postgresql
-redis
+valkey
 pgcli
 docker
 docker-compose

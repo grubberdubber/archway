@@ -2,15 +2,12 @@
 # Authorised testing only: your own systems, CTFs, labs, or signed client scope.
 # Never install whole BlackArch groups. Every name verified with `pacman -Si`.
 
-# Recon and web testing
+# Recon and web testing (ffuf, feroxbuster and whatweb are AUR; see aur-sec.txt)
 nmap
 masscan
-ffuf
 gobuster
-feroxbuster
 sqlmap
 nikto
-whatweb
 zaproxy
 mitmproxy
 termshark
@@ -44,22 +41,18 @@ binwalk
 binutils
 jadx
 z3
-steghide
 perl-image-exiftool
 
-# Active Directory (lab)
+# Active Directory (lab). certipy/evil-winrm/semgrep have no official or AUR
+# package; install those deliberately in a lab venv, never automatically.
 impacket
-certipy
-evil-winrm
 
-# Forensics and malware analysis
+# Forensics and malware analysis (zeek/suricata are AUR; see aur-sec.txt)
 yara
 sleuthkit
 testdisk
 ddrescue
 foremost
-zeek
-suricata
 osquery
 audit
 volatility3
@@ -68,7 +61,6 @@ volatility3
 lynis
 rkhunter
 clamav
-aide
 apparmor
 firejail
 bubblewrap
@@ -82,9 +74,7 @@ tpm2-tools
 ssh-audit
 sslscan
 trivy
-grype
 syft
 cosign
 osv-scanner
-semgrep
 bandit

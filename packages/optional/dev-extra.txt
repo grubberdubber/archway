@@ -8,7 +8,6 @@ strace
 ltrace
 perf
 bpftrace
-rr
 kubectl
 helm
 kubectx

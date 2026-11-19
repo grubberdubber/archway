@@ -205,21 +205,35 @@ keys_generate() {
   keys_generate_doc "$KEYDOC_TARGET"
 }
 
+# Content comparison without diffutils: a bare Arch container has coreutils but
+# may not ship `diff`, and a missing diff must never look like drift.
+keys_same_content() {
+  local a=$1 b=$2
+  [[ -r $a && -r $b ]] || return 1
+  [[ $(sha256sum -- "$a" | cut -d' ' -f1) == "$(sha256sum -- "$b" | cut -d' ' -f1)" ]]
+}
+
 # Ensure the committed artifacts match the source (used by CI and `keys check`).
 keys_check() {
   keys_parse
-  local tmp rc=0
+  local tmp rc=0 file target
   tmp=$(mktemp -d)
   keys_generate_sxhkdrc "$tmp/sxhkdrc" > /dev/null 2>&1 || true
   keys_generate_doc "$tmp/keybinds.md" > /dev/null 2>&1 || true
-  if ! diff -q "$tmp/sxhkdrc" "$SXHKDRC_TARGET" > /dev/null 2>&1; then
-    err "sxhkdrc is out of date; run 'archway keys generate'"
-    rc=1
-  fi
-  if ! diff -q "$tmp/keybinds.md" "$KEYDOC_TARGET" > /dev/null 2>&1; then
-    err "docs/keybinds.md is out of date; run 'archway keys generate'"
-    rc=1
-  fi
+
+  for pair in "sxhkdrc:$SXHKDRC_TARGET" "keybinds.md:$KEYDOC_TARGET"; do
+    file=$tmp/${pair%%:*}
+    target=${pair#*:}
+    if ! keys_same_content "$file" "$target"; then
+      err "$(basename -- "$target") is out of date; run 'archway keys generate'"
+      # Unified diff is optional diagnostics, never required to detect drift.
+      if have diff; then
+        diff -u "$target" "$file" 2> /dev/null | head -n 40 >&2 || true
+      fi
+      rc=1
+    fi
+  done
+
   rm -rf -- "$tmp"
   ((rc == 0)) && ok "generated keybind artifacts are up to date"
   return "$rc"

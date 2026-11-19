@@ -50,11 +50,16 @@ jobs:
       - name: Bats unit tests
         run: bats tests/bats
 
-      - name: Smoke tests (end-to-end, throwaway HOME)
-        run: ./tests/smoke.sh
+      # Mutating commands refuse root by design, so the end-to-end suite runs as
+      # a real unprivileged user (AGENTS.md §14.1: container with a non-root user).
+      - name: Smoke tests as non-root (throwaway HOME)
+        run: |
+          useradd -m ci
+          chown -R ci:ci .
+          su ci -c "HOME=/home/ci ./tests/smoke.sh"
 
       - name: Secret scan
-        run: gitleaks detect --source . --no-banner --redact
+        run: gitleaks dir . --no-banner --redact
 
   manifests:
     name: package names exist
