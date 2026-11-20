@@ -17,7 +17,7 @@ THEME_REQUIRED_KEYS=(
 # module -> stable filename inside $THEME_D_DIR
 declare -gA THEME_TARGETS=(
   [kitty]=kitty.conf
-  [hyprland]=hyprland.conf
+  [hyprland]=hyprland.lua
   [waybar]=waybar.css
   [swaync]=swaync.css
   [hyprlock]=hyprlock.conf
@@ -240,6 +240,23 @@ theme_render() {
     template=$(find "$(theme_path "$id")/$module" -type f 2> /dev/null | sort | head -n1)
     [[ -n $template ]] || continue
     theme_render_file "$template" "$dest/${THEME_TARGETS[$module]}"
+  done
+
+  # Drop artifacts for targets this theme no longer ships, otherwise a file from
+  # an older Archway (e.g. hyprland.conf after the Lua migration) lingers and
+  # gets sourced by mistake.
+  local file target keep
+  for file in "$dest"/*; do
+    [[ -f $file ]] || continue
+    keep=0
+    for target in "${THEME_TARGETS[@]}"; do
+      if [[ $(basename -- "$file") == "$target" ]]; then
+        keep=1
+        break
+      fi
+    done
+    [[ $keep == 1 || $(basename -- "$file") == theme.conf ]] && continue
+    rm -f -- "$file"
   done
   ok "rendered theme '$id' into $dest"
 }

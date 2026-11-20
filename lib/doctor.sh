@@ -113,6 +113,18 @@ doctor_run() {
   else
     doctor_add "hyprland" warn "desktops/hyprland/compat.toml is missing"
   fi
+  # 0.57 replaced hyprlang with a Lua API, so a config that still parses as
+  # key=value silently produces a bare session. Ask the binary itself.
+  local hypr_config="$XDG_CONFIG_HOME/hypr/hyprland.lua"
+  if have Hyprland && [[ -f $hypr_config ]]; then
+    local parsed
+    parsed=$(timeout 15 Hyprland -c "$hypr_config" --verify-config 2>&1 | tail -n 5)
+    if [[ $parsed == *"config ok"* ]]; then
+      doctor_add "hyprland.config" ok "hyprland.lua parses"
+    else
+      doctor_add "hyprland.config" fail "hyprland.lua does not parse: $(printf '%s' "$parsed" | tr '\n' ' ')"
+    fi
+  fi
   local missing_session=() c
   for c in waybar swaync hyprlock hypridle; do have "$c" || missing_session+=("$c"); done
   if ((${#missing_session[@]})); then

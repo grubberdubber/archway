@@ -62,11 +62,61 @@ dotfiles_status() {
   chezmoi --source "$DOTFILES_SRC" status 2> /dev/null || true
 }
 
+# chezmoi never deletes targets that disappeared from the source, so renaming a
+# managed file (hyprland.conf -> hyprland.lua) leaves the old artifact behind and
+# Hyprland could still pick it up. Remove only files Archway recorded as managed
+# whose source no longer exists; user files are never touched.
+dotfiles_target_source() {
+  local rel=${1#"$HOME"/}
+  case $rel in
+    .config/*) printf '%s/dot_config/%s' "$DOTFILES_SRC" "${rel#.config/}" ;;
+    .local/share/*) printf '%s/dot_local/share/%s' "$DOTFILES_SRC" "${rel#.local/share/}" ;;
+    .zshrc) printf '%s/dot_zshrc' "$DOTFILES_SRC" ;;
+    *) return 1 ;;
+  esac
+}
+
+dotfiles_prune_stale() {
+  [[ -r $MANAGED_MANIFEST ]] || return 0
+  local path origin stamp src
+  local -a keep=() removed=()
+  while IFS=$'\t' read -r path origin stamp; do
+    [[ -n $path ]] || continue
+    if [[ $origin != chezmoi ]] || ! src=$(dotfiles_target_source "$path"); then
+      keep+=("$path"$'\t'"$origin"$'\t'"$stamp")
+      continue
+    fi
+    if [[ -e $src || -e $src.tmpl ]]; then
+      keep+=("$path"$'\t'"$origin"$'\t'"$stamp")
+      continue
+    fi
+    if ((DRY_RUN)); then
+      ui_note "[dry-run] would remove stale managed file: $path"
+      keep+=("$path"$'\t'"$origin"$'\t'"$stamp")
+      continue
+    fi
+    if [[ -f $path ]]; then
+      rm -f -- "$path"
+      removed+=("$path")
+    elif [[ -d $path ]] && rmdir -- "$path" 2> /dev/null; then
+      removed+=("$path")
+    else
+      keep+=("$path"$'\t'"$origin"$'\t'"$stamp")
+    fi
+  done < "$MANAGED_MANIFEST"
+  ((${#removed[@]})) || return 0
+  printf '%s\n' "${keep[@]}" > "$MANAGED_MANIFEST.tmp"
+  mv -f -- "$MANAGED_MANIFEST.tmp" "$MANAGED_MANIFEST"
+  ui_note "removed ${#removed[@]} stale managed file(s)"
+  printf '  %s\n' "${removed[@]}" >&2
+}
+
 dotfiles_apply() {
   local changes
   changes=$(dotfiles_status)
   section "Dotfiles (chezmoi)"
   if [[ -z $changes ]]; then
+    dotfiles_prune_stale
     ok "dotfiles already up to date"
     return 0
   fi
@@ -105,6 +155,8 @@ dotfiles_apply() {
     ((skip)) && continue
     record_managed "$target" chezmoi
   done <<< "$changes"
+
+  dotfiles_prune_stale
 }
 
 shell_link() {

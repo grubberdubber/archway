@@ -8,8 +8,10 @@
 
 schema = 1
 
+# 0.57 moved the configuration itself to Lua (`hl.*`). Anything older needs
+# hyprlang files, which Archway no longer ships; treat 0.57.0 as the real floor.
 [hyprland]
-minimum = "0.50.0"
+minimum = "0.57.0"
 tested = "0.57.2"
 
 [hyprlock]

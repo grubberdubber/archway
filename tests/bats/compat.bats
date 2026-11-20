@@ -12,7 +12,7 @@ teardown() {
 }
 
 @test "compat.toml declares the supported Hyprland window" {
-  assert_eq "0.50.0" "$(compat_get hyprland minimum)"
+  assert_eq "0.57.0" "$(compat_get hyprland minimum)"
   assert_eq "0.57.2" "$(compat_get hyprland tested)"
   assert_eq "0.9.7" "$(compat_get hyprlock tested)"
 }

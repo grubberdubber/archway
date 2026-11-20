@@ -27,6 +27,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ARGB syntax.
 - `archway install` rejects any compositor other than `hyprland` instead of
   silently planning an unsupported desktop.
+- **Hyprland 0.57 replaced hyprlang with a Lua configuration API.**
+  `hyprland.lua` and `conf.d/20-keybinds.lua` replace the `.conf` files, the
+  theme renders `hl.config({ ... })` instead of key=value colour blocks, and
+  the keybind generator emits `hl.bind("SUPER + SHIFT + Q",
+  hl.dsp.window.close())`. Dispatchers are mapped in one place, so an unknown
+  name fails generation instead of producing a bind that does nothing.
+- `archway doctor` now runs `Hyprland --verify-config` against the generated
+  config and fails on a parse error, which is how a hyprlang leftover is caught.
+- `archway theme set` prunes generated artifacts for targets the theme no
+  longer ships, so a stale `theme.d/hyprland.conf` cannot linger.
+- A `swaync-client -rs` reload no longer blocks the installer when no swaync
+  daemon is running, and a Neovim theme-contract failure no longer cancels the
+  rest of the install.
 
 ### Fixed
 

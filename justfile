@@ -61,7 +61,7 @@ release-check: lint test
 
 # Full local CI approximation.
 check: lint keys
-  @git diff --exit-code docs/keybinds.md dotfiles/dot_config/hypr/conf.d/20-keybinds.conf || \
+  @git diff --exit-code docs/keybinds.md dotfiles/dot_config/hypr/conf.d/20-keybinds.lua || \
     { echo "generated files out of date: run 'just keys'"; exit 1; }
   bats tests/bats
 

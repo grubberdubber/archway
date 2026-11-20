@@ -60,17 +60,27 @@ EOF
   assert_eq 0 "$status"
 }
 
-@test "binds emit native Hyprland dispatchers, not shell wrappers" {
-  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" \
-    "bind = SUPER, Q, killactive"
-  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" \
-    "bind = SUPER, Return, exec, kitty"
+@test "binds emit Hyprland Lua dispatchers, not shell wrappers" {
+  local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
+  assert_file_contains "$f" 'hl.bind("SUPER + Q", hl.dsp.window.close())'
+  assert_file_contains "$f" 'hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))'
+  # Every modifier needs its own separator or Hyprland rejects the chord.
+  assert_file_contains "$f" 'hl.bind("SUPER + SHIFT + Return"'
+  run grep -q 'SUPER SHIFT +' "$f"
+  assert_eq 1 "$status"
 }
 
 @test "media keys repeat and use wayland clipboard" {
-  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" \
-    "binde = , XF86AudioRaiseVolume"
-  assert_file_contains "$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.conf" "wl-copy"
+  local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
+  assert_file_contains "$f" 'hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("pamixer -i 5'
+  assert_file_contains "$f" '{ repeating = true }'
+  assert_file_contains "$f" "wl-copy"
+}
+
+@test "an unknown dispatcher fails generation instead of emitting dead binds" {
+  run keys_hypr_action workspacelast ""
+  assert_eq 3 "$status"
+  assert_contains "$output" "no Hyprland Lua mapping"
 }
 
 @test "chord split maps modifiers and keysym names" {

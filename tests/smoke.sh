@@ -182,7 +182,7 @@ EOF
     nope "install --dry-run prints a plan" "exit $status: ${out:0:300}"
   fi
   # State/theme dirs may exist from earlier checks; only dotfile targets matter.
-  if [[ -e $XDG_CONFIG_HOME/hypr/hyprland.conf ]]; then
+  if [[ -e $XDG_CONFIG_HOME/hypr/hyprland.lua ]]; then
     nope "install --dry-run writes nothing"
   else
     pass "install --dry-run writes nothing"
