@@ -2,8 +2,8 @@
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
 //
-// Layout: left = where am I, centre = now, right = alerts, connectivity,
-// resources, controls, session — most urgent first (AGENTS.md §10.4).
+// Layout: left = where am I + what is playing, centre = now, right = alerts,
+// connectivity, resources, controls, session — most urgent first.
 // Every alert/resource module prints an empty text when healthy, so the bar
 // stays around eight pills and only grows when something needs attention.
 //
@@ -17,8 +17,8 @@
   "spacing": 0,
   "margin-top": 0,
   "margin-bottom": 0,
-  "modules-left": ["custom/launcher", "hyprland/workspaces", "group/context"],
-  "modules-center": ["mpris", "clock", "custom/notifications"],
+  "modules-left": ["custom/launcher", "hyprland/workspaces", "group/context", "mpris"],
+  "modules-center": ["clock", "custom/notifications"],
   "modules-right": [
     "group/alerts",
     "group/net",
@@ -89,7 +89,7 @@
     "tooltip": true
   },
   "hyprland/window": {
-    "max-length": 22,
+    "max-length": 18,
     "separate-outputs": true,
     "tooltip": false
   },
@@ -97,7 +97,7 @@
   "mpris": {
     "format": "{player_icon} {artist} — {title}",
     "format-paused": "{player_icon} {artist} — {title}",
-    "max-length": 22,
+    "max-length": 30,
     "tooltip-format": "{player} • {album} • {position}/{length}",
     "player-icons": {
       "default": "\uf001",
