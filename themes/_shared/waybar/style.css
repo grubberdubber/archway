@@ -21,15 +21,20 @@ window#waybar {
   color: @text@;
 }
 
-/* Clusters float on the wallpaper; no full-width bar strip. The left inset
- * matches the right one so the single row is optically balanced. */
+/* Clusters float on the wallpaper; no full-width bar strip. Insets match the
+ * inner gap so the centred row reads as evenly spaced. */
 .modules-left,
 .modules-center,
 .modules-right {
   background: transparent;
   border: none;
   padding: 0;
-  margin: 0 4px 0 11px;
+  margin: 0 11px;
+}
+
+/* The row is pinned to the right; this inset makes it read as centred. */
+.modules-right {
+  margin: 0 44px 0 0;
 }
 
 /* One pill per cluster. Inner modules are flush with each other. */
@@ -47,7 +52,7 @@ window#waybar {
   background: @surface@;
   border: @border_width@px solid @border@;
   border-radius: @radius_input@px;
-  margin: 3px 9px;
+  margin: 3px 6px;
   padding: 0 7px;
   min-height: 21px;
 }

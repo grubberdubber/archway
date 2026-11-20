@@ -2,9 +2,10 @@
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
 //
-// Layout: one single row, every pill in the same flow, with one fixed gap for
-// the whole bar (see --pill-gap in style.css). Nothing is anchored left, centre
-// or right, so there is no elastic space and no gap of a different size.
+// Layout: one row, every pill with the same gap. It is held in `modules-right`
+// with a matching inset, which looks centred but pins the right edge: toggling
+// the clock to its long format (click) then grows leftwards into its slack
+// instead of pushing the session pills off the screen.
 // Every alert/resource module prints an empty text when healthy, so the bar
 // stays around eight pills and only grows when something needs attention.
 //
@@ -18,7 +19,9 @@
   "spacing": 0,
   "margin-top": 0,
   "margin-bottom": 0,
-  "modules-left": [
+  "modules-left": [],
+  "modules-center": [],
+  "modules-right": [
     "custom/launcher",
     "hyprland/workspaces",
     "group/context",
@@ -31,9 +34,6 @@
     "group/controls",
     "group/session"
   ],
-
-  "modules-center": [],
-  "modules-right": [],
 
   "group/context": {
     "orientation": "horizontal",
@@ -122,7 +122,7 @@
   },
   "clock": {
     "format": "{:%H:%M}",
-    "format-alt": "{:%a %d %b  %H:%M}",
+    "format-alt": "{:%d/%m %H:%M}",
     "tooltip-format": "<tt>{calendar}</tt>"
   },
   "custom/notifications": {
