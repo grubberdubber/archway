@@ -63,7 +63,7 @@ teardown() {
 
 @test "reload never blocks on a notification daemon that is not running" {
   mkdir -p -- "$SANDBOX/bin"
-  cat > "$SANDBOX/bin/swaync-client" <<'STUB'
+  cat > "$SANDBOX/bin/swaync-client" << 'STUB'
 #!/usr/bin/env bash
 touch "$HOME/swaync-was-called"
 sleep 30
