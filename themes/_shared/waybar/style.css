@@ -32,9 +32,9 @@ window#waybar {
   margin: 0 11px;
 }
 
-/* The row is pinned to the right; this inset makes it read as centred. */
+/* Pinned by the right edge so the row stays put even if a label grows. */
 .modules-right {
-  margin: 0 44px 0 0;
+  margin: 0 23px 0 0;
 }
 
 /* One pill per cluster. Inner modules are flush with each other. */

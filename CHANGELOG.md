@@ -47,8 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   uniform and the row reflows when a title or the track name grows instead of
   leaving a fixed gap around the centre. The status cluster is no longer
   right- or centre-anchored: it is one row with a single fixed 12 px gap and
-  matching insets, so no two gaps differ. The row is pinned by its right edge, so
-  toggling the clock to its long format grows leftwards instead of pushing the
+  matching 29 px insets, so no two gaps differ. The clock always shows date +
+  time (`20/11 18:57`), so clicking it can no longer widen the row and push the
   session pills off screen.
 
 - **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm

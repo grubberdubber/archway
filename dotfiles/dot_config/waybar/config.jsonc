@@ -2,10 +2,10 @@
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
 //
-// Layout: one row, every pill with the same gap. It is held in `modules-right`
-// with a matching inset, which looks centred but pins the right edge: toggling
-// the clock to its long format (click) then grows leftwards into its slack
-// instead of pushing the session pills off the screen.
+// Layout: one row, every pill with the same gap, holding its position from the
+// right edge so a longer label never shifts the row. The clock always shows
+// date + time, so no click changes the row width; the alt format only makes it
+// shorter, and the tooltip still carries the full calendar.
 // Every alert/resource module prints an empty text when healthy, so the bar
 // stays around eight pills and only grows when something needs attention.
 //
@@ -121,8 +121,8 @@
     "on-scroll-down": "playerctl previous"
   },
   "clock": {
-    "format": "{:%H:%M}",
-    "format-alt": "{:%d/%m %H:%M}",
+    "format": "{:%d/%m %H:%M}",
+    "format-alt": "{:%H:%M}",
     "tooltip-format": "<tt>{calendar}</tt>"
   },
   "custom/notifications": {
