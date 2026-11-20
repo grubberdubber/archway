@@ -42,6 +42,7 @@ window#waybar {
 #controls,
 #session,
 #mpris,
+#custom-nowplaying,
 #custom-notifications {
   background: @surface@;
   border: @border_width@px solid @border@;
@@ -90,10 +91,11 @@ window#waybar {
   background: transparent;
 }
 
+/* Active state changes colour only: an extra margin here made one button wider
+ * and slid the whole row on every workspace switch. */
 #workspaces button.active {
   color: @bg@;
   background: @primary@;
-  margin: 0 1px;
 }
 
 #workspaces button.urgent {
@@ -152,10 +154,28 @@ window#waybar {
   font-weight: 600;
 }
 
-#mpris {
+#mpris,
+#custom-nowplaying {
   color: @text@;
   font-size: 10.5px;
-  min-width: 120px;
+  min-width: 156px;
+}
+
+/* The media slot keeps its footprint whether a player is running or not, and
+ * the window title keeps its own: a centred row re-centres whenever a pill
+ * grows or disappears, and that is what made the workspace buttons slide. */
+#context {
+  min-width: 146px;
+}
+
+#mpris.empty,
+#custom-nowplaying.empty,
+#context.empty {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
 }
 
 #mpris.paused {

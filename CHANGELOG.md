@@ -39,6 +39,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The bar row no longer moves. The active workspace button only changes colour
+  (its 1 px margin made one button wider and slid the row), the window-title and
+  media pills keep a fixed footprint (`min-width`), `custom/nowplaying` holds the
+  media slot while no player is running, and the notification bell stays visible
+  with a zero count. The row is therefore the same width in every state, which
+  keeps both edges flush at 8 px on a 1366 px screen and stops re-centring.
+
 - Focus ring is a single flat hairline on the active window: `border_size`
   stays 1 but the two-colour gradient became one solid `primary` line, and the
   ring on unfocused windows is fully transparent. `inactive_opacity` is 1.0 and

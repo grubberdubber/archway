@@ -129,8 +129,10 @@ section_notifications() {
   }
   count=$(swaync-client -c 2> /dev/null || printf 0)
   [[ $(swaync-client -D 2> /dev/null) == true ]] && dnd=1
+  # The bell stays on the bar with a zero count: hiding it made the centred row
+  # jump every time the last notification was dismissed.
   if [[ ${count:-0} -eq 0 && $dnd -eq 0 ]]; then
-    emit ""
+    emit "$(icon f0f3) 0" "no unread notifications" muted
     return 0
   fi
   if [[ $dnd -eq 1 ]]; then
@@ -138,6 +140,21 @@ section_notifications() {
   else
     emit "$(icon f0f3) ${count}" "${count} unread notification(s)" normal
   fi
+}
+
+# Placeholder for the media pill. `mpris` disappears when no player is running,
+# and a vanished pill re-centres the row; this keeps the slot while it is away,
+# and hides as soon as a real player is back.
+section_nowplaying() {
+  have playerctl || {
+    emit ""
+    return 0
+  }
+  if [[ -n $(playerctl status 2> /dev/null || true) ]]; then
+    emit ""
+    return 0
+  fi
+  emit "$(icon f001) —" "no media player is running" muted
 }
 
 # CPU, RAM and temperature, hidden until something is actually hot or full.
@@ -276,6 +293,7 @@ usage: bar.sh <section>
 sections:
   recording | failed | updates | vault | vpn | notifications
   resources | disk | nightlight | power-profile | scratchpad | language
+  nowplaying
 
   nightlight --toggle      turn the night light on or off
   power-profile --next     cycle performance -> balanced -> power-saver
@@ -294,6 +312,7 @@ main() {
     vault) section_vault ;;
     vpn) section_vpn ;;
     notifications) section_notifications ;;
+    nowplaying) section_nowplaying ;;
     resources) section_resources ;;
     disk) section_disk ;;
     scratchpad) section_scratchpad ;;
