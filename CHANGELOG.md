@@ -46,8 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   clock and notifications follow it in the same left row, so spacing stays
   uniform and the row reflows when a title or the track name grows instead of
   leaving a fixed gap around the centre. The status cluster is no longer
-  right-anchored either: the whole bar is one row, so there is no dead band
-  before the first alert pill.
+  right-anchored either: the whole bar is one centred row, so there is no dead
+  band at either end and both margins match.
 
 - **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm
   is out of scope. Packages, profiles, applets, keybinds, theme modules and the
