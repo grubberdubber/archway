@@ -162,10 +162,6 @@ section_resources() {
   elif ((cpu >= 80 || ram >= 88 || (temp > 0 && temp > 90))); then
     class=warning
   fi
-  if [[ $class == normal ]]; then
-    emit "" "$summary"
-    return 0
-  fi
   text="$(icon f2db) ${cpu}% $(icon f0c9) ${ram}%"
   ((temp > 0)) && text+=" ${temp}°"
   emit "$text" "$summary" "$class"
@@ -180,18 +176,16 @@ section_disk() {
     emit ""
     return 0
   }
-  if ((pct < 90)); then
-    emit ""
-    return 0
-  fi
-  emit "$(icon f0a0) ${free}" "root filesystem ${pct}% used" "$([[ $pct -ge 95 ]] && echo critical || echo warning)"
+  local class=normal
+  ((pct >= 90)) && class=warning
+  ((pct >= 95)) && class=critical
+  emit "$(icon f0a0) ${free}" "root filesystem ${pct}% used" "$class"
 }
 
 # Night light (gammastep) state; click toggles it.
 section_nightlight() {
-  # No gammastep, no module: an icon that cannot do anything is noise.
   have gammastep || {
-    emit ""
+    emit "$(icon f185)" "night light unavailable — install gammastep" muted
     return 0
   }
   if pgrep -x gammastep > /dev/null 2>&1; then

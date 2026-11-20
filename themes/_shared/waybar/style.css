@@ -72,9 +72,10 @@ window#waybar {
 }
 
 #workspaces button {
-  padding: 0 3px;
+  padding: 0 5px;
   margin: 0;
-  min-width: 7px;
+  min-width: 14px;
+  font-size: 13px;
   border-radius: @radius_input@px;
   color: @text_muted@;
   background: transparent;
@@ -128,8 +129,9 @@ window#waybar {
 
 #window {
   color: @text_muted@;
-  font-size: 11px;
-  min-width: 90px;
+  font-size: 10.5px;
+  min-width: 55px;
+  padding: 0 3px;
 }
 
 #submap {
@@ -144,8 +146,8 @@ window#waybar {
 
 #mpris {
   color: @text@;
-  font-size: 11px;
-  min-width: 90px;
+  font-size: 10.5px;
+  min-width: 60px;
 }
 
 #mpris.paused {
@@ -206,6 +208,11 @@ window#waybar {
 }
 
 /* ---- resources: hidden unless hot or full ---- */
+#custom-resources,
+#custom-disk {
+  color: @text_muted@;
+}
+
 #custom-resources.warning,
 #custom-disk.warning {
   color: @warning@;
@@ -236,7 +243,8 @@ window#waybar {
   min-width: 44px;
 }
 
-#custom-nightlight {
+#custom-nightlight,
+#custom-nightlight.muted {
   color: @text_muted@;
 }
 

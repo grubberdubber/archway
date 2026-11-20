@@ -25,8 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   controls | session. New modules: `mpris`, notification count with do-not-disturb,
   privacy (mic/camera/screen share), screen recording, failed units, pending
   updates, locked vault, VPN/Tailscale, CPU/RAM/temperature, low disk, night
-  light, keyboard layout, idle inhibitor, power profile. Alerts and resources
-  hide themselves when everything is fine, so the bar sits around ten pills.
+  light, keyboard layout, idle inhibitor, power profile. Alert pills appear
+  only when they have something to say; CPU/RAM/temperature, disk and night
+  light always keep their icon and fade to muted when healthy, so nothing the
+  eye learned to look for silently disappears.
 - `archway-bar`, a small helper installed next to the CLI, backs the bar modules
   that need real logic (13 sections, each printing one waybar JSON object).
 - waybar modules carry Nerd Font icons and state-driven colours from the
