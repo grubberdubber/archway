@@ -21,14 +21,15 @@ window#waybar {
   color: @text@;
 }
 
-/* Clusters float on the wallpaper; no full-width bar strip. */
+/* Clusters float on the wallpaper; no full-width bar strip. The left inset
+ * matches the right one so the single row is optically balanced. */
 .modules-left,
 .modules-center,
 .modules-right {
   background: transparent;
   border: none;
   padding: 0;
-  margin: 0 4px;
+  margin: 0 4px 0 11px;
 }
 
 /* One pill per cluster. Inner modules are flush with each other. */
@@ -46,7 +47,7 @@ window#waybar {
   background: @surface@;
   border: @border_width@px solid @border@;
   border-radius: @radius_input@px;
-  margin: 3px 2px;
+  margin: 3px 9px;
   padding: 0 7px;
   min-height: 21px;
 }
@@ -101,7 +102,6 @@ window#waybar {
 #window,
 #submap,
 #custom-scratchpad,
-#mpris,
 #privacy,
 #custom-recording,
 #custom-failed,

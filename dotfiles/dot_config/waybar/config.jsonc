@@ -2,9 +2,9 @@
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
 //
-// Layout: one continuous row held in `modules-center`, so the row is centred
-// as a block and grows symmetrically. Every pill keeps the same gap; no module
-// is left- or right-anchored, which is what created dead bands at the ends.
+// Layout: one single row, every pill in the same flow, with one fixed gap for
+// the whole bar (see --pill-gap in style.css). Nothing is anchored left, centre
+// or right, so there is no elastic space and no gap of a different size.
 // Every alert/resource module prints an empty text when healthy, so the bar
 // stays around eight pills and only grows when something needs attention.
 //
@@ -18,11 +18,7 @@
   "spacing": 0,
   "margin-top": 0,
   "margin-bottom": 0,
-  "modules-left": [],
-
-  // The whole row is centred as one block: it grows symmetrically as modules
-  // appear, so there is no dead band on either end of the bar.
-  "modules-center": [
+  "modules-left": [
     "custom/launcher",
     "hyprland/workspaces",
     "group/context",
@@ -35,6 +31,8 @@
     "group/controls",
     "group/session"
   ],
+
+  "modules-center": [],
   "modules-right": [],
 
   "group/context": {
