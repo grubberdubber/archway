@@ -239,6 +239,32 @@ EOF
     die "security profile declined" "$EX_CANCELLED"
 }
 
+# Hyprland and waybar start without ~/.local/bin on PATH, so a bind that calls
+# `archway` fails silently while `kitty` works. Everything generated therefore
+# uses this absolute link, which install keeps pointing at the checkout.
+install_cli_links() {
+  local dir="$HOME/.local/bin" name target link spec
+  local -a pairs=("archway:bin/archway" "archway-bar:applets/bar/bar.sh")
+  if ((DRY_RUN)); then
+    for spec in "${pairs[@]}"; do
+      ui_note "[dry-run] would link $dir/${spec%%:*}"
+    done
+    return 0
+  fi
+  mkdir -p -- "$dir"
+  for spec in "${pairs[@]}"; do
+    name=${spec%%:*}
+    target="$ARCHWAY_ROOT/${spec#*:}"
+    link="$dir/$name"
+    if [[ -L $link || ! -e $link ]]; then
+      ln -sfn -- "$target" "$link"
+    else
+      warn "$link exists and is not a symlink; leaving it alone"
+    fi
+  done
+  ok "linked archway and archway-bar into $dir"
+}
+
 cmd_install() {
   parse_common_flags "$@"
   local profile='' wm='' terminal='' shell='' theme='' editor='' dry_requested=0
@@ -373,6 +399,9 @@ cmd_install() {
   else
     ui_note "dotfiles skipped (--no-dotfiles)"
   fi
+
+  section "CLI"
+  install_cli_links
 
   # The wallpaper applet reads user images; give them a known home. Nothing is
   # shipped or downloaded, so this is just an empty directory.

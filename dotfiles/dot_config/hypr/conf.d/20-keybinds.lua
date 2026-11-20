@@ -54,32 +54,32 @@ hl.bind("SUPER + SHIFT + 9", hl.dsp.window.move({ workspace = 9 }))
 
 -- --- archway ---
 
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("rofi -show theme -modi 'theme:archway applet theme-selector'"))
-hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("archway applet android-mount --rofi"))
-hl.bind("SUPER + V", hl.dsp.exec_cmd("archway applet clipboard --rofi"))
-hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("archway applet network --rofi"))
-hl.bind("SUPER + ALT + W", hl.dsp.exec_cmd("archway applet wallpaper --rofi"))
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("archway applet screenshot region"))
-hl.bind("Print", hl.dsp.exec_cmd("archway applet screenshot full"))
+hl.bind("SUPER + Space", hl.dsp.exec_cmd("rofi -show theme -modi \\\"theme:$HOME/.local/bin/archway applet theme-selector\\\""))
+hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet android-mount --rofi"))
+hl.bind("SUPER + V", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet clipboard --rofi"))
+hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet network --rofi"))
+hl.bind("SUPER + ALT + W", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet wallpaper --rofi"))
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot region"))
+hl.bind("Print", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot full"))
 hl.bind("SUPER + P", hl.dsp.exec_cmd("rofi-rbw --type password --action copy"))
 
 -- --- system ---
 
-hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("archway applet power --rofi"))
+hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet power --rofi"))
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hyprlock"))
 hl.bind("SUPER + ALT + R", hl.dsp.reload_config())
 hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd("command -v uwsm >/dev/null 2>&1 && uwsm stop || hyprctl dispatch exit"))
-hl.bind("SUPER + slash", hl.dsp.exec_cmd("kitty --class floating-term -e archway keys list"))
+hl.bind("SUPER + slash", hl.dsp.exec_cmd("$HOME/.local/bin/archway keys list | rofi -dmenu -i -p Keybinds"))
 
 -- --- media ---
 
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("archway applet osd volume up"), { repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("archway applet osd volume down"), { repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("archway applet osd volume mute"))
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("archway applet osd mic mute"))
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd volume up"), { repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd volume down"), { repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd volume mute"))
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd mic mute"))
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"))
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("archway applet osd brightness up"), { repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("archway applet osd brightness down"), { repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd brightness up"), { repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd brightness down"), { repeating = true })
 

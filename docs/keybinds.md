@@ -67,36 +67,36 @@ Press `Super + /` at any time to open this list in a floating terminal.
 
 | Key | Action | Command |
 |---|---|---|
-| `super + space` | Theme selector | `rofi -show theme -modi 'theme:archway applet theme-selector'` |
-| `super + shift + m` | Mount / unmount Android device (MTP) | `archway applet android-mount --rofi` |
-| `super + v` | Clipboard history | `archway applet clipboard --rofi` |
-| `super + shift + n` | Wi-Fi menu | `archway applet network --rofi` |
-| `super + alt + w` | Wallpaper picker | `archway applet wallpaper --rofi` |
-| `super + shift + s` | Screenshot: region | `archway applet screenshot region` |
-| `Print` | Screenshot: whole screen | `archway applet screenshot full` |
+| `super + space` | Theme selector | `rofi -show theme -modi \"theme:$HOME/.local/bin/archway applet theme-selector\"` |
+| `super + shift + m` | Mount / unmount Android device (MTP) | `$HOME/.local/bin/archway applet android-mount --rofi` |
+| `super + v` | Clipboard history | `$HOME/.local/bin/archway applet clipboard --rofi` |
+| `super + shift + n` | Wi-Fi menu | `$HOME/.local/bin/archway applet network --rofi` |
+| `super + alt + w` | Wallpaper picker | `$HOME/.local/bin/archway applet wallpaper --rofi` |
+| `super + shift + s` | Screenshot: region | `$HOME/.local/bin/archway applet screenshot region` |
+| `Print` | Screenshot: whole screen | `$HOME/.local/bin/archway applet screenshot full` |
 | `super + p` | Password manager (rbw) | `rofi-rbw --type password --action copy` |
 
 ## System
 
 | Key | Action | Command |
 |---|---|---|
-| `super + shift + q` | Power menu | `archway applet power --rofi` |
+| `super + shift + q` | Power menu | `$HOME/.local/bin/archway applet power --rofi` |
 | `super + Escape` | Lock screen | `hyprlock` |
 | `super + alt + r` | Reload Hyprland config | `hyprctl dispatch reload` |
 | `super + shift + e` | Log out of the session | `command -v uwsm >/dev/null 2>&1 && uwsm stop \|\| hyprctl dispatch exit` |
-| `super + slash` | Keybind cheatsheet | `kitty --class floating-term -e archway keys list` |
+| `super + slash` | Keybind cheatsheet | `$HOME/.local/bin/archway keys list \| rofi -dmenu -i -p Keybinds` |
 
 ## Media
 
 | Key | Action | Command |
 |---|---|---|
-| `XF86AudioRaiseVolume` | Volume up | `archway applet osd volume up` |
-| `XF86AudioLowerVolume` | Volume down | `archway applet osd volume down` |
-| `XF86AudioMute` | Toggle mute | `archway applet osd volume mute` |
-| `XF86AudioMicMute` | Toggle microphone mute | `archway applet osd mic mute` |
+| `XF86AudioRaiseVolume` | Volume up | `$HOME/.local/bin/archway applet osd volume up` |
+| `XF86AudioLowerVolume` | Volume down | `$HOME/.local/bin/archway applet osd volume down` |
+| `XF86AudioMute` | Toggle mute | `$HOME/.local/bin/archway applet osd volume mute` |
+| `XF86AudioMicMute` | Toggle microphone mute | `$HOME/.local/bin/archway applet osd mic mute` |
 | `XF86AudioPlay` | Play / pause | `playerctl play-pause` |
 | `XF86AudioNext` | Next track | `playerctl next` |
 | `XF86AudioPrev` | Previous track | `playerctl previous` |
-| `XF86MonBrightnessUp` | Brightness up | `archway applet osd brightness up` |
-| `XF86MonBrightnessDown` | Brightness down | `archway applet osd brightness down` |
+| `XF86MonBrightnessUp` | Brightness up | `$HOME/.local/bin/archway applet osd brightness up` |
+| `XF86MonBrightnessDown` | Brightness down | `$HOME/.local/bin/archway applet osd brightness down` |
 

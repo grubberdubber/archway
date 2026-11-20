@@ -1,7 +1,11 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * Archway rofi — launcher, windows, run and ssh.
  * Applets (theme, power, android-mount) are invoked with their own -modi so
- * rofi never has to guess a script path. Visuals: theme.d/rofi.rasi. */
+ * rofi never has to guess a script path.
+ *
+ * No kb-* overrides: rofi already binds Up/Down/Control+k/Control+j/Tab to the
+ * actions below, and re-declaring them makes it print "binding ... is already
+ * bound" on every launch (the Super+D error). Visuals: theme.d/rofi.rasi. */
 
 @theme "~/.config/archway/theme.d/rofi.rasi"
 
@@ -18,10 +22,4 @@ configuration {
     hover-select:        true;
     me-select-entry:     "";
     me-accept-entry:     "MousePrimary";
-    kb-row-up:           "Up,Control+k";
-    kb-row-down:         "Down,Control+j";
-    kb-accept-entry:     "Return,KP_Enter";
-    kb-cancel:           "Escape";
-    kb-mode-next:        "Tab";
-    kb-mode-previous:    "Shift+Tab";
 }

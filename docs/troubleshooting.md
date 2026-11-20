@@ -97,9 +97,10 @@ Until then the desktop installs fine; only Neovim is skipped.
 
 - `archway keys validate` catches duplicates, empty commands and reserved chords.
 - `super + /` opens the generated cheatsheet.
-- Applet bindings go through `archway applet <name>`, so they work from any
-  checkout as long as `archway` is on `PATH` (`~/.local/bin/archway`).
-- Hyprland reads `~/.config/hypr/conf.d/20-keybinds.conf`; after editing the
+- Generated binds call `$HOME/.local/bin/archway` by absolute path: Hyprland and
+  waybar start without `~/.local/bin` on `PATH`, and a bare `archway` fails
+  silently. Re-run `archway install` if that link is missing.
+- Hyprland reads `~/.config/hypr/conf.d/20-keybinds.lua`; after editing the
   source run `archway keys generate` and then `hyprctl reload`.
 - `hyprctl binds` lists what the compositor actually registered.
 

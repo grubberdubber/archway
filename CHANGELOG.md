@@ -20,6 +20,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   restored at session start), `clipboard` (starts the `wl-paste` watcher that
   `cliphist` needs) and `osd` (volume/mic/brightness with `swayosd`, a narrow
   notification only as fallback).
+- **Grouped waybar layout**: each cluster is one pill — launcher + workspaces +
+  context | media + clock + notifications | alerts | connectivity | resources |
+  controls | session. New modules: `mpris`, notification count with do-not-disturb,
+  privacy (mic/camera/screen share), screen recording, failed units, pending
+  updates, locked vault, VPN/Tailscale, CPU/RAM/temperature, low disk, night
+  light, keyboard layout, idle inhibitor, power profile. Alerts and resources
+  hide themselves when everything is fine, so the bar sits around ten pills.
+- `archway-bar`, a small helper installed next to the CLI, backs the bar modules
+  that need real logic (13 sections, each printing one waybar JSON object).
 - waybar modules carry Nerd Font icons and state-driven colours from the
   palette: neutral when healthy, muted when off, green charging, amber warning,
   red critical.
@@ -67,6 +76,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   trackpad, classic wheel direction on mice (`hl.device` rule included).
 
 ### Fixed
+
+- Most `Super` shortcuts did nothing: Hyprland starts without `~/.local/bin` on
+  `PATH`, so the generated binds' bare `archway` call failed silently while
+  `kitty` worked. Binds now use `$HOME/.local/bin/archway` and `archway install`
+  keeps that link (plus `archway-bar`) up to date.
+- `Super+D` printed "binding Control+k / Tab is already bound": `config.rasi`
+  re-declared rofi's own defaults. The overrides are gone.
+- `Super+/` flashed open and closed; the cheatsheet is now a rofi menu instead
+  of a pager in a terminal that exits immediately.
 
 - New terminals no longer take over the workspace: Hyprland now suppresses
   `maximize` requests (`suppress-maximize-events`), which kitty was sending on

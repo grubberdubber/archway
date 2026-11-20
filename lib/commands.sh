@@ -426,15 +426,16 @@ EOF
     done < <(sort -r -t$'\t' -k1,1 "$MANAGED_MANIFEST")
   fi
 
-  local link="$HOME/.local/bin/archway"
-  if [[ -L $link ]]; then
+  local link
+  for link in "$HOME/.local/bin/archway" "$HOME/.local/bin/archway-bar"; do
+    [[ -L $link ]] || continue
     if ((DRY_RUN)); then
       ui_note "[dry-run] would remove $link"
     else
       rm -f -- "$link"
       ok "removed $link"
     fi
-  fi
+  done
 
   if ((purge)); then
     if ((DRY_RUN)); then

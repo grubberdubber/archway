@@ -318,49 +318,49 @@ description = "Move window to workspace 9"
 [[keybind]]
 id = "theme-selector"
 keys = "super + space"
-command = "rofi -show theme -modi 'theme:archway applet theme-selector'"
+command = "rofi -show theme -modi \"theme:$HOME/.local/bin/archway applet theme-selector\""
 category = "archway"
 description = "Theme selector"
 
 [[keybind]]
 id = "android-mount"
 keys = "super + shift + m"
-command = "archway applet android-mount --rofi"
+command = "$HOME/.local/bin/archway applet android-mount --rofi"
 category = "archway"
 description = "Mount / unmount Android device (MTP)"
 
 [[keybind]]
 id = "clipboard-history"
 keys = "super + v"
-command = "archway applet clipboard --rofi"
+command = "$HOME/.local/bin/archway applet clipboard --rofi"
 category = "archway"
 description = "Clipboard history"
 
 [[keybind]]
 id = "network-menu"
 keys = "super + shift + n"
-command = "archway applet network --rofi"
+command = "$HOME/.local/bin/archway applet network --rofi"
 category = "archway"
 description = "Wi-Fi menu"
 
 [[keybind]]
 id = "wallpaper-picker"
 keys = "super + alt + w"
-command = "archway applet wallpaper --rofi"
+command = "$HOME/.local/bin/archway applet wallpaper --rofi"
 category = "archway"
 description = "Wallpaper picker"
 
 [[keybind]]
 id = "screenshot-region"
 keys = "super + shift + s"
-command = "archway applet screenshot region"
+command = "$HOME/.local/bin/archway applet screenshot region"
 category = "archway"
 description = "Screenshot: region"
 
 [[keybind]]
 id = "screenshot-full"
 keys = "Print"
-command = "archway applet screenshot full"
+command = "$HOME/.local/bin/archway applet screenshot full"
 category = "archway"
 description = "Screenshot: whole screen"
 
@@ -374,7 +374,7 @@ description = "Password manager (rbw)"
 [[keybind]]
 id = "power-menu"
 keys = "super + shift + q"
-command = "archway applet power --rofi"
+command = "$HOME/.local/bin/archway applet power --rofi"
 category = "system"
 description = "Power menu"
 
@@ -405,14 +405,14 @@ description = "Log out of the session"
 [[keybind]]
 id = "cheatsheet"
 keys = "super + slash"
-command = "kitty --class floating-term -e archway keys list"
+command = "$HOME/.local/bin/archway keys list | rofi -dmenu -i -p Keybinds"
 category = "system"
 description = "Keybind cheatsheet"
 
 [[keybind]]
 id = "volume-up"
 keys = "XF86AudioRaiseVolume"
-command = "archway applet osd volume up"
+command = "$HOME/.local/bin/archway applet osd volume up"
 category = "media"
 description = "Volume up"
 repeat = "yes"
@@ -420,7 +420,7 @@ repeat = "yes"
 [[keybind]]
 id = "volume-down"
 keys = "XF86AudioLowerVolume"
-command = "archway applet osd volume down"
+command = "$HOME/.local/bin/archway applet osd volume down"
 category = "media"
 description = "Volume down"
 repeat = "yes"
@@ -428,14 +428,14 @@ repeat = "yes"
 [[keybind]]
 id = "volume-mute"
 keys = "XF86AudioMute"
-command = "archway applet osd volume mute"
+command = "$HOME/.local/bin/archway applet osd volume mute"
 category = "media"
 description = "Toggle mute"
 
 [[keybind]]
 id = "mic-mute"
 keys = "XF86AudioMicMute"
-command = "archway applet osd mic mute"
+command = "$HOME/.local/bin/archway applet osd mic mute"
 category = "media"
 description = "Toggle microphone mute"
 
@@ -463,7 +463,7 @@ description = "Previous track"
 [[keybind]]
 id = "brightness-up"
 keys = "XF86MonBrightnessUp"
-command = "archway applet osd brightness up"
+command = "$HOME/.local/bin/archway applet osd brightness up"
 category = "media"
 description = "Brightness up"
 repeat = "yes"
@@ -471,7 +471,7 @@ repeat = "yes"
 [[keybind]]
 id = "brightness-down"
 keys = "XF86MonBrightnessDown"
-command = "archway applet osd brightness down"
+command = "$HOME/.local/bin/archway applet osd brightness down"
 category = "media"
 description = "Brightness down"
 repeat = "yes"

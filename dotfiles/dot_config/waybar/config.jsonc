@@ -1,8 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
+//
+// Layout: left = where am I, centre = now, right = alerts, connectivity,
+// resources, controls, session — most urgent first (AGENTS.md §10.4).
+// Every alert/resource module prints an empty text when healthy, so the bar
+// stays around eight pills and only grows when something needs attention.
+//
 // Icons are Nerd Font glyphs written as JSON escapes (\uf028 = volume, ...) so
 // the file stays portable; colour per state comes from style.css, not the JSON.
+// `archway` is not on Hyprland's PATH, so helpers are called by absolute path.
 {
   "layer": "top",
   "position": "top",
@@ -10,10 +17,58 @@
   "spacing": 0,
   "margin-top": 0,
   "margin-bottom": 0,
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "backlight", "battery", "network", "bluetooth", "tray", "custom/power"],
+  "modules-left": ["custom/launcher", "hyprland/workspaces", "group/context"],
+  "modules-center": ["mpris", "clock", "custom/notifications"],
+  "modules-right": [
+    "group/alerts",
+    "group/net",
+    "group/resources",
+    "group/controls",
+    "group/session"
+  ],
 
+  "group/context": {
+    "orientation": "horizontal",
+    "modules": ["hyprland/submap", "custom/scratchpad", "hyprland/window"]
+  },
+  "group/alerts": {
+    "orientation": "horizontal",
+    "modules": [
+      "privacy",
+      "custom/recording",
+      "custom/failed",
+      "custom/updates",
+      "custom/vault"
+    ]
+  },
+  "group/net": {
+    "orientation": "horizontal",
+    "modules": ["custom/vpn", "network", "bluetooth"]
+  },
+  "group/resources": {
+    "orientation": "horizontal",
+    "modules": ["custom/resources", "custom/disk"]
+  },
+  "group/controls": {
+    "orientation": "horizontal",
+    "modules": [
+      "pulseaudio",
+      "backlight",
+      "custom/nightlight",
+      "custom/language",
+      "idle_inhibitor"
+    ]
+  },
+  "group/session": {
+    "orientation": "horizontal",
+    "modules": ["battery", "custom/power-profile", "tray", "custom/power"]
+  },
+
+  "custom/launcher": {
+    "format": "\uf303",
+    "tooltip": false,
+    "on-click": "rofi -show drun"
+  },
   "hyprland/workspaces": {
     "format": "{id}",
     "on-click": "activate",
@@ -22,33 +77,169 @@
       "*": 5
     }
   },
+  "hyprland/submap": {
+    "format": "\uf0ad {}",
+    "tooltip": false
+  },
+  "custom/scratchpad": {
+    "exec": "$HOME/.local/bin/archway-bar scratchpad",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "hyprctl dispatch togglespecialworkspace",
+    "tooltip": true
+  },
   "hyprland/window": {
-    "max-length": 42,
+    "max-length": 38,
     "separate-outputs": true,
     "tooltip": false
+  },
+
+  "mpris": {
+    "format": "{player_icon} {artist} — {title}",
+    "format-paused": "{player_icon} {artist} — {title}",
+    "max-length": 38,
+    "tooltip-format": "{player} • {album} • {position}/{length}",
+    "player-icons": {
+      "default": "\uf001",
+      "mpv": "\uf03d",
+      "firefox": "\uf269"
+    },
+    "status-icons": {
+      "paused": "\uf04b",
+      "playing": "\uf04c"
+    },
+    "on-click": "playerctl play-pause",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous"
   },
   "clock": {
     "format": "{:%H:%M}",
     "format-alt": "{:%a %d %b  %H:%M}",
     "tooltip-format": "<tt>{calendar}</tt>"
   },
+  "custom/notifications": {
+    "exec": "$HOME/.local/bin/archway-bar notifications",
+    "return-type": "json",
+    "interval": 3,
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "tooltip": true
+  },
+
+  "privacy": {
+    "icon-size": 13,
+    "tooltip": true
+  },
+  "custom/recording": {
+    "exec": "$HOME/.local/bin/archway-bar recording",
+    "return-type": "json",
+    "interval": 2,
+    "on-click": "pkill -x wf-recorder",
+    "tooltip": true
+  },
+  "custom/failed": {
+    "exec": "$HOME/.local/bin/archway-bar failed",
+    "return-type": "json",
+    "interval": 15,
+    "on-click": "kitty -e systemctl --failed",
+    "tooltip": true
+  },
+  "custom/updates": {
+    "exec": "$HOME/.local/bin/archway-bar updates",
+    "return-type": "json",
+    "interval": 1800,
+    "on-click": "kitty -e $HOME/.local/bin/archway update --dry-run",
+    "tooltip": true
+  },
+  "custom/vault": {
+    "exec": "$HOME/.local/bin/archway-bar vault",
+    "return-type": "json",
+    "interval": 15,
+    "on-click": "kitty -e rbw unlock",
+    "tooltip": true
+  },
+
+  "custom/vpn": {
+    "exec": "$HOME/.local/bin/archway-bar vpn",
+    "return-type": "json",
+    "interval": 15,
+    "on-click": "kitty -e nmtui",
+    "tooltip": true
+  },
+  "network": {
+    "format-wifi": "\uf1eb {essid}",
+    "format-ethernet": "\uf0e8 {ifname}",
+    "format-linked": "\uf0e8 {ifname}",
+    "format-disconnected": "\uf05e offline",
+    "tooltip-format": "{ifname} via {gwaddr}\n{ipaddr}/{cidr}",
+    "on-click": "$HOME/.local/bin/archway applet network --rofi",
+    "on-click-right": "nm-connection-editor"
+  },
+  "bluetooth": {
+    "format": "\uf293 {status}",
+    "format-disabled": "\uf293 off",
+    "format-connected": "\uf293 {num_connections}",
+    "tooltip-format": "{controller_alias}\t{controller_address}",
+    "on-click": "blueman-manager"
+  },
+
+  "custom/resources": {
+    "exec": "$HOME/.local/bin/archway-bar resources",
+    "return-type": "json",
+    "interval": 5,
+    "on-click": "kitty -e btop",
+    "tooltip": true
+  },
+  "custom/disk": {
+    "exec": "$HOME/.local/bin/archway-bar disk",
+    "return-type": "json",
+    "interval": 60,
+    "on-click": "kitty -e ncdu /",
+    "tooltip": true
+  },
+
   "pulseaudio": {
     "format": "{icon} {volume}%",
     "format-muted": "\uf026 {volume}%",
+    "format-source": "\uf130 {volume}%",
+    "format-source-muted": "\uf131",
     "format-icons": ["\uf027", "\uf027", "\uf028"],
     "tooltip-format": "{desc}",
     "on-click": "pavucontrol",
-    "on-scroll-up": "archway applet osd volume up",
-    "on-scroll-down": "archway applet osd volume down",
+    "on-scroll-up": "$HOME/.local/bin/archway applet osd volume up",
+    "on-scroll-down": "$HOME/.local/bin/archway applet osd volume down",
     "scroll-step": 5
   },
   "backlight": {
     "format": "\uf185 {percent}%",
     "tooltip": false,
-    "on-scroll-up": "archway applet osd brightness up",
-    "on-scroll-down": "archway applet osd brightness down",
+    "on-scroll-up": "$HOME/.local/bin/archway applet osd brightness up",
+    "on-scroll-down": "$HOME/.local/bin/archway applet osd brightness down",
     "scroll-step": 5
   },
+  "custom/nightlight": {
+    "exec": "$HOME/.local/bin/archway-bar nightlight",
+    "return-type": "json",
+    "interval": 30,
+    "on-click": "$HOME/.local/bin/archway-bar nightlight --toggle",
+    "tooltip": true
+  },
+  "custom/language": {
+    "exec": "$HOME/.local/bin/archway-bar language",
+    "return-type": "json",
+    "interval": 10,
+    "tooltip": true
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "\uf06e",
+      "deactivated": "\uf070"
+    },
+    "tooltip-format-activated": "keep-awake on",
+    "tooltip-format-deactivated": "keep-awake off"
+  },
+
   "battery": {
     "states": {
       "warning": 20,
@@ -60,23 +251,14 @@
     "format-full": "\uf240 {capacity}%",
     "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
     "tooltip-format": "{timeTo}",
-    "on-click": "archway applet power --rofi"
+    "on-click": "$HOME/.local/bin/archway applet power --rofi"
   },
-  "network": {
-    "format-wifi": "\uf1eb {essid}",
-    "format-ethernet": "\uf0e8 {ifname}",
-    "format-linked": "\uf0e8 {ifname}",
-    "format-disconnected": "\uf05e offline",
-    "tooltip-format": "{ifname} via {gwaddr}\n{ipaddr}/{cidr}",
-    "on-click": "archway applet network --rofi",
-    "on-click-right": "nm-connection-editor"
-  },
-  "bluetooth": {
-    "format": "\uf293 {status}",
-    "format-disabled": "\uf293 off",
-    "format-connected": "\uf293 {num_connections}",
-    "tooltip-format": "{controller_alias}\t{controller_address}",
-    "on-click": "blueman-manager"
+  "custom/power-profile": {
+    "exec": "$HOME/.local/bin/archway-bar power-profile",
+    "return-type": "json",
+    "interval": 30,
+    "on-click": "$HOME/.local/bin/archway-bar power-profile --next",
+    "tooltip": true
   },
   "tray": {
     "icon-size": 14,
@@ -85,6 +267,6 @@
   "custom/power": {
     "format": "\uf011",
     "tooltip": false,
-    "on-click": "archway applet power --rofi"
+    "on-click": "$HOME/.local/bin/archway applet power --rofi"
   }
 }

@@ -2,7 +2,11 @@
  * Published to ~/.config/waybar/theme.css and imported by style.css.
  *
  * Colour is information, not decoration (AGENTS.md §9.2): a module is neutral
- * when healthy, muted when off, and tinted only when it needs attention. */
+ * when healthy, muted when off, and tinted only when it needs attention.
+ *
+ * Geometry: the bar itself is transparent; each cluster (workspaces, clock,
+ * alert, connectivity, resources, controls, session) is one pill so the eye
+ * groups functions instead of reading a uniform row of icons. */
 
 * {
   border: none;
@@ -17,19 +21,59 @@ window#waybar {
   color: @text@;
 }
 
+/* Clusters float on the wallpaper; no full-width bar strip. */
 .modules-left,
 .modules-center,
 .modules-right {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0 6px;
+}
+
+/* One pill per cluster. Inner modules are flush with each other. */
+#custom-launcher,
+#workspaces,
+#clock,
+#context,
+#alerts,
+#net,
+#resources,
+#controls,
+#session,
+#mpris,
+#custom-notifications {
   background: @surface@;
   border: @border_width@px solid @border@;
-  border-radius: @radius_window@px;
-  padding: 0 4px;
-  margin: 3px 6px;
+  border-radius: @radius_input@px;
+  margin: 4px 3px;
+  padding: 0 8px;
+  min-height: 22px;
+}
+
+/* Empty pill guard: a group with every child hidden collapses. */
+#alerts.empty,
+#resources.empty,
+#net.empty {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+#custom-launcher {
+  color: @primary@;
+  font-size: 13px;
+  padding: 0 10px;
+}
+
+#custom-launcher:hover {
+  background: @overlay@;
 }
 
 #workspaces button {
-  padding: 0 6px;
-  margin: 1px;
+  padding: 0 5px;
+  margin: 0;
   min-width: 18px;
   border-radius: @radius_input@px;
   color: @text_muted@;
@@ -51,26 +95,45 @@ window#waybar {
   background: @overlay@;
 }
 
+/* Inner modules: no own background, no margins, no padding storm. */
 #window,
-#clock,
-#cpu,
-#memory,
-#temperature,
-#pulseaudio,
-#backlight,
-#battery,
+#submap,
+#custom-scratchpad,
+#mpris,
+#privacy,
+#custom-recording,
+#custom-failed,
+#custom-updates,
+#custom-vault,
+#custom-vpn,
 #network,
 #bluetooth,
+#custom-resources,
+#custom-disk,
+#pulseaudio,
+#backlight,
+#custom-nightlight,
+#custom-language,
+#idle_inhibitor,
+#battery,
+#custom-power-profile,
 #tray,
 #custom-power {
-  padding: 0 6px;
-  margin: 1px 0;
+  padding: 0 5px;
+  margin: 0;
   color: @text@;
+  background: transparent;
 }
 
 #window {
   color: @text_muted@;
   font-size: 11px;
+  min-width: 120px;
+}
+
+#submap {
+  color: @tertiary@;
+  font-weight: 600;
 }
 
 #clock {
@@ -78,8 +141,45 @@ window#waybar {
   font-weight: 600;
 }
 
-/* Wi-Fi / Bluetooth: neutral when connected, muted when off, red on failure.
- * The module keeps one width so the bar does not reflow on every change. */
+#mpris {
+  color: @text@;
+  font-size: 11px;
+  min-width: 110px;
+}
+
+#mpris.paused {
+  color: @text_muted@;
+}
+
+/* ---- alerts: tinted only when there is something to fix ---- */
+#privacy,
+#custom-recording,
+#custom-failed,
+#custom-updates,
+#custom-vault {
+  min-width: 0;
+}
+
+#custom-recording,
+#custom-failed.critical {
+  color: @error@;
+  font-weight: 700;
+}
+
+#custom-updates.warning,
+#custom-vault.warning {
+  color: @warning@;
+}
+
+#privacy {
+  color: @error@;
+}
+
+/* ---- connectivity ---- */
+#custom-vpn {
+  color: @secondary@;
+}
+
 #network {
   color: @text@;
   min-width: 74px;
@@ -96,7 +196,7 @@ window#waybar {
 
 #bluetooth {
   color: @text_muted@;
-  min-width: 40px;
+  min-width: 34px;
 }
 
 #bluetooth.connected,
@@ -104,14 +204,21 @@ window#waybar {
   color: @primary@;
 }
 
-#bluetooth.disabled,
-#bluetooth.off {
-  color: @text_muted@;
+/* ---- resources: hidden unless hot or full ---- */
+#custom-resources.warning,
+#custom-disk.warning {
+  color: @warning@;
 }
 
-/* Audio: neutral while audible, muted when silenced. */
+#custom-resources.critical,
+#custom-disk.critical {
+  color: @error@;
+  font-weight: 700;
+}
+
+/* ---- controls ---- */
 #pulseaudio {
-  min-width: 62px;
+  min-width: 56px;
 }
 
 #pulseaudio.muted,
@@ -125,12 +232,25 @@ window#waybar {
 
 #backlight {
   color: @text@;
-  min-width: 56px;
+  min-width: 52px;
 }
 
-/* Battery: green while charging/full, amber as a warning, red when critical. */
+#custom-nightlight {
+  color: @text_muted@;
+}
+
+#custom-language {
+  color: @text_muted@;
+  font-size: 11px;
+}
+
+#idle_inhibitor.activated {
+  color: @warning@;
+}
+
+/* ---- session ---- */
 #battery {
-  min-width: 62px;
+  min-width: 58px;
 }
 
 #battery.charging,
@@ -146,6 +266,10 @@ window#waybar {
 #battery.critical:not(.charging) {
   color: @error@;
   font-weight: 700;
+}
+
+#custom-power-profile {
+  color: @text_muted@;
 }
 
 #custom-power {

@@ -72,8 +72,8 @@ EOF
 
 @test "media keys repeat and go through the OSD applet" {
   local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
-  assert_file_contains "$f" 'hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("archway applet osd volume up"), { repeating = true })'
-  assert_file_contains "$f" 'hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("archway applet osd brightness down"), { repeating = true })'
+  assert_file_contains "$f" 'hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd volume up"), { repeating = true })'
+  assert_file_contains "$f" 'hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd brightness down"), { repeating = true })'
   # No inline notify-send/pipe chains: the applet owns the fallback logic.
   run grep -q 'notify-send' "$f"
   assert_eq 1 "$status"

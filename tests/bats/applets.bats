@@ -9,6 +9,7 @@ setup() {
   WALL="$ARCHWAY_ROOT/applets/wallpaper/wallpaper.sh"
   NET="$ARCHWAY_ROOT/applets/network/network.sh"
   CLIP="$ARCHWAY_ROOT/applets/clipboard/clipboard.sh"
+  BAR="$ARCHWAY_ROOT/applets/bar/bar.sh"
 }
 
 teardown() {
@@ -100,4 +101,59 @@ teardown() {
   run "$CLIP" --list --json
   assert_eq 0 "$status"
   assert_contains "$output" '"entries":0'
+}
+
+@test "bar updates stays hidden when the system is current" {
+  mock_cmd checkupdates 'exit 2'
+  run "$BAR" updates
+  assert_eq 0 "$status"
+  assert_contains "$output" '"text": ""'
+}
+
+@test "bar updates reports the pending count" {
+  mock_cmd checkupdates 'printf "a 1 -> 2\nb 1 -> 2\n"'
+  run "$BAR" updates
+  assert_eq 0 "$status"
+  assert_contains "$output" '"class": "warning"'
+  run grep -q '"text": ""' <<< "$output"
+  assert_eq 1 "$status"
+}
+
+@test "bar failed counts failed units and escalates to critical" {
+  mock_cmd systemctl 'printf "a.service loaded failed failed A\nb.service loaded failed failed B\n"'
+  run "$BAR" failed
+  assert_eq 0 "$status"
+  assert_contains "$output" '"class": "critical"'
+  assert_contains "$output" "2"
+}
+
+@test "bar failed is hidden when nothing failed" {
+  mock_cmd systemctl 'exit 0'
+  run "$BAR" failed
+  assert_contains "$output" '"text": ""'
+}
+
+@test "bar vault stays hidden when rbw is not configured" {
+  run "$BAR" vault
+  assert_eq 0 "$status"
+  assert_contains "$output" '"text": ""'
+}
+
+@test "bar power-profile cycles performance to balanced" {
+  mock_cmd powerprofilesctl 'case $1 in get) echo performance ;; set) printf "%s\n" "$2" > "$HOME/pp" ;; esac'
+  run "$BAR" power-profile --next
+  assert_eq 0 "$status"
+  assert_eq balanced "$(cat "$HOME/pp")"
+}
+
+@test "bar rejects an unknown section with the usage exit code" {
+  run "$BAR" nope
+  assert_eq 2 "$status"
+}
+
+@test "bar help documents every section" {
+  run "$BAR" --help
+  assert_eq 0 "$status"
+  assert_contains "$output" "power-profile"
+  assert_contains "$output" "scratchpad"
 }
