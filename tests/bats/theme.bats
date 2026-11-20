@@ -60,3 +60,16 @@ teardown() {
   THEMES_DIR="$SANDBOX/themes" run theme_validate bad
   assert_eq 1 "$status"
 }
+
+@test "reload never blocks on a notification daemon that is not running" {
+  mkdir -p -- "$SANDBOX/bin"
+  cat > "$SANDBOX/bin/swaync-client" <<'STUB'
+#!/usr/bin/env bash
+touch "$HOME/swaync-was-called"
+sleep 30
+STUB
+  chmod +x -- "$SANDBOX/bin/swaync-client"
+  PATH="$SANDBOX/bin:$PATH" run timeout 10 bash -c 'source "$ARCHWAY_ROOT/lib/core.sh"; source "$ARCHWAY_ROOT/lib/paths.sh"; source "$ARCHWAY_ROOT/lib/ui.sh"; source "$ARCHWAY_ROOT/lib/theme.sh"; theme_reload'
+  assert_eq 0 "$status"
+  [ ! -e "$HOME/swaync-was-called" ]
+}

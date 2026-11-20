@@ -304,7 +304,7 @@ theme_set() {
 
   if ((rc != 0)); then
     err "theme applied everywhere except Neovim (see messages above)"
-    exit "$EX_FAIL"
+    return "$EX_FAIL"
   fi
   ok "theme '$id' is active; new shells pick up the rest"
 }
@@ -355,21 +355,26 @@ theme_reload() {
   fi
   # Never restart or kill the compositor: a config reload is enough, and the
   # user's session must survive a theme change (AGENTS.md §8.2).
+  #
+  # Every step is guarded twice: only touch apps that are actually running, and
+  # bound the call with timeout. `swaync-client -rs` blocks forever when no
+  # daemon owns the name (e.g. changing the theme from a non-Hyprland session),
+  # which used to hang the whole install.
   if have hyprctl && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
-    hyprctl reload > /dev/null 2>&1 || true
+    timeout 5 hyprctl reload > /dev/null 2>&1 || true
   fi
   if have kitty && [[ -n ${KITTY_LISTEN_ON:-} ]]; then
-    kitty @ set-colors --all --configured "$THEME_D_DIR/kitty.conf" 2> /dev/null || true
+    timeout 5 kitty @ set-colors --all --configured "$THEME_D_DIR/kitty.conf" 2> /dev/null || true
   fi
-  if have pkill; then
-    pkill -SIGUSR2 -x waybar > /dev/null 2>&1 || true
+  if have pgrep && pgrep -x waybar > /dev/null 2>&1; then
+    timeout 5 pkill -SIGUSR2 -x waybar > /dev/null 2>&1 || true
   fi
-  if have swaync-client; then
-    swaync-client -rs > /dev/null 2>&1 || true
+  if have pgrep && have swaync-client && pgrep -x swaync > /dev/null 2>&1; then
+    timeout 5 swaync-client -rs > /dev/null 2>&1 || true
   fi
   if have tmux && tmux list-sessions > /dev/null 2>&1; then
     tmux setenv -g ARCHWAY_THEME_DIR "$THEME_D_DIR"
-    tmux source-file "$XDG_CONFIG_HOME/tmux/tmux.conf" > /dev/null 2>&1 || true
+    timeout 5 tmux source-file "$XDG_CONFIG_HOME/tmux/tmux.conf" > /dev/null 2>&1 || true
   fi
   ok "reloaded running components"
 }

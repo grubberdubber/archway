@@ -285,7 +285,10 @@ cmd_install() {
   fi
 
   section "Theme"
-  theme_set "$theme"
+  # A broken Neovim theme contract must not cancel the desktop (AGENTS.md
+  # §7.2/§9.5): finish the install, report it, and exit non-zero at the end.
+  local theme_failed=0
+  theme_set "$theme" || theme_failed=1
 
   section "Shell"
   shell_link
@@ -319,6 +322,12 @@ cmd_install() {
   ui_item "archway update keeps this machine current (no re-clone)"
   ui_item "archway rollback restores the last backup"
   ((dry_requested)) && ui_note "this was a dry-run: nothing was written"
+
+  if ((theme_failed)); then
+    err "the desktop is installed, but Neovim did not get the theme"
+    err "see 'archway doctor' and AGENTS.md §9.5 for the required upstream hook"
+    return "$EX_FAIL"
+  fi
   return 0
 }
 
