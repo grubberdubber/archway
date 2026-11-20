@@ -2,9 +2,10 @@
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
 //
-// Layout: left = one continuous row (where am I, what is playing, what time it
-// is), right = alerts, connectivity, resources, controls, session. Keeping the
-// clock out of `modules-center` avoids a fixed gap that never shrinks.
+// Layout: one continuous row, left to right: context, media, time,
+// notifications, then alerts, connectivity, resources, controls, session.
+// Nothing is right-anchored or centre-anchored, so every pill keeps the same
+// gap and the whole row shifts by itself when a module grows or disappears.
 // Every alert/resource module prints an empty text when healthy, so the bar
 // stays around eight pills and only grows when something needs attention.
 //
@@ -24,16 +25,16 @@
     "group/context",
     "mpris",
     "clock",
-    "custom/notifications"
-  ],
-  "modules-center": [],
-  "modules-right": [
+    "custom/notifications",
     "group/alerts",
     "group/net",
     "group/resources",
     "group/controls",
     "group/session"
   ],
+  "modules-center": [],
+  "modules-right": [],
+
 
   "group/context": {
     "orientation": "horizontal",

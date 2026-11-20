@@ -130,7 +130,7 @@ window#waybar {
 #window {
   color: @text_muted@;
   font-size: 10.5px;
-  min-width: 55px;
+  min-width: 100px;
   padding: 0 3px;
 }
 
@@ -147,7 +147,7 @@ window#waybar {
 #mpris {
   color: @text@;
   font-size: 10.5px;
-  min-width: 60px;
+  min-width: 120px;
 }
 
 #mpris.paused {
