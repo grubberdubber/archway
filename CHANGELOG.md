@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Workspaces now show where the windows are: a workspace with windows keeps
+  full-brightness text plus a `primary` hairline under the number, an empty one
+  fades to muted, and the active one keeps the filled pill. The hairline is a
+  box shadow, so the buttons do not change size.
+
 - The bar row no longer moves. The active workspace button only changes colour
   (its 1 px margin made one button wider and slid the row), the window-title and
   media pills keep a fixed footprint (`min-width`), `custom/nowplaying` holds the

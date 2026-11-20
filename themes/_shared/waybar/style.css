@@ -81,14 +81,32 @@ window#waybar {
   background: @overlay@;
 }
 
+/* Occupancy is colour only: a workspace with windows is full-brightness text,
+ * an empty one fades to muted. Nothing here changes size, so the buttons stay
+ * put while the row stays aligned. */
 #workspaces button {
   padding: 0 5px;
   margin: 0;
   min-width: 14px;
   font-size: 13px;
   border-radius: @radius_input@px;
-  color: @text_muted@;
+  color: @text@;
   background: transparent;
+}
+
+#workspaces button.empty {
+  color: @text_muted@;
+}
+
+/* Occupied workspaces get a hairline under the number, painted with a shadow so
+ * the button keeps its size, and the empty/active states drop it. */
+#workspaces button {
+  box-shadow: inset 0 -2px 0 -1px @primary@;
+}
+
+#workspaces button.empty,
+#workspaces button.active {
+  box-shadow: none;
 }
 
 /* Active state changes colour only: an extra margin here made one button wider
