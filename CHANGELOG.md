@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Workspaces are capped at six: `Super+7/8/9` and their `movetoworkspace`
+  counterparts are gone from `keybinds.toml`, and waybar reserves exactly six
+  workspace pills. Six is the most that fits next to the status cluster on a
+  1366 px screen, so the session counter can no longer grow the row off screen.
+
 - Tighter waybar geometry: smaller pill padding and gaps, narrower
   workspaces, status modules and window title, so the bar reads as dense
   instead of airy. The media pill moved next to the window title: what is
@@ -46,12 +51,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   clock and notifications follow it in the same left row, so spacing stays
   uniform and the row reflows when a title or the track name grows instead of
   leaving a fixed gap around the centre. The status cluster is no longer
-  one full-width line: it is three zones (session/shell, identifiers, status)
-  separated by a 28 px break, with pills inside a zone spaced 8 px apart and
-  matching 29 px insets. The left and right zones stay anchored to their edges,
-  so an extra alert pill or a long title can only eat the air between zones and
-  never pushes anything off screen. The clock always shows date + time
-  (`20/11 18:57`), so clicking it does not change the row width.
+  anchored to a single edge: it is one centred row of three zones
+  (session/shell, identifiers, status) separated by an 18 px break, with pills
+  inside a zone spaced 6 px apart. Centring keeps the two insets equal on any
+  screen width instead of leaving a void on wide monitors. The clock always
+  shows date + time (`20/11 18:57`), so clicking it does not change the row
+  width, and workspaces are capped at six, which was what pushed the row past
+  the screen edge before.
 
 - **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm
   is out of scope. Packages, profiles, applets, keybinds, theme modules and the

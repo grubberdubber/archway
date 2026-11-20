@@ -50,18 +50,12 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + 4` | Workspace 4 | `hyprctl dispatch workspace 4` |
 | `super + 5` | Workspace 5 | `hyprctl dispatch workspace 5` |
 | `super + 6` | Workspace 6 | `hyprctl dispatch workspace 6` |
-| `super + 7` | Workspace 7 | `hyprctl dispatch workspace 7` |
-| `super + 8` | Workspace 8 | `hyprctl dispatch workspace 8` |
-| `super + 9` | Workspace 9 | `hyprctl dispatch workspace 9` |
 | `super + shift + 1` | Move window to workspace 1 | `hyprctl dispatch movetoworkspace 1` |
 | `super + shift + 2` | Move window to workspace 2 | `hyprctl dispatch movetoworkspace 2` |
 | `super + shift + 3` | Move window to workspace 3 | `hyprctl dispatch movetoworkspace 3` |
 | `super + shift + 4` | Move window to workspace 4 | `hyprctl dispatch movetoworkspace 4` |
 | `super + shift + 5` | Move window to workspace 5 | `hyprctl dispatch movetoworkspace 5` |
 | `super + shift + 6` | Move window to workspace 6 | `hyprctl dispatch movetoworkspace 6` |
-| `super + shift + 7` | Move window to workspace 7 | `hyprctl dispatch movetoworkspace 7` |
-| `super + shift + 8` | Move window to workspace 8 | `hyprctl dispatch movetoworkspace 8` |
-| `super + shift + 9` | Move window to workspace 9 | `hyprctl dispatch movetoworkspace 9` |
 
 ## Archway
 

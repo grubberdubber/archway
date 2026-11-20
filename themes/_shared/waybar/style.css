@@ -21,27 +21,14 @@ window#waybar {
   color: @text@;
 }
 
-/* Clusters float on the wallpaper; no full-width bar strip. The bar is three
- * zones separated by a wider gap than the one between pills, so a zone can only
- * grow into its own air before it meets its neighbour. */
+/* Clusters float on the wallpaper; no full-width bar strip. The row is centred
+ * by waybar, so the insets at both edges match on any screen width. */
 .modules-left,
 .modules-center,
 .modules-right {
   background: transparent;
   border: none;
   padding: 0;
-}
-
-.modules-left {
-  margin: 0 10px 0 25px;
-}
-
-.modules-center {
-  margin: 0 10px;
-}
-
-.modules-right {
-  margin: 0 25px 0 10px;
 }
 
 /* One pill per cluster. Inner modules are flush with each other. */
@@ -59,9 +46,18 @@ window#waybar {
   background: @surface@;
   border: @border_width@px solid @border@;
   border-radius: @radius_input@px;
-  margin: 3px 4px;
-  padding: 0 7px;
+  margin: 3px 3px;
+  padding: 0 6px;
   min-height: 21px;
+}
+
+/* Zone breaks: a wider gap closes each of the two leading groups, so the row
+ * reads as three zones. They hang off the last always-visible pill of a group
+ * (workspaces, clock) instead of the first pill of the next one, because a
+ * hidden module would otherwise swallow the break. */
+#workspaces,
+#clock {
+  margin-right: 15px;
 }
 
 /* Empty pill guard: a group with every child hidden collapses. */

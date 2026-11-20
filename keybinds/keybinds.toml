@@ -219,29 +219,8 @@ argument = "6"
 category = "workspaces"
 description = "Workspace 6"
 
-[[keybind]]
-id = "workspace-7"
-keys = "super + 7"
-dispatcher = "workspace"
-argument = "7"
-category = "workspaces"
-description = "Workspace 7"
 
-[[keybind]]
-id = "workspace-8"
-keys = "super + 8"
-dispatcher = "workspace"
-argument = "8"
-category = "workspaces"
-description = "Workspace 8"
 
-[[keybind]]
-id = "workspace-9"
-keys = "super + 9"
-dispatcher = "workspace"
-argument = "9"
-category = "workspaces"
-description = "Workspace 9"
 
 [[keybind]]
 id = "send-workspace-1"
@@ -291,29 +270,8 @@ argument = "6"
 category = "workspaces"
 description = "Move window to workspace 6"
 
-[[keybind]]
-id = "send-workspace-7"
-keys = "super + shift + 7"
-dispatcher = "movetoworkspace"
-argument = "7"
-category = "workspaces"
-description = "Move window to workspace 7"
 
-[[keybind]]
-id = "send-workspace-8"
-keys = "super + shift + 8"
-dispatcher = "movetoworkspace"
-argument = "8"
-category = "workspaces"
-description = "Move window to workspace 8"
 
-[[keybind]]
-id = "send-workspace-9"
-keys = "super + shift + 9"
-dispatcher = "movetoworkspace"
-argument = "9"
-category = "workspaces"
-description = "Move window to workspace 9"
 
 [[keybind]]
 id = "theme-selector"
