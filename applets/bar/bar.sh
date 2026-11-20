@@ -189,6 +189,11 @@ section_disk() {
 
 # Night light (gammastep) state; click toggles it.
 section_nightlight() {
+  # No gammastep, no module: an icon that cannot do anything is noise.
+  have gammastep || {
+    emit ""
+    return 0
+  }
   if pgrep -x gammastep > /dev/null 2>&1; then
     emit "$(icon f186)" "night light on — click to turn off" normal
   else
