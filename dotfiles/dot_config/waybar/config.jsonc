@@ -2,8 +2,10 @@
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
 //
-// Layout: one row, every pill with the same gap, holding its position from the
-// right edge so a longer label never shifts the row. The clock always shows
+// Layout: three zones — session/shell on the left, the identifiers that change
+// most (window, media, clock) in the middle, status on the right. Each zone
+// grows into the gap that separates it from the next one, so a new alert or a
+// longer title is stopped by its neighbour instead of running off the screen. The clock always shows
 // date + time, so no click changes the row width; the alt format only makes it
 // shorter, and the tooltip still carries the full calendar.
 // Every alert/resource module prints an empty text when healthy, so the bar
@@ -19,14 +21,9 @@
   "spacing": 0,
   "margin-top": 0,
   "margin-bottom": 0,
-  "modules-left": [],
-  "modules-center": [],
+  "modules-left": ["custom/launcher", "hyprland/workspaces"],
+  "modules-center": ["group/context", "mpris", "clock"],
   "modules-right": [
-    "custom/launcher",
-    "hyprland/workspaces",
-    "group/context",
-    "mpris",
-    "clock",
     "custom/notifications",
     "group/alerts",
     "group/net",
@@ -105,7 +102,7 @@
   "mpris": {
     "format": "{player_icon} {artist} — {title}",
     "format-paused": "{player_icon} {artist} — {title}",
-    "max-length": 30,
+    "max-length": 26,
     "tooltip-format": "{player} • {album} • {position}/{length}",
     "player-icons": {
       "default": "\uf001",

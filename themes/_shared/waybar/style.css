@@ -21,20 +21,27 @@ window#waybar {
   color: @text@;
 }
 
-/* Clusters float on the wallpaper; no full-width bar strip. Insets match the
- * inner gap so the centred row reads as evenly spaced. */
+/* Clusters float on the wallpaper; no full-width bar strip. The bar is three
+ * zones separated by a wider gap than the one between pills, so a zone can only
+ * grow into its own air before it meets its neighbour. */
 .modules-left,
 .modules-center,
 .modules-right {
   background: transparent;
   border: none;
   padding: 0;
-  margin: 0 11px;
 }
 
-/* Pinned by the right edge so the row stays put even if a label grows. */
+.modules-left {
+  margin: 0 10px 0 25px;
+}
+
+.modules-center {
+  margin: 0 10px;
+}
+
 .modules-right {
-  margin: 0 23px 0 0;
+  margin: 0 25px 0 10px;
 }
 
 /* One pill per cluster. Inner modules are flush with each other. */
@@ -52,7 +59,7 @@ window#waybar {
   background: @surface@;
   border: @border_width@px solid @border@;
   border-radius: @radius_input@px;
-  margin: 3px 6px;
+  margin: 3px 4px;
   padding: 0 7px;
   min-height: 21px;
 }
