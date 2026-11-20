@@ -89,7 +89,7 @@
     "tooltip": true
   },
   "hyprland/window": {
-    "max-length": 38,
+    "max-length": 30,
     "separate-outputs": true,
     "tooltip": false
   },
@@ -97,7 +97,7 @@
   "mpris": {
     "format": "{player_icon} {artist} — {title}",
     "format-paused": "{player_icon} {artist} — {title}",
-    "max-length": 38,
+    "max-length": 30,
     "tooltip-format": "{player} • {album} • {position}/{length}",
     "player-icons": {
       "default": "\uf001",

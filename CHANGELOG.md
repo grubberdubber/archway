@@ -37,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Tighter waybar geometry: smaller pill padding and gaps, narrower
+  workspaces, status modules and window title, so the bar reads as dense
+  instead of airy.
+
 - **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm
   is out of scope. Packages, profiles, applets, keybinds, theme modules and the
   session config were migrated: `hypr`, `waybar`, `swaync`, `hyprlock`,

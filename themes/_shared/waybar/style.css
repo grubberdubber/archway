@@ -28,7 +28,7 @@ window#waybar {
   background: transparent;
   border: none;
   padding: 0;
-  margin: 0 6px;
+  margin: 0 4px;
 }
 
 /* One pill per cluster. Inner modules are flush with each other. */
@@ -46,9 +46,9 @@ window#waybar {
   background: @surface@;
   border: @border_width@px solid @border@;
   border-radius: @radius_input@px;
-  margin: 4px 3px;
-  padding: 0 8px;
-  min-height: 22px;
+  margin: 3px 2px;
+  padding: 0 7px;
+  min-height: 21px;
 }
 
 /* Empty pill guard: a group with every child hidden collapses. */
@@ -64,7 +64,7 @@ window#waybar {
 #custom-launcher {
   color: @primary@;
   font-size: 13px;
-  padding: 0 10px;
+  padding: 0 7px;
 }
 
 #custom-launcher:hover {
@@ -72,9 +72,9 @@ window#waybar {
 }
 
 #workspaces button {
-  padding: 0 5px;
+  padding: 0 3px;
   margin: 0;
-  min-width: 18px;
+  min-width: 7px;
   border-radius: @radius_input@px;
   color: @text_muted@;
   background: transparent;
@@ -83,6 +83,7 @@ window#waybar {
 #workspaces button.active {
   color: @bg@;
   background: @primary@;
+  margin: 0 1px;
 }
 
 #workspaces button.urgent {
@@ -119,7 +120,7 @@ window#waybar {
 #custom-power-profile,
 #tray,
 #custom-power {
-  padding: 0 5px;
+  padding: 0 4px;
   margin: 0;
   color: @text@;
   background: transparent;
@@ -128,7 +129,7 @@ window#waybar {
 #window {
   color: @text_muted@;
   font-size: 11px;
-  min-width: 120px;
+  min-width: 90px;
 }
 
 #submap {
@@ -144,7 +145,7 @@ window#waybar {
 #mpris {
   color: @text@;
   font-size: 11px;
-  min-width: 110px;
+  min-width: 90px;
 }
 
 #mpris.paused {
@@ -182,7 +183,7 @@ window#waybar {
 
 #network {
   color: @text@;
-  min-width: 74px;
+  min-width: 62px;
 }
 
 #network.disconnected,
@@ -196,7 +197,7 @@ window#waybar {
 
 #bluetooth {
   color: @text_muted@;
-  min-width: 34px;
+  min-width: 26px;
 }
 
 #bluetooth.connected,
@@ -218,7 +219,7 @@ window#waybar {
 
 /* ---- controls ---- */
 #pulseaudio {
-  min-width: 56px;
+  min-width: 46px;
 }
 
 #pulseaudio.muted,
@@ -232,7 +233,7 @@ window#waybar {
 
 #backlight {
   color: @text@;
-  min-width: 52px;
+  min-width: 44px;
 }
 
 #custom-nightlight {
@@ -250,7 +251,7 @@ window#waybar {
 
 /* ---- session ---- */
 #battery {
-  min-width: 58px;
+  min-width: 50px;
 }
 
 #battery.charging,
