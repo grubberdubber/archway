@@ -56,6 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ring on unfocused windows is fully transparent. `inactive_opacity` is 1.0 and
   the palette `opacity` is 1.0, so an unfocused window is neither dimmed nor
   washed out — focus is carried by the line alone.
+- Firefox is square too: a `firefox-square` window rule drops the compositor
+  rounding for `firefox`, `firefox-esr` and `librewolf`, whose surfaces are
+  drawn edge to edge and looked cut into arcs.
+
 - Terminals are square and opaque. A window rule sets `rounding = 0` for
   `kitty`/`floating-term`/`alacritty`/`foot`, and kitty goes back to
   `background_opacity 1.0`. Rounded corners plus a translucent background drew

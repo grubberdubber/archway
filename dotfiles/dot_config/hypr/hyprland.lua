@@ -117,6 +117,14 @@ hl.window_rule({
   rounding = 0,
 })
 
+-- Firefox paints its own square surface edge to edge, so the compositor
+-- rounding only shaved the corners into arcs that do not match the content.
+hl.window_rule({
+  name = "firefox-square",
+  match = { class = "^(firefox|firefox-esr|librewolf|LibreWolf)$" },
+  rounding = 0,
+})
+
 hl.window_rule({ name = "pavucontrol", match = { class = "^(pavucontrol)$" }, float = true })
 hl.window_rule({ name = "nm-connection-editor", match = { class = "^(nm-connection-editor)$" }, float = true })
 hl.window_rule({ name = "blueman-manager", match = { class = "^(blueman-manager)$" }, float = true })
