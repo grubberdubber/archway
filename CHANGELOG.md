@@ -56,6 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ring on unfocused windows is fully transparent. `inactive_opacity` is 1.0 and
   the palette `opacity` is 1.0, so an unfocused window is neither dimmed nor
   washed out — focus is carried by the line alone.
+- kitty has no inner padding any more: the 12 px band was painted in the
+  terminal background colour and showed as a ghost frame around Neovim, whose
+  own background differs. Text and Neovim now reach the 1 px window border, and
+  nothing is added outside it either.
 - Firefox is square too: a `firefox-square` window rule drops the compositor
   rounding for `firefox`, `firefox-esr` and `librewolf`, whose surfaces are
   drawn edge to edge and looked cut into arcs.
