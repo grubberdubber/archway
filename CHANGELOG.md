@@ -39,6 +39,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Focus ring is a single flat hairline on the active window: `border_size`
+  stays 1 but the two-colour gradient became one solid `primary` line, and the
+  ring on unfocused windows is fully transparent. `inactive_opacity` is 1.0 and
+  the palette `opacity` is 1.0, so an unfocused window is neither dimmed nor
+  washed out — focus is carried by the line alone.
+- Terminals are square and opaque. A window rule sets `rounding = 0` for
+  `kitty`/`floating-term`/`alacritty`/`foot`, and kitty goes back to
+  `background_opacity 1.0`. Rounded corners plus a translucent background drew
+  a faint arc of border over the first cells of the grid, which looked like a
+  phantom frame inside Neovim.
+
 - Workspaces are capped at six: `Super+7/8/9` and their `movetoworkspace`
   counterparts are gone from `keybinds.toml`, and waybar reserves exactly six
   workspace pills. Six is the most that fits next to the status cluster on a

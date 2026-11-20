@@ -108,6 +108,15 @@ hl.window_rule({
   center = true,
   size = "70% 60%",
 })
+-- Terminals are square. A rounded corner arcs the compositor border over the
+-- first cells of the grid; with a full-bleed background that reads as a phantom
+-- frame inside the window, most obvious around Neovim.
+hl.window_rule({
+  name = "terminal-square",
+  match = { class = "^(kitty|floating-term|Alacritty|Foot|foot)$" },
+  rounding = 0,
+})
+
 hl.window_rule({ name = "pavucontrol", match = { class = "^(pavucontrol)$" }, float = true })
 hl.window_rule({ name = "nm-connection-editor", match = { class = "^(nm-connection-editor)$" }, float = true })
 hl.window_rule({ name = "blueman-manager", match = { class = "^(blueman-manager)$" }, float = true })

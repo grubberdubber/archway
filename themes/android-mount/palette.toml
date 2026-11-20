@@ -38,6 +38,8 @@ font_fallback = "Noto Sans"
 font_size     = 11
 
 [effects]
-opacity      = 0.96
+# Fully opaque: anything below 1.0 leaves the wallpaper showing through the
+# terminal background, which reads as a faint frame around the text grid.
+opacity      = 1.0
 transitions  = 160
 reduce_motion = 0

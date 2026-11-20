@@ -9,14 +9,20 @@ hl.config({
     gaps_out = 8,
     resize_on_border = true,
     col = {
-      active_border = { colors = { "rgba(@primary:hex@ee)", "rgba(@secondary:hex@ee)" }, angle = 45 },
-      inactive_border = "rgba(@border:hex@aa)",
+      -- One flat hairline, focused window only. A two-colour gradient reads as
+      -- a thicker band at one pixel, and a ring around every unfocused window
+      -- pulls the eye away from the focused one, so that ring is transparent.
+      active_border = "rgba(@primary:hex@ff)",
+      inactive_border = "rgba(@border:hex@00)",
     },
   },
   decoration = {
     rounding = @radius_window@,
     active_opacity = @opacity@,
-    inactive_opacity = 0.94,
+    -- Unfocused windows keep their full brightness: the hairline already shows
+    -- focus, and dimming made every other window look disabled (and fought the
+    -- terminal opacity).
+    inactive_opacity = 1.0,
     -- Blur and shadows are off: on integrated/older GPUs they cost more frames
     -- than they add polish (AGENTS.md §2.7). Enable per taste, not per theme.
     blur = {
@@ -28,8 +34,8 @@ hl.config({
   },
   group = {
     col = {
-      border_active = "rgba(@primary:hex@ee)",
-      border_inactive = "rgba(@border:hex@aa)",
+      border_active = "rgba(@primary:hex@ff)",
+      border_inactive = "rgba(@border:hex@00)",
     },
     groupbar = {
       text_color = "rgba(@text:hex@ff)",
