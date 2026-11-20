@@ -42,7 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tighter waybar geometry: smaller pill padding and gaps, narrower
   workspaces, status modules and window title, so the bar reads as dense
   instead of airy. The media pill moved next to the window title: what is
-  playing is context for the same workspace, not a separate centre block.
+  playing is context for the same workspace, not a separate centre block. The
+  clock and notifications follow it in the same left row, so spacing stays
+  uniform and the row reflows when a title or the track name grows instead of
+  leaving a fixed gap around the centre.
 
 - **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm
   is out of scope. Packages, profiles, applets, keybinds, theme modules and the
