@@ -55,6 +55,11 @@ run() {
 
 volume() {
   local action=$1
+  # Validate first: the error must not depend on which backend is installed.
+  case $action in
+    up | down | mute) ;;
+    *) die "volume: expected up, down or mute" 2 ;;
+  esac
   if have swayosd-client; then
     case $action in
       up) run swayosd-client --output-volume raise ;;
@@ -109,6 +114,10 @@ mic() {
 
 brightness() {
   local action=$1
+  case $action in
+    up | down) ;;
+    *) die "brightness: expected up or down" 2 ;;
+  esac
   if have swayosd-client; then
     case $action in
       up) run swayosd-client --brightness raise ;;
