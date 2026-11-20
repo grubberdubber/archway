@@ -22,6 +22,12 @@ without a backup, a manifest entry and your explicit consent.
   **swaync** + `hyprlock`/`hypridle` + XDG portals; `sway` is the planned fallback
 - **kitty** terminal, native modular **zsh** (no Oh-My-Zsh), `starship`, `tmux`
 - **Neovim** from the pinned [`grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config)
+- **Ten themes out of the box**: the flagship **Android Mount** palette plus
+  monochrome variants (blue, teal, green, yellow, orange, red, pink, purple,
+  slate). Switch with `Super+Space`; every app follows the same palette.
+- A small, square **OSD** for volume/brightness (`swayosd`), a **Wi-Fi menu**
+  in rofi (`Super+Shift+N`), a **wallpaper picker** (`Super+Alt+W`) and a
+  clipboard history that starts its own watcher (`Super+V`).
 - The **Android Mount** theme: hand-written Material-You-inspired dark palette,
   WCAG AA checked, propagated to every enabled application
 - **Android Mount applet**: mount/unmount MTP devices from Rofi, safely
@@ -58,10 +64,10 @@ Arch Linux x86_64, `bash >= 5.2`, `git`, `chezmoi`, `pacman`, a non-root user.
 | `archway update` | fast-forward + backup + migrations + apply + doctor (+ rollback) |
 | `archway rollback` | restore the last consistent backup |
 | `archway doctor` | diagnose deps, theme, keybinds, Neovim pin, state |
-| `archway theme` | `list`, `current`, `set`, `preview`, `validate`, `render` |
+| `archway theme` | `list [--names]`, `current`, `set`, `preview`, `validate`, `render` |
 | `archway nvim` | `install`, `pin`, `status`, `doctor`, `rollback` |
 | `archway keys` | `list`, `search`, `generate`, `validate`, `check` |
-| `archway applet` | run a bundled applet (`android-mount`, `screenshot`, `power`, `theme-selector`) |
+| `archway applet` | run a bundled applet (`android-mount`, `clipboard`, `network`, `osd`, `power`, `screenshot`, `theme-selector`, `wallpaper`) |
 | `archway pkg` | `list`, `why`, `export`, `check` |
 | `archway backup` / `restore` | manual backup and restore |
 | `archway uninstall` | remove managed files, restore backups |

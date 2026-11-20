@@ -1,24 +1,31 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Archway waybar — Hyprland modules only. Colours live in theme.css, which
 // `archway theme set` publishes from the palette.
+// Icons are Nerd Font glyphs written as JSON escapes (\uf028 = volume, ...) so
+// the file stays portable; colour per state comes from style.css, not the JSON.
 {
   "layer": "top",
   "position": "top",
-  "height": 40,
-  "spacing": 4,
+  "height": 30,
+  "spacing": 0,
   "margin-top": 0,
+  "margin-bottom": 0,
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "backlight", "battery", "network", "bluetooth", "tray"],
+  "modules-right": ["pulseaudio", "backlight", "battery", "network", "bluetooth", "tray", "custom/power"],
 
   "hyprland/workspaces": {
     "format": "{id}",
     "on-click": "activate",
-    "all-outputs": true
+    "all-outputs": true,
+    "persistent-workspaces": {
+      "*": 5
+    }
   },
   "hyprland/window": {
-    "max-length": 60,
-    "separate-outputs": true
+    "max-length": 42,
+    "separate-outputs": true,
+    "tooltip": false
   },
   "clock": {
     "format": "{:%H:%M}",
@@ -27,13 +34,19 @@
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",
-    "format-muted": "muted",
-    "format-icons": ["low", "medium", "high"],
+    "format-muted": "\uf026 {volume}%",
+    "format-icons": ["\uf027", "\uf027", "\uf028"],
+    "tooltip-format": "{desc}",
     "on-click": "pavucontrol",
+    "on-scroll-up": "archway applet osd volume up",
+    "on-scroll-down": "archway applet osd volume down",
     "scroll-step": 5
   },
   "backlight": {
-    "format": "{percent}%",
+    "format": "\uf185 {percent}%",
+    "tooltip": false,
+    "on-scroll-up": "archway applet osd brightness up",
+    "on-scroll-down": "archway applet osd brightness down",
     "scroll-step": 5
   },
   "battery": {
@@ -41,26 +54,37 @@
       "warning": 20,
       "critical": 10
     },
-    "format": "{capacity}% {icon}",
-    "format-charging": "{capacity}% +",
-    "format-icons": ["low", "medium", "high"]
+    "format": "{icon} {capacity}%",
+    "format-charging": "\uf0e7 {capacity}%",
+    "format-plugged": "\uf0e7 {capacity}%",
+    "format-full": "\uf240 {capacity}%",
+    "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+    "tooltip-format": "{timeTo}",
+    "on-click": "archway applet power --rofi"
   },
   "network": {
-    "format-wifi": "wifi {essid}",
-    "format-ethernet": "eth",
-    "format-disconnected": "offline",
-    "tooltip-format": "{ifname} via {gwaddr}",
-    "on-click": "nm-connection-editor"
+    "format-wifi": "\uf1eb {essid}",
+    "format-ethernet": "\uf0e8 {ifname}",
+    "format-linked": "\uf0e8 {ifname}",
+    "format-disconnected": "\uf05e offline",
+    "tooltip-format": "{ifname} via {gwaddr}\n{ipaddr}/{cidr}",
+    "on-click": "archway applet network --rofi",
+    "on-click-right": "nm-connection-editor"
   },
   "bluetooth": {
-    "format": "bt",
-    "format-disabled": "",
-    "format-connected": "bt {num_connections}",
+    "format": "\uf293 {status}",
+    "format-disabled": "\uf293 off",
+    "format-connected": "\uf293 {num_connections}",
     "tooltip-format": "{controller_alias}\t{controller_address}",
     "on-click": "blueman-manager"
   },
   "tray": {
-    "icon-size": 16,
-    "spacing": 8
+    "icon-size": 14,
+    "spacing": 4
+  },
+  "custom/power": {
+    "format": "\uf011",
+    "tooltip": false,
+    "on-click": "archway applet power --rofi"
   }
 }

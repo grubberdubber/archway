@@ -1,0 +1,29 @@
+# Monochrome Purple theme metadata.
+id = "mono-purple"
+name = "Monochrome Purple"
+variant = "dark"
+schema = 1
+version = "0.1.0"
+description = "Monochrome variant of Android Mount: one accent hue, neutral surfaces."
+inspiration = "Android Mount (Material You inspired); no vendor assets."
+license = "GPL-3.0-or-later"
+wallpapers = "none (original assets required before shipping any)"
+
+[variants]
+dark = "palette.toml"
+light = "planned"
+high_contrast = "planned"
+
+[targets]
+kitty = "terminal"
+hyprland = "compositor"
+waybar = "status bar"
+swaync = "notifications"
+swayosd = "volume / brightness OSD"
+hyprlock = "lock screen"
+rofi = "launcher and applets"
+tmux = "multiplexer"
+starship = "shell prompt"
+fzf = "fuzzy finder"
+bat = "pager / syntax highlighting"
+nvim = "shared artifact; themed via the nvim-config hook"

@@ -66,14 +66,27 @@ dotfiles_status() {
 # managed file (hyprland.conf -> hyprland.lua) leaves the old artifact behind and
 # Hyprland could still pick it up. Remove only files Archway recorded as managed
 # whose source no longer exists; user files are never touched.
+# Map a target path back to its chezmoi source path: every component that
+# starts with a dot becomes `dot_<name>` (`.config/zsh/.zshrc` ->
+# `dot_config/zsh/dot_zshrc`). Getting this wrong prunes live user files.
 dotfiles_target_source() {
-  local rel=${1#"$HOME"/}
-  case $rel in
-    .config/*) printf '%s/dot_config/%s' "$DOTFILES_SRC" "${rel#.config/}" ;;
-    .local/share/*) printf '%s/dot_local/share/%s' "$DOTFILES_SRC" "${rel#.local/share/}" ;;
-    .zshrc) printf '%s/dot_zshrc' "$DOTFILES_SRC" ;;
-    *) return 1 ;;
-  esac
+  local target=$1 rel part dir
+  [[ $target == "$HOME"/* ]] || return 1
+  rel=${target#"$HOME"/}
+  [[ -n $rel ]] || return 1
+  local -a parts=() mapped=()
+  IFS=/ read -r -a parts <<< "$rel"
+  for part in "${parts[@]}"; do
+    if [[ $part == .* ]]; then
+      part="dot_${part#.}"
+    fi
+    mapped+=("$part")
+  done
+  dir=$(
+    IFS=/
+    printf '%s' "${mapped[*]}"
+  )
+  printf '%s/%s' "$DOTFILES_SRC" "$dir"
 }
 
 dotfiles_prune_stale() {
@@ -136,13 +149,38 @@ dotfiles_apply() {
     fi
   fi
 
-  run_cmd chezmoi --source "$DOTFILES_SRC" apply
+  # A managed file the user deleted makes chezmoi ask "has changed since chezmoi
+  # last wrote it?" on a TTY that does not exist under --yes. The file is gone,
+  # so recreating it cannot overwrite anything: restore those targets with
+  # --force, then apply the rest normally (a real local edit still stops here).
+  local -a deleted=() modified=()
+  local target
+  while IFS= read -r line; do
+    [[ -n $line ]] || continue
+    if [[ ${line:0:1} == D ]]; then
+      # chezmoi only resolves absolute target arguments for `apply -- <target>`.
+      target=$(trim "${line:2}")
+      target=${target#\~/}
+      [[ $target = /* ]] || target="$HOME/$target"
+      deleted+=("$target")
+    else
+      modified+=("$line")
+    fi
+  done <<< "$changes"
+
+  if ((${#deleted[@]})); then
+    ui_note "restoring managed files that were removed: ${deleted[*]}"
+    run_cmd chezmoi --source "$DOTFILES_SRC" apply --force -- "${deleted[@]}"
+  fi
+  if ((${#modified[@]})); then
+    run_cmd chezmoi --source "$DOTFILES_SRC" apply
+  fi
 
   # chezmoi status prints two status columns, a space, then the target path
   # (relative to $HOME, occasionally absolute).  # Directories that contain user data must never be recorded as managed:
   # uninstall would then be able to remove them wholesale.
   local protected=("$HOME" "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME")
-  local line target p skip
+  local target p skip
   while IFS= read -r line; do
     target=$(printf '%s' "$line" | awk '{print $2}')
     [[ -n $target ]] || continue
@@ -334,6 +372,12 @@ cmd_install() {
     dotfiles_apply
   else
     ui_note "dotfiles skipped (--no-dotfiles)"
+  fi
+
+  # The wallpaper applet reads user images; give them a known home. Nothing is
+  # shipped or downloaded, so this is just an empty directory.
+  if ((! DRY_RUN)); then
+    mkdir -p -- "$XDG_DATA_HOME/archway/wallpapers"
   fi
 
   section "Theme"

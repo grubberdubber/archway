@@ -20,13 +20,19 @@ declare -gA THEME_TARGETS=(
   [hyprland]=hyprland.lua
   [waybar]=waybar.css
   [swaync]=swaync.css
+  [swayosd]=swayosd.css
   [hyprlock]=hyprlock.conf
   [rofi]=rofi.rasi
   [tmux]=tmux.conf
   [starship]=starship.toml
   [fzf]=fzf.sh
-  [bat]=android-mount.tmTheme
+  [bat]=archway.tmTheme
 )
+
+# Templates shared by every theme live here; a theme only ships the modules it
+# styles differently (usually just palette.toml). This is what keeps a family of
+# colour variants from becoming fifteen copies of the same CSS.
+THEME_SHARED_DIR="$THEMES_DIR/_shared"
 
 declare -gA PALETTE=()
 
@@ -40,6 +46,28 @@ theme_list() {
     [[ -f $d/palette.toml ]] || continue
     basename -- "$d"
   done
+}
+
+# Human-readable name from theme.toml (falls back to the id).
+theme_display_name() {
+  local id=$1 file name=''
+  file="$(theme_path "$id")/theme.toml"
+  if [[ -r $file ]]; then
+    name=$(sed -n 's/^name[[:space:]]*=[[:space:]]*"\(.*\)"$/\1/p' "$file" | head -n1)
+  fi
+  printf '%s' "${name:-$id}"
+}
+
+# Where a module's template lives: the theme's own directory wins, then _shared.
+theme_module_template() {
+  local id=$1 module=$2 dir found=''
+  for dir in "$(theme_path "$id")/$module" "$THEME_SHARED_DIR/$module"; do
+    [[ -d $dir ]] || continue
+    found=$(find "$dir" -type f 2> /dev/null | sort | head -n1)
+    [[ -n $found ]] && break
+  done
+  [[ -n $found ]] || return 1
+  printf '%s' "$found"
 }
 
 # Parse flat `key = "value"` / `key = number` pairs out of a TOML section.
@@ -176,8 +204,7 @@ theme_validate() {
 
   local module template
   for module in "${!THEME_TARGETS[@]}"; do
-    template=$(find "$(theme_path "$id")/$module" -type f 2> /dev/null | sort | head -n1)
-    [[ -n $template ]] || warnings+=("no template for module: $module")
+    theme_module_template "$id" "$module" > /dev/null || warnings+=("no template for module: $module")
   done
 
   if ((JSON_OUT)); then
@@ -237,8 +264,7 @@ theme_render() {
   theme_load_palette "$id"
   local module template
   for module in "${!THEME_TARGETS[@]}"; do
-    template=$(find "$(theme_path "$id")/$module" -type f 2> /dev/null | sort | head -n1)
-    [[ -n $template ]] || continue
+    template=$(theme_module_template "$id" "$module") || continue
     theme_render_file "$template" "$dest/${THEME_TARGETS[$module]}"
   done
 
@@ -332,6 +358,7 @@ theme_set() {
 theme_publish_generated() {
   local waybar_dir="$XDG_CONFIG_HOME/waybar"
   local swaync_dir="$XDG_CONFIG_HOME/swaync"
+  local swayosd_dir="$XDG_CONFIG_HOME/swayosd"
   local bat_dir="$XDG_CONFIG_HOME/bat/themes"
   local f
 
@@ -345,12 +372,22 @@ theme_publish_generated() {
     cp -f -- "$THEME_D_DIR/swaync.css" "$swaync_dir/theme.css"
     record_managed "$swaync_dir/theme.css" theme
   fi
+  # swayosd only reads $XDG_CONFIG_HOME/swayosd/style.css; it has no include.
+  if [[ -f $THEME_D_DIR/swayosd.css ]]; then
+    mkdir -p -- "$swayosd_dir"
+    cp -f -- "$THEME_D_DIR/swayosd.css" "$swayosd_dir/style.css"
+    record_managed "$swayosd_dir/style.css" theme
+  fi
   for f in "$THEME_D_DIR"/*.tmTheme; do
     [[ -e $f ]] || continue
     mkdir -p -- "$bat_dir"
     cp -f -- "$f" "$bat_dir/"
     record_managed "$bat_dir/$(basename -- "$f")" theme
   done
+  # bat caches themes by file name; without a rebuild it keeps the old palette.
+  if have bat; then
+    timeout 10 bat cache --build > /dev/null 2>&1 || true
+  fi
 }
 
 render_theme_metadata() {

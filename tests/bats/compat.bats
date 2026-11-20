@@ -39,6 +39,8 @@ teardown() {
 }
 
 @test "a missing compositor is a warning, never fatal" {
+  # The developer may be running Hyprland; force the "not installed" path.
+  mock_cmd hyprctl 'exit 1'
   run compat_check hyprland
   assert_contains "$output" "warn"
   assert_contains "$output" "not queryable"

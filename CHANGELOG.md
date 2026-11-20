@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Nine monochrome themes** next to the flagship palette: `mono-blue`,
+  `mono-teal`, `mono-green`, `mono-yellow`, `mono-orange`, `mono-red`,
+  `mono-pink`, `mono-purple` and `mono-slate`. Application templates moved to
+  `themes/_shared/`, so a variant is a palette plus metadata instead of ten
+  copies of every CSS file. `archway theme list --names` shows the display
+  name, and the rofi selector reads it.
+- Applets: `network` (rofi Wi-Fi menu with signal/lock icons, radio toggle,
+  rescan and password prompt), `wallpaper` (`hyprpaper`, `Super+Alt+W`,
+  restored at session start), `clipboard` (starts the `wl-paste` watcher that
+  `cliphist` needs) and `osd` (volume/mic/brightness with `swayosd`, a narrow
+  notification only as fallback).
+- waybar modules carry Nerd Font icons and state-driven colours from the
+  palette: neutral when healthy, muted when off, green charging, amber warning,
+  red critical.
+- `swayosd` and `cliphist` in the desktop manifest, `papirus-icon-theme` for
+  rofi/waybar icons.
+
 ### Changed
 
 - **The desktop is now Hyprland on Wayland**, started through `uwsm`; X11/bspwm
@@ -40,8 +59,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A `swaync-client -rs` reload no longer blocks the installer when no swaync
   daemon is running, and a Neovim theme-contract failure no longer cancels the
   rest of the install.
+- **Waybar is compact and quiet**: 30 px tall, smaller paddings, window title
+  secondary, no transitions. Hyprland ships without animations, blur or
+  shadows, with 4/8 px gaps and VFR enabled — the desktop is tuned for latency
+  on laptop GPUs, not for movement.
+- Touchpad and mouse are configured separately: natural scroll on the
+  trackpad, classic wheel direction on mice (`hl.device` rule included).
 
 ### Fixed
+
+- New terminals no longer take over the workspace: Hyprland now suppresses
+  `maximize` requests (`suppress-maximize-events`), which kitty was sending on
+  map.
+- `Super + Space` registered as a lowercase `space` keysym that Hyprland could
+  not bind; the generator canonicalises keysym names (`Space`, `Escape`,
+  `Prior`, ...) and a test covers it.
+- `archway install --yes` no longer aborts when a managed dotfile was deleted:
+  targets reported as removed are restored with a scoped `--force` instead of
+  asking for a TTY that `--yes` does not have.
+- The stale-artifact prune maps a target to its real source path
+  (`.config/zsh/.zshrc` -> `dot_config/zsh/dot_zshrc`); the previous mapping
+  missed dot-prefixed file names and deleted the live `.zshrc` on every install.
+  Covered by two regression tests.
+- `yazi` (bound to `Super+E`) and `swayimg` are now in the desktop manifest;
+  the file-manager keybind previously pointed at a package Archway never
+  installed.
 
 - Read-only commands (`doctor`, `theme validate`, `keys check`, `pkg check`)
   now run as root, so CI containers can use them. Only mutating commands

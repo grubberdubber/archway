@@ -38,6 +38,12 @@ jobs:
       - name: Theme validates (AA contrast + required keys)
         run: ./bin/archway theme validate android-mount
 
+      - name: Every shipped theme validates
+        run: |
+          for palette in themes/*/palette.toml; do
+            ./bin/archway theme validate "$(basename "$(dirname "$palette")")"
+          done
+
       - name: Theme artifact matches palette (Neovim contract)
         run: ./bin/archway theme nvim-contract android-mount
 

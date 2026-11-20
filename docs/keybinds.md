@@ -69,7 +69,9 @@ Press `Super + /` at any time to open this list in a floating terminal.
 |---|---|---|
 | `super + space` | Theme selector | `rofi -show theme -modi 'theme:archway applet theme-selector'` |
 | `super + shift + m` | Mount / unmount Android device (MTP) | `archway applet android-mount --rofi` |
-| `super + v` | Clipboard history | `cliphist list \| rofi -dmenu -display-columns 2 -p clipboard \| cliphist decode \| wl-copy` |
+| `super + v` | Clipboard history | `archway applet clipboard --rofi` |
+| `super + shift + n` | Wi-Fi menu | `archway applet network --rofi` |
+| `super + alt + w` | Wallpaper picker | `archway applet wallpaper --rofi` |
 | `super + shift + s` | Screenshot: region | `archway applet screenshot region` |
 | `Print` | Screenshot: whole screen | `archway applet screenshot full` |
 | `super + p` | Password manager (rbw) | `rofi-rbw --type password --action copy` |
@@ -88,12 +90,13 @@ Press `Super + /` at any time to open this list in a floating terminal.
 
 | Key | Action | Command |
 |---|---|---|
-| `XF86AudioRaiseVolume` | Volume up | `pamixer -i 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%` |
-| `XF86AudioLowerVolume` | Volume down | `pamixer -d 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%` |
-| `XF86AudioMute` | Toggle mute | `pamixer -t && notify-send -t 800 -h string:x-canonical-private-synchronous:volume 'mute' $(pamixer --get-mute)` |
+| `XF86AudioRaiseVolume` | Volume up | `archway applet osd volume up` |
+| `XF86AudioLowerVolume` | Volume down | `archway applet osd volume down` |
+| `XF86AudioMute` | Toggle mute | `archway applet osd volume mute` |
+| `XF86AudioMicMute` | Toggle microphone mute | `archway applet osd mic mute` |
 | `XF86AudioPlay` | Play / pause | `playerctl play-pause` |
 | `XF86AudioNext` | Next track | `playerctl next` |
 | `XF86AudioPrev` | Previous track | `playerctl previous` |
-| `XF86MonBrightnessUp` | Brightness up | `brightnessctl set +5%` |
-| `XF86MonBrightnessDown` | Brightness down | `brightnessctl set 5%-` |
+| `XF86MonBrightnessUp` | Brightness up | `archway applet osd brightness up` |
+| `XF86MonBrightnessDown` | Brightness down | `archway applet osd brightness down` |
 

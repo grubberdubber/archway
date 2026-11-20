@@ -41,9 +41,16 @@ cmd_theme() {
 
   case $sub in
     list)
-      local id
+      local id names=0
+      if [[ ${ARGS[0]:-} == --names ]]; then
+        names=1
+        ARGS=("${ARGS[@]:1}")
+      fi
       for id in $(theme_list); do
-        if [[ $id == "$(current_theme)" ]]; then
+        if ((names)); then
+          # Tab-separated for rofi: the id stays machine-readable.
+          printf '%s\t%s\n' "$id" "$(theme_display_name "$id")"
+        elif [[ $id == "$(current_theme)" ]]; then
           printf '* %s\n' "$id"
         else
           printf '  %s\n' "$id"

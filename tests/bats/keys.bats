@@ -70,11 +70,18 @@ EOF
   assert_eq 1 "$status"
 }
 
-@test "media keys repeat and use wayland clipboard" {
+@test "media keys repeat and go through the OSD applet" {
   local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
-  assert_file_contains "$f" 'hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("pamixer -i 5'
-  assert_file_contains "$f" '{ repeating = true }'
-  assert_file_contains "$f" "wl-copy"
+  assert_file_contains "$f" 'hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("archway applet osd volume up"), { repeating = true })'
+  assert_file_contains "$f" 'hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("archway applet osd brightness down"), { repeating = true })'
+  # No inline notify-send/pipe chains: the applet owns the fallback logic.
+  run grep -q 'notify-send' "$f"
+  assert_eq 1 "$status"
+}
+
+@test "a lowercase keysym is normalised to the name Hyprland expects" {
+  assert_eq "SUPER|Space" "$(keys_split_chord 'super + space')"
+  assert_eq "|Print" "$(keys_split_chord 'print')"
 }
 
 @test "an unknown dispatcher fails generation instead of emitting dead binds" {

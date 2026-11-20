@@ -149,6 +149,27 @@ keys_validate() {
   return 1
 }
 
+# XKB keysym names are case-sensitive: `space` and `Space` are not the same
+# token to Hyprland's parser, and a lowercase word bind fails to register.
+keys_canonical_key() {
+  local key=$1
+  case ${key,,} in
+    space) printf 'Space' ;;
+    escape) printf 'Escape' ;;
+    return) printf 'Return' ;;
+    tab) printf 'Tab' ;;
+    print) printf 'Print' ;;
+    backspace) printf 'BackSpace' ;;
+    delete) printf 'Delete' ;;
+    insert) printf 'Insert' ;;
+    home) printf 'Home' ;;
+    end) printf 'End' ;;
+    page_up | pageup | prior) printf 'Prior' ;;
+    page_down | pagedown | next) printf 'Next' ;;
+    *) printf '%s' "$key" ;;
+  esac
+}
+
 # "super + shift + Q" -> "SUPER SHIFT" (mods) and "Q" (key). Single characters
 # are upper-cased; keysym names (Return, Escape, Print, slash, XF86Audio*) are
 # already in the form Hyprland expects.
@@ -162,7 +183,7 @@ keys_split_chord() {
     [[ -z $token ]] && continue
     if ((i == last)); then
       if ((${#token} == 1)); then token=${token^^}; fi
-      key=$token
+      key=$(keys_canonical_key "$token")
       continue
     fi
     case ${token,,} in

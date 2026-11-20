@@ -40,12 +40,33 @@ written to `managed.tsv`.
 - kitty needs `allow_remote_control socket-only` (already in the shipped config)
   and a `KITTY_LISTEN_ON` socket to hot-reload; otherwise open a new window.
 - waybar, swaync and bat get native copies (`waybar/theme.css`,
-  `swaync/theme.css`, `bat/themes/android-mount.tmTheme`) because they load
+  `swaync/theme.css`, `swayosd/style.css`, `bat/themes/archway.tmTheme`) because they load
   assets from their own tree.
+- swayosd runs its own process; `archway theme set` rewrites
+  `swayosd/style.css` and swayosd picks it up on the next OSD.
 - Neovim applies the theme on its next start, never by reloading a session with
   unsaved buffers.
 
 Validate the palette itself: `archway theme validate android-mount`.
+
+## The volume OSD is a wide notification
+
+That happens when `swayosd` is not installed: `archway applet osd` falls back to
+`notify-send`, and a notification spans the whole screen. Install the official
+package and restart the session (or run `swayosd-server &`):
+
+```sh
+sudo pacman -S swayosd
+```
+
+Hyprland starts `swayosd-server` automatically when it is present.
+
+## Wallpapers
+
+`Super+Alt+W` lists images from `~/.local/share/archway/wallpapers` and
+`~/Pictures/Wallpapers`. Archway ships no wallpaper assets; the last choice is
+stored in `~/.local/state/archway/wallpaper` and restored at session start.
+hyprpaper must be running (the session starts it).
 
 ## Neovim does not get the theme
 

@@ -24,14 +24,18 @@ playerctl
 pamixer
 libnotify
 wl-clipboard
+cliphist
+swayosd
 
 # Capture and sharing (Wayland-native; no maim/slop/xclip)
 grim
 slurp
 satty
 
-# Terminal
+# Terminal and file manager (Super+E launches yazi inside kitty)
 kitty
+yazi
+swayimg
 
 # Audio, network, Bluetooth
 pipewire
@@ -49,6 +53,9 @@ blueman
 udisks2
 gvfs
 gvfs-mtp
+
+# Icons and cursor (rofi/waybar) share the palette's look
+papirus-icon-theme
 
 # XDG / session integration
 xdg-utils

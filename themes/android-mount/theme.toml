@@ -4,10 +4,10 @@ name = "Android Mount"
 variant = "dark"
 schema = 1
 version = "0.1.0"
-description = "Material You inspired dark theme: dense, technical, keyboard-first."
+description = "Material You inspired dark theme: dense, technical, keyboard-first. Flagship palette; the shared templates also power the monochrome variants."
 inspiration = "Material You / Android dark surfaces; homage only, no vendor assets."
 license = "GPL-3.0-or-later"
-wallpapers = "none in v0.1.0 (original assets required before shipping any)"
+wallpapers = "none in v0.1.0 (original assets required before shipping any; Super+Alt+W picks from your own folders)"
 
 [variants]
 dark = "palette.toml"
@@ -16,8 +16,9 @@ high_contrast = "planned"
 
 [targets]
 kitty = "terminal"
-hyprland = "compositor (borders, gaps, blur, rounding)"
+hyprland = "compositor (borders, gaps, opacity, rounding)"
 waybar = "status bar"
+swayosd = "volume / brightness OSD"
 swaync = "notifications"
 hyprlock = "lock screen"
 rofi = "launcher"
@@ -26,3 +27,4 @@ starship = "shell prompt"
 fzf = "fuzzy finder"
 bat = "pager / syntax highlighting"
 nvim = "artifact consumed through grubberdubber/nvim-config hook"
+# Application templates live in themes/_shared; a theme only ships overrides.

@@ -69,7 +69,37 @@ touch "$HOME/swaync-was-called"
 sleep 30
 STUB
   chmod +x -- "$SANDBOX/bin/swaync-client"
+  # A real swaync on the host would make pgrep succeed and hit the stub; the
+  # test must not depend on what the developer is running.
+  printf '#!/bin/sh\nexit 1\n' > "$SANDBOX/bin/pgrep"
+  chmod +x -- "$SANDBOX/bin/pgrep"
   PATH="$SANDBOX/bin:$PATH" run timeout 10 bash -c 'source "$ARCHWAY_ROOT/lib/core.sh"; source "$ARCHWAY_ROOT/lib/paths.sh"; source "$ARCHWAY_ROOT/lib/ui.sh"; source "$ARCHWAY_ROOT/lib/theme.sh"; theme_reload'
   assert_eq 0 "$status"
   [ ! -e "$HOME/swaync-was-called" ]
+}
+
+@test "every monochrome variant validates against AA" {
+  local id
+  for id in mono-blue mono-teal mono-green mono-yellow mono-orange mono-red mono-pink mono-purple mono-slate; do
+    run theme_validate "$id"
+    assert_eq 0 "$status" "theme $id failed validation"
+  done
+}
+
+@test "a variant without its own templates renders from themes/_shared" {
+  local dest="$SANDBOX/render"
+  mkdir -p "$dest"
+  theme_render mono-pink "$dest"
+  assert_file_contains "$dest/kitty.conf" "#F4A6C8"
+  assert_file_contains "$dest/waybar.css" "#F4A6C8"
+  assert_missing "$dest/nvim"
+  run grep -rn '@[a-z_]*@' "$dest"
+  assert_eq 1 "$status"
+}
+
+@test "theme list --names pairs the id with the display name" {
+  run "$ARCHWAY_ROOT/bin/archway" theme list --names
+  assert_eq 0 "$status"
+  assert_contains "$output" "android-mount	Android Mount"
+  assert_contains "$output" "mono-blue	Monochrome Blue"
 }

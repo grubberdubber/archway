@@ -332,9 +332,23 @@ description = "Mount / unmount Android device (MTP)"
 [[keybind]]
 id = "clipboard-history"
 keys = "super + v"
-command = "cliphist list | rofi -dmenu -display-columns 2 -p clipboard | cliphist decode | wl-copy"
+command = "archway applet clipboard --rofi"
 category = "archway"
 description = "Clipboard history"
+
+[[keybind]]
+id = "network-menu"
+keys = "super + shift + n"
+command = "archway applet network --rofi"
+category = "archway"
+description = "Wi-Fi menu"
+
+[[keybind]]
+id = "wallpaper-picker"
+keys = "super + alt + w"
+command = "archway applet wallpaper --rofi"
+category = "archway"
+description = "Wallpaper picker"
 
 [[keybind]]
 id = "screenshot-region"
@@ -398,7 +412,7 @@ description = "Keybind cheatsheet"
 [[keybind]]
 id = "volume-up"
 keys = "XF86AudioRaiseVolume"
-command = "pamixer -i 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%"
+command = "archway applet osd volume up"
 category = "media"
 description = "Volume up"
 repeat = "yes"
@@ -406,7 +420,7 @@ repeat = "yes"
 [[keybind]]
 id = "volume-down"
 keys = "XF86AudioLowerVolume"
-command = "pamixer -d 5 && notify-send -t 800 -h int:value:$(pamixer --get-volume) -h string:x-canonical-private-synchronous:volume volume $(pamixer --get-volume)%"
+command = "archway applet osd volume down"
 category = "media"
 description = "Volume down"
 repeat = "yes"
@@ -414,9 +428,16 @@ repeat = "yes"
 [[keybind]]
 id = "volume-mute"
 keys = "XF86AudioMute"
-command = "pamixer -t && notify-send -t 800 -h string:x-canonical-private-synchronous:volume 'mute' $(pamixer --get-mute)"
+command = "archway applet osd volume mute"
 category = "media"
 description = "Toggle mute"
+
+[[keybind]]
+id = "mic-mute"
+keys = "XF86AudioMicMute"
+command = "archway applet osd mic mute"
+category = "media"
+description = "Toggle microphone mute"
 
 [[keybind]]
 id = "media-play"
@@ -442,7 +463,7 @@ description = "Previous track"
 [[keybind]]
 id = "brightness-up"
 keys = "XF86MonBrightnessUp"
-command = "brightnessctl set +5%"
+command = "archway applet osd brightness up"
 category = "media"
 description = "Brightness up"
 repeat = "yes"
@@ -450,7 +471,7 @@ repeat = "yes"
 [[keybind]]
 id = "brightness-down"
 keys = "XF86MonBrightnessDown"
-command = "brightnessctl set 5%-"
+command = "archway applet osd brightness down"
 category = "media"
 description = "Brightness down"
 repeat = "yes"

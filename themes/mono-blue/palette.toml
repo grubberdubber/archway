@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Monochrome Blue — single-hue accent over the Android Mount dark surface.
+# Hand-written, contrast-checked by `archway theme validate`.
+# Applications ship one template set in themes/_shared; only the palette changes.
+
+[palette]
+theme_name  = "Monochrome Blue"
+bg          = "#0B0F14"
+surface     = "#11161D"
+surface_alt = "#1A212B"
+overlay     = "#222B37"
+border      = "#2A3441"
+text        = "#E6EDF3"
+text_muted  = "#9BA7B4"
+primary     = "#8AB4F8"
+secondary   = "#A8C7FA"
+tertiary    = "#C6DAFC"
+error       = "#F28B82"
+warning     = "#FDD663"
+success     = "#81C995"
+selection   = "#8AB4F8"
+selection_bg = "#1F2A3A"
+
+[geometry]
+radius_window = 12
+radius_input  = 8
+radius_pill   = 999
+padding       = 12
+border_width  = 1
+focus_width   = 2
+
+[typography]
+font_mono     = "JetBrainsMono Nerd Font"
+font_ui       = "Inter"
+font_fallback = "Noto Sans"
+font_size     = 11
+
+[effects]
+opacity      = 0.98
+transitions  = 120
+reduce_motion = 1
