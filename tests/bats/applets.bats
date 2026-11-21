@@ -343,6 +343,118 @@ JSON
   assert_contains "$output" "is not installed"
 }
 
+# ---------------------------------------------------------------- keyd -----
+
+# The applet must be testable without root and without touching the real /etc:
+# KEYD_DIR is the documented override for tests and non-standard installs.
+_keyd_mocks() {
+  export KEYD_DIR="$HOME/etc-keyd"
+  unset KEYD_BIN
+  export KEYD_BIN=keyd
+  mock_cmd keyd 'printf "%s\n" "$*" >> "$HOME/keyd.log"'
+  mock_cmd notify-send 'exit 0'
+  mock_cmd sudo '[[ $1 == -n ]] && shift
+    [[ $1 == true ]] && exit 0
+    "$@"'
+  mock_cmd systemctl 'printf "%s\n" "$*" >> "$HOME/systemctl.log"
+    case $1 in
+      is-active) [[ -e "$HOME/active" ]] ;;
+      is-enabled) [[ -e "$HOME/enabled" ]] ;;
+      enable) touch "$HOME/active" "$HOME/enabled" ;;
+      disable) rm -f "$HOME/active" "$HOME/enabled" ;;
+    esac'
+}
+
+@test "keyd status reports a machine without keyd" {
+  export KEYD_DIR="$HOME/etc-keyd"
+  export KEYD_BIN=keyd-not-installed
+  run "$ARCHWAY_ROOT/applets/keyd/keyd.sh" status --json
+  assert_eq 0 "$status"
+  assert_contains "$output" '"installed":false'
+  assert_contains "$output" '"config":"missing"'
+}
+
+@test "keyd on installs the packaged layer and enables the service" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  run "$K" on
+  assert_eq 0 "$status"
+  assert_file_contains "$KEYD_DIR/default.conf" "capslock = overload(numpad, esc)"
+  assert_file_contains "$HOME/systemctl.log" "enable --now keyd"
+  run "$K" status --json
+  assert_contains "$output" '"active":true'
+  assert_contains "$output" '"config":"managed"'
+}
+
+@test "keyd on refuses to run when the package is absent" {
+  export KEYD_DIR="$HOME/etc-keyd"
+  export KEYD_BIN=keyd-not-installed
+  mock_cmd notify-send 'exit 0'
+  run "$ARCHWAY_ROOT/applets/keyd/keyd.sh" on
+  assert_eq 3 "$status"
+  assert_contains "$output" "pacman -S keyd"
+}
+
+@test "keyd off disables the service and keeps the layer file" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  run "$K" on
+  run "$K" off
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/systemctl.log" "disable --now keyd"
+  assert_file_contains "$KEYD_DIR/default.conf" "capslock = overload(numpad, esc)"
+  run "$K" status --json
+  assert_contains "$output" '"active":false'
+}
+
+@test "keyd toggle flips the service state" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  run "$K" toggle
+  assert_eq 0 "$status"
+  [[ -e $HOME/active ]] || fail "toggle did not start the service"
+  run "$K" toggle
+  assert_eq 0 "$status"
+  [[ ! -e $HOME/active ]] || fail "toggle did not stop the service"
+}
+
+@test "keyd install never overwrites a config Archway does not own" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  mkdir -p -- "$KEYD_DIR"
+  printf '[ids]\n*\n[main]\ncapslock = esc\n' > "$KEYD_DIR/default.conf"
+  run "$K" install
+  assert_eq 1 "$status"
+  assert_contains "$output" "not managed by Archway"
+  assert_file_contains "$KEYD_DIR/default.conf" "capslock = esc"
+}
+
+@test "keyd install --replace keeps the previous file as a backup" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  mkdir -p -- "$KEYD_DIR"
+  printf '[ids]\n*\n[main]\ncapslock = esc\n' > "$KEYD_DIR/default.conf"
+  run "$K" install --replace
+  assert_eq 0 "$status"
+  assert_file_contains "$KEYD_DIR/default.conf" "overload(numpad, esc)"
+  run bash -c "ls \"$KEYD_DIR\"/default.conf.bak.*"
+  assert_eq 0 "$status"
+  assert_contains "$output" "default.conf.bak."
+}
+
+@test "keyd dry-run writes nothing" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  run "$K" --dry-run on
+  assert_eq 0 "$status"
+  assert_contains "$output" "[dry-run] systemctl enable --now keyd"
+  assert_missing "$KEYD_DIR/default.conf"
+  # Reading the state is fine; changing it is not.
+  if [[ -r $HOME/systemctl.log ]] && grep -qE '^(enable|disable)' "$HOME/systemctl.log"; then
+    fail "dry-run changed the service state"
+  fi
+}
+
 # ------------------------------------------------------------ wallpaper -----
 
 @test "wallpaper dry-run prints the hyprpaper request it would send" {

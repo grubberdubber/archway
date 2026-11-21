@@ -37,6 +37,7 @@ hl.bind("SUPER + ALT + F", hl.dsp.window.float({ action = "toggle" }))
 
 -- --- system ---
 
+hl.bind("SUPER + CTRL + K", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet keyd toggle"))
 hl.bind("SUPER + ALT + G", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet gaming toggle"))
 hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet power --rofi"))
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hyprlock"))

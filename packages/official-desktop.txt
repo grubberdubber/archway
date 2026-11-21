@@ -24,13 +24,22 @@ playerctl
 pamixer
 libnotify
 wl-clipboard
+# wl-clip-persist keeps a copy alive after the program that made it exits;
+# without it Super+V looks broken as soon as an app closes.
+wl-clip-persist
 cliphist
 swayosd
+# hyprpicker: colour picker for the screenshot/theme workflow (Super+Shift+S)
+hyprpicker
 
 # Capture and sharing (Wayland-native; no maim/slop/xclip)
 grim
 slurp
 satty
+
+# Documents: a PDF reader is part of the desktop baseline (manual pages, RFCs).
+zathura
+zathura-pdf-mupdf
 
 # Terminals: kitty is the default, alacritty is the supported alternative that
 # `archway applet terminal --pick` can switch to (same palette, same opacity).
@@ -61,6 +70,13 @@ network-manager-applet
 bluez
 bluez-utils
 blueman
+# The gaming applet and the bar's power pill drive these profiles.
+power-profiles-daemon
+
+# Browser and VPN: Super+B needs a browser, and the bar's VPN pill reads
+# tailscale/wg state. Both are user-space and opt out with --no-packages.
+firefox
+tailscale
 
 # MTP / removable media (simple-mtpfs is AUR; see aur-core.txt)
 udisks2
@@ -72,6 +88,11 @@ gvfs-nfs
 
 # Icons and cursor (rofi/waybar) share the palette's look
 papirus-icon-theme
+
+# Keyboard remapping (keyd): tap CapsLock = Esc, hold = one-hand numpad.
+# The package is installed but the service stays off until you toggle it with
+# Super+Ctrl+K or `archway applet keyd on` (AGENTS.md §10.3).
+keyd
 
 # XDG / session integration
 xdg-utils

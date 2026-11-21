@@ -4,10 +4,14 @@
 # Git + GitHub workflow
 github-cli
 lazygit
+# difftastic: structural diffs for the `difft` pager on hard reviews
+difftastic
 openssh
 git-lfs
 pre-commit
 gitleaks
+# just runs this repository's justfile (build, test, lint recipes)
+just
 
 # Version/runtime managers
 mise
@@ -30,6 +34,11 @@ nodejs
 npm
 pnpm
 
+# Debugging: gdb for native crashes, strace when a process misbehaves.
+# (valgrind, ltrace, perf and bpftrace stay in optional/dev-extra.)
+gdb
+strace
+
 # Language servers, formatters, linters
 lua-language-server
 bash-language-server
@@ -51,6 +60,7 @@ tree-sitter-cli
 # API / database / containers
 xh
 httpie
+hurl
 websocat
 sqlite
 postgresql
@@ -63,6 +73,9 @@ buildah
 skopeo
 lazydocker
 k9s
+# k9s without kubectl cannot reach a cluster; helm for the releases.
+kubectl
+helm
 
 # Infrastructure
 opentofu

@@ -107,6 +107,15 @@ dispatcher = "togglefloating"
 category = "windows"
 description = "Toggle floating"
 
+# keyd lives in /etc and needs root, so the layer is toggled from one bind:
+# on when off, off when on. Nothing changes while it is off.
+[[keybind]]
+id = "keyd-toggle"
+keys = "super + ctrl + k"
+command = "$HOME/.local/bin/archway applet keyd toggle"
+category = "system"
+description = "keyd numpad layer on/off (CapsLock)"
+
 [[keybind]]
 id = "gaming-mode"
 keys = "super + alt + g"

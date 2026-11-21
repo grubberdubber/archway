@@ -5,25 +5,66 @@ numpad under the right hand, so you can type numbers without leaving the home
 row. It is kernel-level (evdev), which is why it works in X11, Wayland and the
 TTY alike.
 
-Archway ships the configuration as documentation, not as a managed file: it
-lives in `/etc/keyd/default.conf`, and Archway never writes to `/etc` without a
-package installation. Nothing is enabled by default, because a keyboard remap
-can fight an existing one (or a game that reads evdev directly).
+Archway owns the whole lifecycle from one applet, so you never hand-edit `/etc`:
 
-## 1. Install
+| What you want | Command |
+|---|---|
+| Turn it on | `Super + Ctrl + K` (toggle) or `archway applet keyd on` |
+| Turn it off | `Super + Ctrl + K` again, or `archway applet keyd off` |
+| See the state | `archway applet keyd status [--json]` |
+| Write the layer | `archway applet keyd install` (add `--replace` to reset an edit) |
+| Apply an edit | `archway applet keyd reload` |
+
+`on`/`off` only touch the systemd service. Turning it off restores the firmware
+mapping immediately and leaves `/etc/keyd/default.conf` alone.
+
+## 1. Install the package
 
 ```bash
 sudo pacman -S keyd
 ```
 
-The package is in `extra`; no AUR, no helper needed.
+`keyd` is in `extra` and is part of the desktop manifest, so a normal
+`archway install` already provides it. The service is **not** enabled by the
+installer: a keyboard remap can fight an existing one (or a game that reads
+evdev directly), so it stays off until you ask for it.
 
-## 2. Configure the layer
+## 2. Turn it on
 
-Write `/etc/keyd/default.conf` (root owns it, mode 644):
+```bash
+archway applet keyd on
+```
+
+That is it: the applet writes the packaged layer when
+`/etc/keyd/default.conf` does not exist yet, then enables and starts the
+service. Root is requested once, through `sudo -n` if the credentials are
+already cached (a terminal) or `pkexec` otherwise (the keybind, through
+`hyprpolkitagent`).
+
+An existing `default.conf` that Archway did not write is **not** replaced. The
+applet reports it and leaves it in charge, so your own mapping keeps working:
+
+```bash
+archway applet keyd status
+# keyd: on
+#   installed  true
+#   active     true
+#   enabled    true
+#   config     foreign (/etc/keyd/default.conf)
+```
+
+To make Archway's layer current again:
+
+```bash
+archway applet keyd install --replace   # keeps default.conf.bak.<timestamp>
+```
+
+## 3. The layer
+
+`/etc/keyd/default.conf` (packaged at `applets/keyd/default.conf`):
 
 ```ini
-# CapsLock: tap = Esc, hold = numpad under the right hand.
+# Managed by Archway (applet: keyd).
 [ids]
 *
 
@@ -52,17 +93,22 @@ h = /
 keyboard and want different behaviour, list the devices from
 `sudo keyd monitor` instead of `*`.
 
-## 3. Enable and reload
+## 4. Editing and reloading
+
+Change `applets/keyd/default.conf` in the checkout, then:
 
 ```bash
-sudo systemctl enable --now keyd    # once
-sudo keyd reload                    # after every edit
+archway applet keyd install --replace   # backups, then writes the new layer
+archway applet keyd reload              # apply it without a restart
 ```
 
-`keyd reload` applies the change without restarting the service; a broken file
-leaves the previous mapping in place.
+`keyd reload` talks to the running daemon, so a syntax error leaves the previous
+mapping in place — a broken edit cannot lock you out of your keyboard. If you
+prefer to edit `/etc/keyd/default.conf` directly, the same `reload` applies it:
+the applet reports the file as `modified` and never overwrites changes it did
+not make.
 
-## 4. Test it
+## 5. Test it
 
 1. **TTY** (the honest test, no compositor involved): switch with
    `Ctrl+Alt+F3`, log in, then
@@ -74,7 +120,7 @@ leaves the previous mapping in place.
 3. `sudo keyd monitor` prints every key event with the mapping applied — the
    fastest way to see whether a key is being remapped or swallowed.
 
-## 5. Optional navigation layer
+## 6. Optional navigation layer
 
 The same file can hold a second layer; until you add it, `rightalt` keeps
 working as AltGr (needed for `@`, `#`, `{` on many layouts):
@@ -100,11 +146,16 @@ Note `compose` as the fallback: it keeps the Compose behaviour Archway already
 sets in `hyprland.lua` (`kb_options = "compose:ralt"`). Do not map `rightalt` to
 `overload(nav, rightalt)`: that removes AltGr and breaks `@` on a US layout.
 
-## 6. Known interactions
+Add it to the packaged file if you want it in every install (mark it in the
+CHANGELOG: it changes the default keyboard for everyone), or keep it local and
+let the applet report the config as `modified`.
+
+## 7. Known interactions
 
 - **Games** that read `/dev/input` directly (some anti-cheat, some SDL builds)
   bypass keyd and see the raw key. If a game ignores the layer, that is the
-  cause, not Archway.
+  cause, not Archway. `archway applet keyd off` before launching is the honest
+  workaround, and it is one keybind.
 - **Other remappers** (`kanata`, `interception-tools` + `caps2esc`, `xremap`,
   `kmonad`, `input-remapper`) must not run at the same time; they fight for the
   same devices.
@@ -112,12 +163,16 @@ sets in `hyprland.lua` (`kb_options = "compose:ralt"`). Do not map `rightalt` to
   the compositor receives after keyd; `wev` shows the final keysym.
 - **Laptop firmware keys** (brightness, volume, Fn) are untouched: the layer
   only adds an overload on CapsLock.
+- **A forgotten Escape**: CapsLock is only a numpad *while held*; tapping it is
+  always Escape, so a stuck layer is not possible.
 
-## 7. Remove
+## 8. Remove
 
 ```bash
-sudo systemctl disable --now keyd
-sudo rm /etc/keyd/default.conf
+archway applet keyd off        # service disabled, typing back to normal
+sudo pacman -Rns keyd          # optional: drop the package
+sudo rm /etc/keyd/default.conf # optional: drop the layer file
 ```
 
-Typing goes back to the firmware mapping immediately; nothing else was changed.
+Turning it off is enough to get the old keyboard back; removing the package and
+the file only cleans up. Nothing else on the system was changed.

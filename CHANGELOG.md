@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `keyd` applet and `Super+Ctrl+K`: turn the one-hand numpad layer on and off
+  without touching `/etc` by hand. `on`/`off`/`toggle` only touch the systemd
+  service (idempotent, no root kept around), `install` writes the packaged
+  `applets/keyd/default.conf` and refuses a file Archway does not own unless
+  `--replace` is passed, keeping `default.conf.bak.<timestamp>`, and `reload`
+  applies an edit without a restart so a syntax error leaves the old mapping in
+  place. Root comes from `sudo -n` when cached, otherwise `pkexec` through the
+  polkit agent — the same command works from a keybind and a terminal. The
+  package is in the desktop manifest but the service stays off until asked.
+  `docs/keyd.md` now documents the applet instead of manual root edits.
+- Desktop baseline gaps that made existing shortcuts fail silently: `firefox`
+  (behind `Super+B`), `power-profiles-daemon` (gaming applet and the power
+  pill), `wl-clip-persist` (copied text survives the app that made it),
+  `hyprpicker`, `zathura` with the MuPDF backend, and `tailscale` for the VPN
+  pill.
+- `developer` manifest: `just` (the repo's own justfile), `gdb` and `strace`
+  for native crashes, `hurl`, `kubectl`/`helm` (k9s could not reach a cluster),
+  and `difftastic` next to `delta`.
 - `window` applet and `Super+Shift+F` as **almost fullscreen**: the window fills
   the whole work area (monitor minus the bar's reserved space) so the bar and
   its icons stay visible, and pressing it again returns to the layout. True

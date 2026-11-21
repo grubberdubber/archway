@@ -668,6 +668,7 @@ selection_bg= "#1F2A3A"
 | `Super+Shift+F`       | Semi-fullscreen / maximizar (la barra sigue visible) |
 | `Super+Alt+F`         | Flotante                             |
 | `Super+Alt+G`         | Modo gaming (rendimiento, DND, sin idle) |
+| `Super+Ctrl+K`        | Activar/desactivar la capa keyd      |
 | `Super+Alt+R`         | Recargar WM                          |
 | `Super+Shift+E`       | Salir/cerrar sesión                  |
 | `Super+/`             | Cheatsheet                           |
@@ -679,7 +680,12 @@ Las teclas de función/medios (volumen, brillo, play/pause) se mapean con `XF86A
 ### 10.3 Capa numpad de una mano (keyd)
 
 Objetivo: mantener CapsLock como tap=Esc y hold=numpad; la mano derecha escribe números.
-`/etc/keyd/default.conf` (propuesta; el installer debe fusionar, no sobrescribir):
+El ciclo completo lo gestiona el applet `keyd` (`applets/keyd/`), que nunca
+escribe en `/etc` sin backup ni consentimiento: `on`/`off`/`toggle` tocan solo
+el servicio, `install` escribe la capa empaquetada y `reload` la aplica.
+
+`/etc/keyd/default.conf` (fuente: `applets/keyd/default.conf`; un archivo ajeno
+o editado no se sobrescribe sin `--replace`, que guarda `default.conf.bak.<ts>`):
 
 ```ini
 [ids]
@@ -710,7 +716,7 @@ h = /
 - Añadir una capa `nav` en otra tecla (p. ej. `rightalt = overload(nav, compose)`) con `h/j/k/l` = flechas, `u/i` = Home/End, `n/m` = PgDn/PgUp, `,`/`.` = Insert/Delete. No romper AltGr.
 - `keyd reload` tras cambios; test manual en TTY y en la sesión Wayland.
 - Alternativas documentadas: `kanata` (home-row mods, tap-dance), `interception-tools` + `caps2esc`, `xremap`, `kmonad`, `evremap`, `input-remapper` (GUI).
-- No activar keyd por defecto sin preguntar; puede chocar con remaps existentes y con algunos juegos.
+- No activar keyd por defecto sin preguntar; puede chocar con remaps existentes y con algunos juegos. El paquete se instala, el servicio arranca desactivado; se enciende con `Super+Ctrl+K` o `archway applet keyd on`.
 - Usar `wev` para depurar eventos de teclado (`xev` solo aplica a apps XWayland).
 
 ### 10.4 Accesibilidad

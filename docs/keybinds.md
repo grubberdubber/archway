@@ -48,6 +48,7 @@ Press `Super + /` at any time to open this list in a floating terminal.
 
 | Key | Action | Command |
 |---|---|---|
+| `super + ctrl + k` | keyd numpad layer on/off (CapsLock) | `$HOME/.local/bin/archway applet keyd toggle` |
 | `super + alt + g` | Gaming mode (performance, DND, no idle) | `$HOME/.local/bin/archway applet gaming toggle` |
 | `super + shift + q` | Power menu | `$HOME/.local/bin/archway applet power --rofi` |
 | `super + Escape` | Lock screen | `hyprlock` |
