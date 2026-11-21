@@ -47,6 +47,9 @@ on        install the layer if /etc/keyd/default.conf is missing, then
           enable and start the keyd service (root via sudo -n or pkexec).
 off       disable and stop the service; typing goes back to the firmware
           mapping immediately. The config file is left untouched.
+          Needs root: sudo when credentials are cached, otherwise a pkexec
+          prompt, which requires a running polkit agent (hyprpolkitagent on
+          Hyprland; Archway starts it with the session).
 toggle    on when keyd is off, off when it is on (this is the keybind).
 install   write the packaged layer. A config Archway does not own is refused
           unless --replace is given; the previous file is kept as
@@ -98,6 +101,16 @@ config_state() {
   printf 'foreign'
 }
 
+# pkexec needs a running polkit *agent*. Without one it falls back to the
+# textual agent, which cannot open /dev/tty from a keybind and fails with
+# "Error creating textual authentication agent" — the reason toggling from the
+# shortcut looked broken while the same command worked in a terminal.
+polkit_agent_running() {
+  pgrep -x hyprpolkitagent > /dev/null 2>&1 && return 0
+  pgrep -f 'polkit-gnome-authentication-agent|polkit-kde-authentication-agent|lxqt-policykit|lxpolkit|mate-polkit' \
+    > /dev/null 2>&1
+}
+
 # sudo only when it cannot prompt (a keybind has no terminal to prompt on);
 # otherwise pkexec, which the polkit agent renders as a graphical dialog.
 root_exec() {
@@ -110,6 +123,9 @@ root_exec() {
     return
   fi
   if have pkexec; then
+    if ! polkit_agent_running; then
+      die "no polkit agent is running, so the password prompt cannot open; start hyprpolkitagent (Archway autostarts it on Hyprland) or run this from a terminal" 3
+    fi
     pkexec "$@"
     return
   fi

@@ -18,6 +18,14 @@ Archway owns the whole lifecycle from one applet, so you never hand-edit `/etc`:
 `on`/`off` only touch the systemd service. Turning it off restores the firmware
 mapping immediately and leaves `/etc/keyd/default.conf` alone.
 
+Both need root. From a terminal `sudo` asks for the password normally; from the
+shortcut there is no terminal, so the applet uses cached `sudo -n` credentials or
+`pkexec`, which needs a running polkit agent. Archway starts `hyprpolkitagent`
+with the Hyprland session for exactly this reason; if you run a different
+compositor setup, start an agent (or run the command once from a terminal) and
+the shortcut will prompt graphically instead of failing with
+`Error creating textual authentication agent`.
+
 ## 1. Install the package
 
 ```bash

@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Yazi is a theme module: `themes/_shared/yazi/theme.toml` maps the manager,
+  tabs, mode, status, popups and file-type colours to `palette.toml` and is
+  published as `~/.config/yazi/theme.toml`; a pre-existing file is copied to
+  `~/.local/state/archway/backups/<timestamp>/yazi-theme.toml` the first time
+  and named on screen, since Yazi has no include. Powerline separators and pill
+  padding are gone (square), icons are left to the terminal font, and the
+  hovered row in the preview pane is filled instead of underlined — that
+  underline inherited the file-type colour and showed as a stray blue line in
+  the right-hand panel.
 - `password` applet behind `Super+P`: rbw/rofi-rbw with a notification, a
   `--type username` option, `lock`, and a clipboard that clears after 30 s
   (`PASSWORD_CLEAR_SECONDS`). Secrets stay in the vault; the applet never logs
@@ -105,6 +114,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `archway keys generate` now delivers the chords to the running session: it
+  copies the generated file to `~/.config/hypr/conf.d/20-keybinds.lua`, keeps the
+  chezmoi source in step and reloads Hyprland. Until now it wrote only the
+  checkout, so a new bind existed in the repo and in the tests but never in the
+  compositor — which is why the keyd chord looked dead and Ctrl+K reached
+  readline. `doctor` now distinguishes a stale live file ("run archway keys
+  generate") from a session that just needs `Super+Alt+R`.
+- Hyprland starts `hyprpolkitagent` with the session. Without a polkit agent
+  `pkexec` falls back to its textual agent and dies on `/dev/tty` when launched
+  from a keybind, so `Super+Alt+N` could not turn keyd off while the same command
+  worked in a terminal. The keyd applet now says so explicitly (exit 3) instead
+  of reporting a generic failure.
+- Thunar's remaining bright edges are gone: the menubar/toolbar, list column
+  headers, treeview row separators and the scrollbar slider no longer inherit
+  gradients or light borders from the stock GTK theme, the scroll edge shadows
+  are flat, and the breadcrumb buttons are transparent until hovered with the
+  current folder marked in accent text instead of a solid block. Sidebar rows and
+  their labels get explicit text and selection colours.
 - **keyd moved to `Super+Alt+N`** and the applet reports what it actually did.
   `Super+Ctrl+K` was a bad chord: if the bind is not loaded (a session running
   an older config, a failed reload) the keypress is forwarded to the focused

@@ -85,6 +85,50 @@ headerbar,
   padding: 4px 8px;
 }
 
+/* Thunar keeps a menubar above the toolbar. Left alone it keeps the stock
+ * light strip, which is the bright bar that shows up on a dark window. */
+menubar,
+.menubar {
+  background-image: none;
+  background-color: @surface_alt@;
+  color: @text@;
+  border-bottom: 1px solid @border@;
+  padding: 0;
+}
+
+menubar > menuitem,
+.menubar > menuitem {
+  background-color: transparent;
+  color: @text@;
+  padding: 3px 8px;
+  min-height: 18px;
+}
+
+menubar > menuitem:hover {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+menubar > menuitem:disabled {
+  color: @text_muted@;
+}
+
+toolbar,
+.toolbar,
+.primary-toolbar {
+  background-image: none;
+  background-color: @surface@;
+  color: @text@;
+  border-bottom: 1px solid @border@;
+  box-shadow: none;
+  padding: 2px;
+}
+
+toolbar separator,
+.sidebar separator {
+  background-color: @border@;
+}
+
 headerbar button,
 .titlebar button {
   background-image: none;
@@ -160,18 +204,81 @@ separator {
   background-color: @border@;
 }
 
-scrollbar {
-  background-color: transparent;
+/* Stock GTK draws its column headers and row separators with gradients and
+ * inherited border colours from the light fallback theme; both read as bright
+ * lines on a dark window until they are reset here. */
+treeview.view {
+  background-image: none;
+  background-color: @surface@;
+  color: @text@;
+  border-color: @border@;
+  -GtkTreeView-grid-line-width: 0;
+  -GtkTreeView-grid-line-pattern: "";
 }
 
+treeview.view header button {
+  background-image: none;
+  background-color: @surface_alt@;
+  color: @text_muted@;
+  border: 1px solid @border@;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  padding: 4px 8px;
+  min-height: 20px;
+}
+
+treeview.view header button:hover {
+  background-color: @overlay@;
+  color: @text@;
+}
+
+treeview.view header button:active {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+/* Scroll edge shadows use a gradient of the stock colours. */
+scrolledwindow undershoot.top,
+scrolledwindow undershoot.bottom,
+scrolledwindow overshoot.top,
+scrolledwindow overshoot.bottom,
+scrolledwindow overshoot.left,
+scrolledwindow overshoot.right,
+scrolledwindow junction {
+  background-image: none;
+  background-color: transparent;
+  border-color: @border@;
+}
+
+frame > border,
+.frame {
+  border: 1px solid @border@;
+  box-shadow: none;
+}
+
+scrollbar {
+  background-color: transparent;
+  border: none;
+}
+
+/* Themes draw the slider with a gradient overlay; without the reset it stays a
+ * thin bright line on the window edge whatever background-color says. */
 scrollbar slider {
+  background-image: none;
   background-color: @border@;
-  min-width: 8px;
-  min-height: 8px;
+  border: none;
+  border-radius: 0;
+  min-width: 6px;
+  min-height: 24px;
 }
 
 scrollbar slider:hover {
   background-color: @text_muted@;
+}
+
+scrollbar slider:active {
+  background-color: @primary@;
 }
 
 /* --- Thunar ------------------------------------------------------------ */
@@ -185,6 +292,48 @@ scrollbar slider:hover {
 .thunar .standard-view {
   background-color: @bg@;
   border-color: @border@;
+}
+
+.thunar .sidebar,
+.thunar .shortcuts-pane,
+.places-sidebar,
+.sidebar {
+  color: @text@;
+  border-right: 1px solid @border@;
+}
+
+.thunar .sidebar .view,
+.thunar .shortcuts-pane .view,
+.places-sidebar .view,
+.sidebar .view {
+  background-color: @bg@;
+  color: @text@;
+}
+
+/* Rows and their labels inherit black from the light fallback theme. */
+.sidebar-row,
+.sidebar-row label,
+.places-sidebar row label,
+.thunar .sidebar row label,
+.thunar .shortcuts-pane row label {
+  color: @text@;
+}
+
+.sidebar-row:hover,
+.places-sidebar row:hover,
+.thunar .sidebar row:hover,
+.thunar .shortcuts-pane row:hover {
+  background-color: @surface_alt@;
+  color: @text@;
+}
+
+.sidebar-row:selected,
+.sidebar-row:selected label,
+.places-sidebar row:selected,
+.thunar .sidebar row:selected,
+.thunar .shortcuts-pane row:selected {
+  background-color: @selection_bg@;
+  color: @text@;
 }
 
 .thunar .sidebar .view:selected,
@@ -217,6 +366,33 @@ scrollbar slider:hover {
 .thunar .location-bar entry,
 .thunar .path-bar button {
   min-height: 24px;
+}
+
+/* Breadcrumb buttons: flat until hovered, so the toolbar reads as one bar
+ * instead of a row of boxes, and the current folder is marked with the accent
+ * text instead of a solid block. */
+.thunar .path-bar button,
+.thunar .location-bar button {
+  background-image: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: @text_muted@;
+  padding: 2px 8px;
+}
+
+.thunar .path-bar button:hover,
+.thunar .location-bar button:hover {
+  background-color: @surface_alt@;
+  color: @text@;
+}
+
+.thunar .path-bar button:checked,
+.thunar .location-bar button:checked {
+  background-color: @surface_alt@;
+  border-color: @border@;
+  color: @primary@;
+  font-weight: bold;
 }
 
 .thunar .statusbar {

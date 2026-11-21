@@ -29,6 +29,7 @@ declare -gA THEME_TARGETS=(
   [bat]=archway.tmTheme
   [alacritty]=alacritty-theme.toml
   [gtk]=gtk.css
+  [yazi]=yazi-theme.toml
 )
 
 # Templates shared by every theme live here; a theme only ships the modules it
@@ -365,6 +366,10 @@ theme_publish_generated() {
   # GTK3 reads exactly one gtk.css per user; publishing as archway.css keeps it
   # side by side with a gtk.css the user owns, which imports it in one line.
   local gtk_dir="$XDG_CONFIG_HOME/gtk-3.0"
+  # Yazi reads exactly one theme.toml and has no include, so the generated theme
+  # replaces it. Whatever was there before the first Archway run is backed up
+  # once and named, instead of disappearing silently (AGENTS.md §2.1).
+  local yazi_dir="$XDG_CONFIG_HOME/yazi"
   local f
 
   if [[ -f $THEME_D_DIR/waybar.css ]]; then
@@ -387,6 +392,18 @@ theme_publish_generated() {
     mkdir -p -- "$gtk_dir"
     cp -f -- "$THEME_D_DIR/gtk.css" "$gtk_dir/archway.css"
     record_managed "$gtk_dir/archway.css" theme
+  fi
+  if [[ -f $THEME_D_DIR/yazi-theme.toml ]]; then
+    mkdir -p -- "$yazi_dir"
+    if [[ -e $yazi_dir/theme.toml ]] && ! is_managed "$yazi_dir/theme.toml"; then
+      local backup_dir
+      backup_dir="$STATE_DIR/backups/$(date +%Y%m%dT%H%M%S)"
+      mkdir -p -- "$backup_dir"
+      cp -a -- "$yazi_dir/theme.toml" "$backup_dir/yazi-theme.toml"
+      ui_note "previous Yazi theme kept at $backup_dir/yazi-theme.toml"
+    fi
+    cp -f -- "$THEME_D_DIR/yazi-theme.toml" "$yazi_dir/theme.toml"
+    record_managed "$yazi_dir/theme.toml" theme
   fi
   for f in "$THEME_D_DIR"/*.tmTheme; do
     [[ -e $f ]] || continue

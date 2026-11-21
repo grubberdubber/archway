@@ -564,6 +564,8 @@ selection_bg= "#1F2A3A"
 - Wallpapers originales inspirados en Material You (abstractos, gradientes, formas), licencia compatible; nada de assets propietarios de Google.
 
 **Propagación obligatoria:** hyprland (bordes, gaps, colores), waybar, rofi, swaync/mako, hyprlock, hyprpaper, kitty, ghostty, wezterm, alacritty, foot, nvim (vía `nvim-config`), bat, eza, fzf, delta, btop, lazygit, yazi, starship, tmux, zellij, GTK3/4, Qt5/6 (qt6ct/kvantum), Firefox (tema propio), zathura, mpv, cava, ncmpcpp/rmpc, y `swaylock` en el perfil fallback.
+
+**Estado de la propagación:** implementados kitty, alacritty, hyprland, waybar, swaync, swayosd, hyprlock, rofi, tmux, starship, fzf, bat, **GTK3** y **yazi**. Yazi no tiene include de temas: se publica `~/.config/yazi/theme.toml` generado, con backup y `record_managed` la primera vez. Pendientes: ghostty, wezterm, foot, btop, lazygit, GTK4, Qt, Firefox, zathura, mpv, cava, rmpc, swaylock, zellij.
 **Estado:** GTK3 ya es módulo del tema (`themes/_shared/gtk/gtk.css`, publicado como `~/.config/gtk-3.0/archway.css` e importado por el `gtk.css` trackeado), así que Thunar y los diálogos de archivo siguen la paleta. GTK4 y Qt siguen pendientes de módulo propio.
 **Regla:** si un módulo no está habilitado, no se genera; si está habilitado y no recibe el tema, es un bug. En Neovim el mecanismo es el contrato de §9.5; si el hook falta, `archway theme set` aplica el resto, marca Neovim como fallo crítico y sale con código `1`, sin editar archivos trackeados.
 
@@ -718,6 +720,7 @@ h = /
 - `capslock` tap = Esc; hold = capa numpad.
 - Añadir una capa `nav` en otra tecla (p. ej. `rightalt = overload(nav, compose)`) con `h/j/k/l` = flechas, `u/i` = Home/End, `n/m` = PgDn/PgUp, `,`/`.` = Insert/Delete. No romper AltGr.
 - `keyd reload` tras cambios; test manual en TTY y en la sesión Wayland.
+- El toggle de keyd necesita root y desde un atajo no hay TTY: se usa `sudo -n` o `pkexec`, y `pkexec` requiere un **agente polkit** corriendo (`hyprpolkitagent`). Sin agente falla con "textual authentication agent" y el atajo parece roto aunque el comando funcione en terminal. Hyprland lo arranca con la sesión (`hyprland.start`) y el applet detecta la ausencia y sale con código `3` explicando qué falta.
 - Alternativas documentadas: `kanata` (home-row mods, tap-dance), `interception-tools` + `caps2esc`, `xremap`, `kmonad`, `evremap`, `input-remapper` (GUI).
 - No activar keyd por defecto sin preguntar; puede chocar con remaps existentes y con algunos juegos. El paquete se instala, el servicio arranca desactivado; se enciende con `Super+Alt+N` o `archway applet keyd on`.
 - **No usar combinaciones con Ctrl como atajo del WM**: si el bind no está cargado (sesión vieja, reload fallido), la tecla se filtra a la terminal y Ctrl+K hace kill-line. `archway doctor` verifica con `hyprctl binds` qué atajos cargó realmente la sesión (`keybinds.loaded`).

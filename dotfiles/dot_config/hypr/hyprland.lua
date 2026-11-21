@@ -151,6 +151,9 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("waybar")
   hl.exec_cmd("swaync")
   hl.exec_cmd("hypridle")
+  -- Without a polkit agent, pkexec refuses to prompt from a keybind (there is no
+  -- tty to read a password from), so every privileged applet looks broken.
+  hl.exec_cmd("[ -x /usr/lib/hyprpolkitagent/hyprpolkitagent ] && { pgrep -x hyprpolkitagent >/dev/null || /usr/lib/hyprpolkitagent/hyprpolkitagent; }")
   hl.exec_cmd("command -v swayosd-server >/dev/null 2>&1 && swayosd-server")
   hl.exec_cmd("command -v hyprpaper >/dev/null 2>&1 && hyprpaper")
   -- cliphist only records what a watcher feeds it; without this the Super+V

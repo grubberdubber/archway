@@ -569,3 +569,23 @@ _keyd_mocks() {
   assert_eq 0 "$status"
   assert_contains "$output" 'hyprctl hyprpaper wallpaper'
 }
+
+@test "keyd explains a missing polkit agent instead of failing on /dev/tty" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  export KEYD_DIR="$HOME/etc-keyd"
+  export KEYD_BIN=keyd
+  mock_cmd keyd 'exit 0'
+  mock_cmd notify-send 'exit 0'
+  mock_cmd sudo '[[ $1 == -n ]] && exit 1
+    exit 0'
+  mock_cmd pkexec 'printf "prompted\n" >> "$HOME/pkexec.log"'
+  mock_cmd systemctl 'case $1 in
+      is-active | is-enabled) return 0 ;;
+    esac
+    exit 0'
+  mock_cmd pgrep 'exit 1'
+  run "$K" off
+  assert_eq 3 "$status"
+  assert_contains "$output" "no polkit agent is running"
+  assert_missing "$HOME/pkexec.log"
+}
