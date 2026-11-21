@@ -44,8 +44,13 @@ hl.config({
     touchpad = {
       natural_scroll = true,
       tap_to_click = true,
+      -- Standard tap map: one finger left, two right, three middle. Do not
+      -- enable clickfinger_behavior here: it counts fingers for physical
+      -- presses instead of using the button areas, and on clickpads that also
+      -- have real buttons (ThinkPad-style) a one-finger press on the right
+      -- button is reported as a left click.
+      tap_button_map = "lrm",
       disable_while_typing = true,
-      clickfinger_behavior = true,
       scroll_factor = 1.0,
     },
   },

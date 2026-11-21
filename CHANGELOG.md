@@ -130,6 +130,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The touchpad lost its right click: `input.touchpad.clickfinger_behavior` was
+  on, so a physical press counted fingers instead of using the button areas and
+  a one-finger press on the right button arrived as a left click. The option is
+  gone and `tap_button_map` is pinned to `lrm` (one finger left, two right,
+  three middle).
 - Most `Super` shortcuts did nothing: Hyprland starts without `~/.local/bin` on
   `PATH`, so the generated binds' bare `archway` call failed silently while
   `kitty` worked. Binds now use `$HOME/.local/bin/archway` and `archway install`
