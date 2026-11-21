@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Archway custom actions for Thunar (right click -> "Open With" / actions bar).
+
+  Paths are quoted in every command: Thunar expands %f and then parses the
+  resulting string, so a folder called "My Stuff" would otherwise split into two
+  arguments. Nothing here needs root and nothing deletes data.
+
+  Dependencies are deliberately boring: kitty, yazi, neovim, wl-clipboard and
+  bsdtar (libarchive, part of base). No archive manager or GUI extractor is
+  assumed, so the actions work on a minimal install too.
+
+  Order matters: the most used actions come first so they sit at the top of the
+  context menu.
+-->
+<actions>
+  <action>
+    <icon>utilities-terminal</icon>
+    <name>Open Terminal Here</name>
+    <unique-id>archway-open-terminal</unique-id>
+    <command>kitty --working-directory %f</command>
+    <description>Open the Archway terminal in this folder</description>
+    <range>1</range>
+    <patterns>*</patterns>
+    <directories/>
+  </action>
+
+  <action>
+    <icon>system-file-manager</icon>
+    <name>Open in Yazi</name>
+    <unique-id>archway-open-yazi</unique-id>
+    <command>kitty --class floating-term -e yazi %f</command>
+    <description>Browse with the keyboard-driven file manager</description>
+    <range>*</range>
+    <patterns>*</patterns>
+    <directories/>
+    <other-files/>
+  </action>
+
+  <action>
+    <icon>accessories-text-editor</icon>
+    <name>Edit with Neovim</name>
+    <unique-id>archway-open-nvim</unique-id>
+    <command>kitty -e nvim %f</command>
+    <description>Open the file in Neovim</description>
+    <range>*</range>
+    <patterns>*</patterns>
+    <other-files/>
+  </action>
+
+  <action>
+    <icon>edit-copy</icon>
+    <name>Copy Path</name>
+    <unique-id>archway-copy-path</unique-id>
+    <command>sh -c 'printf %s "$1" | wl-copy' sh %f</command>
+    <description>Copy the full path to the Wayland clipboard</description>
+    <range>1</range>
+    <patterns>*</patterns>
+    <directories/>
+    <other-files/>
+  </action>
+
+  <action>
+    <icon>package-x-generic</icon>
+    <name>Extract Here</name>
+    <unique-id>archway-extract-here</unique-id>
+    <command>sh -c 'cd "$(dirname "$1")" &amp;&amp; exec bsdtar -xf "$1"' sh %f</command>
+    <description>Extract this archive next to it (libarchive)</description>
+    <range>1</range>
+    <patterns>*.zip;*.tar;*.tar.gz;*.tgz;*.tar.xz;*.txz;*.tar.zst;*.tzst;*.tar.bz2;*.7z;*.rar</patterns>
+    <other-files/>
+  </action>
+</actions>

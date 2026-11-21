@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Archway Thunar settings. Thunar keeps its state in this xfconf channel, so the
+  defaults have to be declared here rather than patched at runtime.
+
+  Choices, and why:
+    - details view + folders first: a file manager is read, not explored by icon.
+    - thumbnails always: tumbler is installed and cheap for local files.
+    - single click off: destructive actions on a trackpad deserve a real click,
+      and selection stays possible.
+    - delete action visible: the trash is one shortcut away, but a misplaced
+      Delete would otherwise be silent.
+    - volume management on: USB sticks and Android (MTP) mount on plug; nothing
+      is formatted or repartitioned.
+
+  Any key a future Thunar drops is ignored by xfconf, so this stays forward
+  compatible.
+-->
+<channel name="thunar" version="1.0">
+  <property name="default-view" type="string" value="ThunarDetailsView"/>
+  <property name="last-view" type="string" value="ThunarDetailsView"/>
+  <property name="last-location-bar" type="string" value="ThunarLocationButtons"/>
+  <property name="last-show-hidden" type="bool" value="false"/>
+  <property name="last-details-view-visible-columns" type="string" value="name,size,type,date"/>
+  <property name="last-window-width" type="int" value="1100"/>
+  <property name="last-window-height" type="int" value="700"/>
+  <property name="last-window-maximized" type="bool" value="false"/>
+
+  <property name="misc-single-click" type="bool" value="false"/>
+  <property name="misc-thumbnail-mode" type="string" value="THUNAR_THUMBNAIL_MODE_ALWAYS"/>
+  <property name="misc-thumbnail-draw-frames" type="bool" value="false"/>
+  <property name="misc-folders-first" type="bool" value="true"/>
+  <property name="misc-date-style" type="string" value="THUNAR_DATE_STYLE_SHORT"/>
+  <property name="misc-volume-management" type="bool" value="true"/>
+  <property name="misc-show-delete-action" type="bool" value="true"/>
+  <property name="misc-horizontal-wheel-navigates" type="bool" value="true"/>
+  <property name="misc-tab-close-middle-click" type="bool" value="true"/>
+  <property name="misc-recursive-permissions" type="string" value="THUNAR_RECURSIVE_PERMISSIONS_ASK"/>
+  <property name="misc-exec-shell-scripts-silently" type="bool" value="false"/>
+  <property name="misc-case-sensitive" type="bool" value="false"/>
+  <property name="misc-image-zoom-level" type="int" value="100"/>
+</channel>

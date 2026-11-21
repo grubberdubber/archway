@@ -6,18 +6,15 @@
 hl.bind("SUPER + Return", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet terminal"))
 hl.bind("SUPER + SHIFT + Return", hl.dsp.exec_cmd("kitty --class floating-term"))
 hl.bind("SUPER + D", hl.dsp.exec_cmd("rofi -show drun"))
-hl.bind("SUPER + E", hl.dsp.exec_cmd("kitty --class floating-term -e yazi"))
+hl.bind("SUPER + E", hl.dsp.exec_cmd("thunar"))
+hl.bind("SUPER + ALT + E", hl.dsp.exec_cmd("kitty --class floating-term -e yazi"))
+hl.bind("SUPER + CTRL + Return", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet terminal --pick"))
 hl.bind("SUPER + B", hl.dsp.exec_cmd("${BROWSER:-firefox}"))
 hl.bind("SUPER + SHIFT + P", hl.dsp.exec_cmd("rofi -show run -display-name 'Archway'"))
 
--- --- windows ---
-
-hl.bind("SUPER + Q", hl.dsp.window.close())
-hl.bind("SUPER + F", hl.dsp.window.fullscreen())
-hl.bind("SUPER + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
-
 -- --- navigation ---
 
+hl.bind("SUPER + Tab", hl.dsp.exec_cmd("rofi -show window"))
 hl.bind("SUPER + H", hl.dsp.focus({ direction = "left" }))
 hl.bind("SUPER + J", hl.dsp.focus({ direction = "down" }))
 hl.bind("SUPER + K", hl.dsp.focus({ direction = "up" }))
@@ -30,6 +27,22 @@ hl.bind("SUPER + ALT + H", hl.dsp.window.resize({ x = 20, y = 0, relative = true
 hl.bind("SUPER + ALT + J", hl.dsp.window.resize({ x = 0, y = 20, relative = true }))
 hl.bind("SUPER + ALT + K", hl.dsp.window.resize({ x = 0, y = -20, relative = true }))
 hl.bind("SUPER + ALT + L", hl.dsp.window.resize({ x = -20, y = 0, relative = true }))
+
+-- --- windows ---
+
+hl.bind("SUPER + Q", hl.dsp.window.close())
+hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+hl.bind("SUPER + SHIFT + F", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet window maximize"))
+hl.bind("SUPER + ALT + F", hl.dsp.window.float({ action = "toggle" }))
+
+-- --- system ---
+
+hl.bind("SUPER + ALT + G", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet gaming toggle"))
+hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet power --rofi"))
+hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hyprlock"))
+hl.bind("SUPER + ALT + R", hl.dsp.reload_config())
+hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd("command -v uwsm >/dev/null 2>&1 && uwsm stop || hyprctl dispatch exit"))
+hl.bind("SUPER + slash", hl.dsp.exec_cmd("$HOME/.local/bin/archway keys list | rofi -dmenu -i -p Keybinds"))
 
 -- --- workspaces ---
 
@@ -56,14 +69,6 @@ hl.bind("SUPER + ALT + W", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet wall
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot region"))
 hl.bind("Print", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot full"))
 hl.bind("SUPER + P", hl.dsp.exec_cmd("rofi-rbw --type password --action copy"))
-
--- --- system ---
-
-hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet power --rofi"))
-hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hyprlock"))
-hl.bind("SUPER + ALT + R", hl.dsp.reload_config())
-hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd("command -v uwsm >/dev/null 2>&1 && uwsm stop || hyprctl dispatch exit"))
-hl.bind("SUPER + slash", hl.dsp.exec_cmd("$HOME/.local/bin/archway keys list | rofi -dmenu -i -p Keybinds"))
 
 -- --- media ---
 

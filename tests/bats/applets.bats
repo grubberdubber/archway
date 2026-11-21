@@ -64,12 +64,23 @@ teardown() {
   mkdir -p "$XDG_DATA_HOME/archway/wallpapers"
   printf 'x' > "$XDG_DATA_HOME/archway/wallpapers/a.png"
   mock_cmd pgrep 'exit 0'
-  mock_cmd hyprctl 'printf "%s\n" "$*" >> "$HOME/hyprctl.log"'
+  # A real hyprpaper must never start from a test: it inherits the test's stdout
+  # and keeps the runner waiting for EOF.
+  mock_cmd hyprpaper 'sleep 300'
+  # hyprpaper 0.8: `wallpaper ,<path>` applies and `listactive` confirms it.
+  # `preload`/`unload` are gone, so the applet must not call them any more.
+  mock_cmd hyprctl 'printf "%s\n" "$*" >> "$HOME/hyprctl.log"
+    if [[ $2 == wallpaper ]]; then
+      printf "%s" "${3#*,}" > "$HOME/active"
+    elif [[ $2 == listactive ]]; then
+      printf "LVDS-1: %s\n" "$(cat "$HOME/active")"
+    fi'
   run "$WALL" --set "$XDG_DATA_HOME/archway/wallpapers/a.png"
   assert_eq 0 "$status"
-  assert_file_contains "$HOME/hyprctl.log" "hyprpaper preload $XDG_DATA_HOME/archway/wallpapers/a.png"
   assert_file_contains "$HOME/hyprctl.log" "hyprpaper wallpaper ,$XDG_DATA_HOME/archway/wallpapers/a.png"
+  assert_file_contains "$HOME/hyprctl.log" "hyprpaper listactive"
   assert_file_contains "$XDG_STATE_HOME/archway/wallpaper" "a.png"
+  assert_file_contains "$HOME/.config/hypr/hyprpaper.conf" "path = $XDG_DATA_HOME/archway/wallpapers/a.png"
 }
 
 @test "network dry-run does not change the radio" {
@@ -103,11 +114,14 @@ teardown() {
   assert_contains "$output" '"entries":0'
 }
 
-@test "bar updates stays hidden when the system is current" {
+@test "bar updates stays visible but muted when the system is current" {
+  # Regression: hiding the pill at zero made the button look broken, so the
+  # module now reports a muted check mark instead of an empty text.
   mock_cmd checkupdates 'exit 2'
   run "$BAR" updates
   assert_eq 0 "$status"
-  assert_contains "$output" '"text": ""'
+  assert_contains "$output" '"class": "muted"'
+  assert_contains "$output" "up to date"
 }
 
 @test "bar updates reports the pending count" {
@@ -230,4 +244,110 @@ mock_hypr_for_terminal() {
   TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
   run "$TERM_APP" --nope
   assert_eq 2 "$status"
+}
+
+# --------------------------------------------------------------- window -----
+
+_window_mock() {
+  cat > "$HOME/clients.json" << JSON
+[{"address":"0xabc","class":"kitty","fullscreen":${1:-0},"floating":false,"focusHistoryID":0}]
+JSON
+  mock_cmd hyprctl 'case "$1" in
+    clients) cat "$HOME/clients.json" ;;
+    dispatch) printf "%s\n" "$2" >> "$HOME/dispatch.log" ;;
+  esac'
+}
+
+@test "window maximize asks for the maximized mode, not fullscreen" {
+  WIN="$ARCHWAY_ROOT/applets/window/window.sh"
+  _window_mock 0
+  run "$WIN" maximize
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/dispatch.log" 'fullscreen({ mode = "maximized" })'
+}
+
+@test "window status reports a maximized window" {
+  WIN="$ARCHWAY_ROOT/applets/window/window.sh"
+  _window_mock 1
+  run "$WIN" --status
+  assert_eq 0 "$status"
+  assert_contains "$output" "maximized"
+}
+
+@test "window center refuses a tiled window" {
+  WIN="$ARCHWAY_ROOT/applets/window/window.sh"
+  _window_mock 0
+  run "$WIN" center
+  assert_eq 1 "$status"
+  assert_contains "$output" "float it first"
+}
+
+# --------------------------------------------------------------- gaming -----
+
+@test "gaming mode sets performance and restores the saved profile" {
+  GAME="$ARCHWAY_ROOT/applets/gaming/gaming.sh"
+  mock_cmd powerprofilesctl 'case "$1" in
+    get) cat "$HOME/profile" 2>/dev/null || echo balanced ;;
+    set) printf "%s\n" "$2" > "$HOME/profile" ;;
+  esac'
+  mock_cmd swaync-client 'case "$1" in
+    -D) echo false ;;
+    *) printf "%s\n" "$1" >> "$HOME/dnd.log" ;;
+  esac'
+
+  run "$GAME" on
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/profile" "performance"
+  run "$GAME" status --json
+  assert_contains "$output" '"enabled":true'
+
+  run "$GAME" off
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/profile" "balanced"
+  run "$GAME" status --json
+  assert_contains "$output" '"enabled":false'
+}
+
+@test "gaming toggle is idempotent about its state file" {
+  GAME="$ARCHWAY_ROOT/applets/gaming/gaming.sh"
+  mock_cmd powerprofilesctl 'printf "%s\n" "$2" > "$HOME/profile"'
+  run "$GAME" --dry-run on
+  assert_eq 0 "$status"
+  assert_missing "$XDG_STATE_HOME/archway/gaming.state"
+}
+
+# ------------------------------------------------------------- terminal -----
+
+@test "terminal --print falls back to kitty" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  run "$TERM_APP" --print
+  assert_eq 0 "$status"
+  assert_contains "$output" "kitty"
+}
+
+@test "terminal --set stores the choice and --print reads it back" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  mock_cmd alacritty 'exit 0'
+  run "$TERM_APP" --set alacritty
+  assert_eq 0 "$status"
+  run "$TERM_APP" --print
+  assert_contains "$output" "alacritty"
+}
+
+@test "terminal --set refuses a program that is not installed" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  run "$TERM_APP" --set ghostty-nonexistent
+  assert_eq 3 "$status"
+  assert_contains "$output" "is not installed"
+}
+
+# ------------------------------------------------------------ wallpaper -----
+
+@test "wallpaper dry-run prints the hyprpaper request it would send" {
+  img="$XDG_DATA_HOME/archway/wallpapers/a.png"
+  mkdir -p -- "$(dirname -- "$img")"
+  printf 'not really a png\n' > "$img"
+  run "$WALL" --dry-run --set "$img"
+  assert_eq 0 "$status"
+  assert_contains "$output" 'hyprctl hyprpaper wallpaper'
 }

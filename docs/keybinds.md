@@ -11,22 +11,17 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + Return` | Terminal (opens towards the cursor) | `$HOME/.local/bin/archway applet terminal` |
 | `super + shift + Return` | Floating scratchpad terminal | `kitty --class floating-term` |
 | `super + d` | Application launcher | `rofi -show drun` |
-| `super + e` | File manager (yazi) | `kitty --class floating-term -e yazi` |
+| `super + e` | File manager (Thunar) | `thunar` |
+| `super + alt + e` | File manager (yazi, TUI) | `kitty --class floating-term -e yazi` |
+| `super + ctrl + Return` | Choose the default terminal | `$HOME/.local/bin/archway applet terminal --pick` |
 | `super + b` | Web browser | `${BROWSER:-firefox}` |
 | `super + shift + p` | Run a command (archway, system tools) | `rofi -show run -display-name 'Archway'` |
-
-## Windows
-
-| Key | Action | Command |
-|---|---|---|
-| `super + q` | Close focused window | `hyprctl dispatch killactive` |
-| `super + f` | Toggle fullscreen | `hyprctl dispatch fullscreen 0` |
-| `super + shift + f` | Toggle floating | `hyprctl dispatch togglefloating` |
 
 ## Navigation
 
 | Key | Action | Command |
 |---|---|---|
+| `super + Tab` | Switch window (rofi) | `rofi -show window` |
 | `super + h` | Focus west | `hyprctl dispatch movefocus l` |
 | `super + j` | Focus south | `hyprctl dispatch movefocus d` |
 | `super + k` | Focus north | `hyprctl dispatch movefocus u` |
@@ -39,6 +34,26 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + alt + j` | Grow vertically | `hyprctl dispatch resizeactive 0 20` |
 | `super + alt + k` | Shrink vertically | `hyprctl dispatch resizeactive 0 -20` |
 | `super + alt + l` | Shrink horizontally | `hyprctl dispatch resizeactive -20 0` |
+
+## Windows
+
+| Key | Action | Command |
+|---|---|---|
+| `super + q` | Close focused window | `hyprctl dispatch killactive` |
+| `super + f` | Toggle fullscreen | `hyprctl dispatch fullscreen 0` |
+| `super + shift + f` | Maximize (keeps the bar visible) | `$HOME/.local/bin/archway applet window maximize` |
+| `super + alt + f` | Toggle floating | `hyprctl dispatch togglefloating` |
+
+## System
+
+| Key | Action | Command |
+|---|---|---|
+| `super + alt + g` | Gaming mode (performance, DND, no idle) | `$HOME/.local/bin/archway applet gaming toggle` |
+| `super + shift + q` | Power menu | `$HOME/.local/bin/archway applet power --rofi` |
+| `super + Escape` | Lock screen | `hyprlock` |
+| `super + alt + r` | Reload Hyprland config | `hyprctl dispatch reload` |
+| `super + shift + e` | Log out of the session | `command -v uwsm >/dev/null 2>&1 && uwsm stop \|\| hyprctl dispatch exit` |
+| `super + slash` | Keybind cheatsheet | `$HOME/.local/bin/archway keys list \| rofi -dmenu -i -p Keybinds` |
 
 ## Workspaces
 
@@ -69,16 +84,6 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + shift + s` | Screenshot: region | `$HOME/.local/bin/archway applet screenshot region` |
 | `Print` | Screenshot: whole screen | `$HOME/.local/bin/archway applet screenshot full` |
 | `super + p` | Password manager (rbw) | `rofi-rbw --type password --action copy` |
-
-## System
-
-| Key | Action | Command |
-|---|---|---|
-| `super + shift + q` | Power menu | `$HOME/.local/bin/archway applet power --rofi` |
-| `super + Escape` | Lock screen | `hyprlock` |
-| `super + alt + r` | Reload Hyprland config | `hyprctl dispatch reload` |
-| `super + shift + e` | Log out of the session | `command -v uwsm >/dev/null 2>&1 && uwsm stop \|\| hyprctl dispatch exit` |
-| `super + slash` | Keybind cheatsheet | `$HOME/.local/bin/archway keys list \| rofi -dmenu -i -p Keybinds` |
 
 ## Media
 

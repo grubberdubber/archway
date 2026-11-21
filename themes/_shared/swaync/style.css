@@ -6,10 +6,17 @@
   font-size: 12px;
 }
 
+/* The control centre is a sheet, not a card: square corners and no right/bottom
+ * margin (config.json), so it reads as attached to the screen edge instead of
+ * floating with a strip of wallpaper around it. Notifications keep their own
+ * rounding. */
 .control-center {
   background: @surface@;
   border: @border_width@px solid @border@;
-  border-radius: @radius_window@px;
+  border-top-left-radius: @radius_window@px;
+  border-bottom-left-radius: @radius_window@px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   color: @text@;
   padding: @padding@px;
 }

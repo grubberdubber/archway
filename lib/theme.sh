@@ -27,6 +27,7 @@ declare -gA THEME_TARGETS=(
   [starship]=starship.toml
   [fzf]=fzf.sh
   [bat]=archway.tmTheme
+  [alacritty]=alacritty-theme.toml
 )
 
 # Templates shared by every theme live here; a theme only ships the modules it
@@ -417,8 +418,18 @@ theme_reload() {
   if have hyprctl && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
     timeout 5 hyprctl reload > /dev/null 2>&1 || true
   fi
-  if have kitty && [[ -n ${KITTY_LISTEN_ON:-} ]]; then
-    timeout 5 kitty @ set-colors --all --configured "$THEME_D_DIR/kitty.conf" 2> /dev/null || true
+  # kitty: every instance listens on /tmp/kitty-archway-<pid> (kitty.conf sets
+  # `listen_on`), so a theme change reaches the terminals that are already open,
+  # not only new ones. KITTY_LISTEN_ON is useless here: the applet runs from a
+  # keybind or rofi, whose environment never belonged to kitty. `load-config`
+  # also re-reads opacity and ligature settings from the tracked config.
+  local kitty_sock
+  if have kitty; then
+    for kitty_sock in /tmp/kitty-archway-*; do
+      [[ -S $kitty_sock ]] || continue
+      timeout 5 kitty @ --to "unix:$kitty_sock" set-colors --all --configured "$THEME_D_DIR/kitty.conf" > /dev/null 2>&1 || true
+      timeout 5 kitty @ --to "unix:$kitty_sock" load-config > /dev/null 2>&1 || true
+    done
   fi
   if have pgrep && pgrep -x waybar > /dev/null 2>&1; then
     timeout 5 pkill -SIGUSR2 -x waybar > /dev/null 2>&1 || true

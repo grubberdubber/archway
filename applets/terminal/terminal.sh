@@ -15,25 +15,34 @@ set -Eeuo pipefail
 
 DRY_RUN=0
 JSON=0
+MODE=run
+SET_TO=''
 # Inside the middle band no side is forced: spawn as usual.
 DEAD_ZONE=15 # percent of half the area width/height
 TIMEOUT=30   # tenths of a second to wait for the new window
-TERMINAL="${ARCHWAY_TERMINAL:-kitty}"
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/archway"
+TERMINAL_FILE="$CONFIG_DIR/terminal"
+# Terminals Archway knows how to launch; --pick only offers the installed ones.
+KNOWN_TERMINALS=(kitty alacritty ghostty wezterm foot)
 
 usage() {
   cat << 'EOF'
 terminal — open a terminal on the side of the workspace the cursor is on
 
 Usage:
-  terminal.sh [--dry-run] [--json]
+  terminal.sh [--dry-run] [--json]     open a terminal towards the cursor
+  terminal.sh --print                  print the default terminal
+  terminal.sh --set <command>          make <command> the default terminal
+  terminal.sh --pick                   choose the default terminal with rofi
 
 The pointer picks the side: left, right, up or down from the centre of the
 workspace work area (monitor minus reserved space, so the bar is excluded).
 With the pointer in the middle band the terminal opens the way dwindle decides.
 --dry-run and --json only report the decision; they start nothing.
 
-Environment:
-  ARCHWAY_TERMINAL   command to run (default: kitty)
+Default: $ARCHWAY_TERMINAL if set, else $XDG_CONFIG_HOME/archway/terminal,
+else kitty. `--set` writes that file (user config, never the repo).
 
 Needs a running Hyprland session (hyprctl) and jq.
 EOF
@@ -46,6 +55,63 @@ die() {
 
 have() { command -v "$1" > /dev/null 2>&1; }
 
+# Resolution order: environment, then the per-host file, then kitty. The file is
+# what `--set`/`--pick` write, so a preference survives sessions without a
+# rebuild and without touching the repo.
+default_terminal() {
+  local saved=''
+  if [[ -n ${ARCHWAY_TERMINAL:-} ]]; then
+    printf '%s' "$ARCHWAY_TERMINAL"
+    return
+  fi
+  if [[ -r $TERMINAL_FILE ]]; then
+    IFS= read -r saved < "$TERMINAL_FILE" || true
+    if [[ -n $saved ]]; then
+      printf '%s' "$saved"
+      return
+    fi
+  fi
+  printf 'kitty'
+}
+
+# The command may carry arguments ("kitty --single-instance"); only the program
+# has to exist.
+program_of() { printf '%s' "${1%% *}"; }
+
+set_terminal() {
+  local cmd=$1 program
+  program=$(program_of "$cmd")
+  have "$program" || die "'$program' is not installed" 3
+  if ((DRY_RUN)); then
+    printf '[dry-run] write %s -> %s\n' "$TERMINAL_FILE" "$cmd"
+    return 0
+  fi
+  mkdir -p -- "$CONFIG_DIR"
+  printf '%s\n' "$cmd" > "$TERMINAL_FILE"
+  chmod 644 -- "$TERMINAL_FILE"
+  printf 'default terminal: %s\n' "$cmd"
+}
+
+pick_terminal() {
+  have rofi || die "rofi is required for --pick" 3
+  local t current choice
+  current=$(default_terminal)
+  local -a rows=()
+  for t in "${KNOWN_TERMINALS[@]}"; do
+    have "$t" || continue
+    if [[ $t == "$(program_of "$current")" ]]; then
+      rows+=("* $t")
+    else
+      rows+=("$t")
+    fi
+  done
+  ((${#rows[@]})) || die "no supported terminal is installed" 3
+  choice=$(printf '%s\n' "${rows[@]}" |
+    rofi -dmenu -i -p terminal -theme "$CONFIG_DIR/theme.d/rofi.rasi") || return 1
+  [[ -n $choice ]] || return 1
+  set_terminal "${choice#\* }"
+}
+
 while (($#)); do
   case $1 in
     -h | --help)
@@ -54,6 +120,14 @@ while (($#)); do
       ;;
     --dry-run) DRY_RUN=1 ;;
     --json) JSON=1 ;;
+    --print) MODE=print ;;
+    --pick) MODE=pick ;;
+    --set)
+      MODE='set'
+      SET_TO=${2:-}
+      [[ -n $SET_TO ]] || die "--set needs a command" 2
+      shift
+      ;;
     *)
       printf 'terminal: unknown option: %s\n' "$1" >&2
       exit 2
@@ -61,6 +135,26 @@ while (($#)); do
   esac
   shift
 done
+
+case $MODE in
+  print)
+    default_terminal
+    printf '\n'
+    exit 0
+    ;;
+  set)
+    set_terminal "$SET_TO"
+    exit 0
+    ;;
+  pick)
+    pick_terminal
+    exit 0
+    ;;
+esac
+
+TERMINAL=$(default_terminal)
+TERMINAL_PROGRAM=$(program_of "$TERMINAL")
+have "$TERMINAL_PROGRAM" || die "default terminal '$TERMINAL_PROGRAM' is not installed (archway applet terminal --pick)" 3
 
 # ---------------------------------------------------------------- pointer ---
 
@@ -102,8 +196,8 @@ fi
 
 # Both --json and --dry-run are reports: they never start a terminal.
 if ((JSON)); then
-  jq -n --arg d "$direction" --argjson x "$CX" --argjson y "$CY" \
-    --argjson area "[$AX, $AY, $AW, $AH]" '{direction: $d, cursor: [$x, $y], area: $area}'
+  jq -n --arg d "$direction" --arg t "$TERMINAL" --argjson x "$CX" --argjson y "$CY" \
+    --argjson area "[$AX, $AY, $AW, $AH]" '{direction: $d, terminal: $t, cursor: [$x, $y], area: $area}'
   exit 0
 fi
 if ((DRY_RUN)); then

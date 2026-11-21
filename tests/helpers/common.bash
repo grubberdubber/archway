@@ -8,6 +8,11 @@ ARCHWAY_TEST_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 export ARCHWAY_ROOT="$ARCHWAY_TEST_ROOT"
 export PATH="$ARCHWAY_ROOT/bin:$PATH"
 
+# A test that leaves a child holding the runner's stdout would hang the suite
+# forever (a real daemon started from an applet does exactly that). Fail the
+# test instead: no Archway test legitimately needs a minute.
+export BATS_TEST_TIMEOUT=${BATS_TEST_TIMEOUT:-60}
+
 setup_sandbox() {
   SANDBOX=$(mktemp -d "${TMPDIR:-/tmp}/archway-test.XXXXXX")
   export HOME="$SANDBOX/home"

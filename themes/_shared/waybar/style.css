@@ -43,6 +43,7 @@ window#waybar {
 #session,
 #mpris,
 #custom-nowplaying,
+#custom-media,
 #custom-notifications {
   background: @surface@;
   border: @border_width@px solid @border@;
@@ -146,6 +147,7 @@ window#waybar {
 #custom-language,
 #idle_inhibitor,
 #battery,
+#custom-gaming,
 #custom-power-profile,
 #tray,
 #custom-power {
@@ -177,6 +179,22 @@ window#waybar {
   color: @text@;
   font-size: 10.5px;
   min-width: 156px;
+}
+
+/* Elapsed time of the current track (playerctl, one second resolution). Zero
+ * width when nothing plays, so the media slot keeps its size. */
+#custom-media {
+  color: @text_muted@;
+  font-size: 10px;
+  padding: 0 2px;
+}
+
+#custom-media.empty {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
 }
 
 /* The media slot keeps its footprint whether a player is running or not, and
@@ -218,6 +236,11 @@ window#waybar {
 #custom-updates.warning,
 #custom-vault.warning {
   color: @warning@;
+}
+
+/* Up to date: the pill stays visible but stops asking for attention. */
+#custom-updates.muted {
+  color: @text_muted@;
 }
 
 #privacy {
@@ -320,6 +343,18 @@ window#waybar {
 
 #battery.critical:not(.charging) {
   color: @error@;
+  font-weight: 700;
+}
+
+/* The rocket pill next to the power button: gaming mode. Off is muted (nothing
+ * to report), on is the accent colour so it is obvious the session changed
+ * power, notification and idle behaviour. */
+#custom-gaming {
+  color: @text_muted@;
+}
+
+#custom-gaming.active {
+  color: @primary@;
   font-weight: 700;
 }
 

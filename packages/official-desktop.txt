@@ -32,8 +32,21 @@ grim
 slurp
 satty
 
-# Terminal and file manager (Super+E launches yazi inside kitty)
+# Terminals: kitty is the default, alacritty is the supported alternative that
+# `archway applet terminal --pick` can switch to (same palette, same opacity).
 kitty
+alacritty
+
+# File manager: Thunar (Super+E), Yazi for the TUI (Super+Alt+E).
+# thunar-volman mounts removable media and MTP; tumbler draws thumbnails, and
+# ffmpegthumbnailer/poppler-glib are the backends it needs for video and PDF.
+thunar
+thunar-volman
+thunar-archive-plugin
+tumbler
+ffmpegthumbnailer
+poppler-glib
+file-roller
 yazi
 swayimg
 
@@ -53,6 +66,9 @@ blueman
 udisks2
 gvfs
 gvfs-mtp
+# Thunar's trash/network search backends
+gvfs-smb
+gvfs-nfs
 
 # Icons and cursor (rofi/waybar) share the palette's look
 papirus-icon-theme

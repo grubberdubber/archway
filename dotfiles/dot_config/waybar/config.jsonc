@@ -28,6 +28,7 @@
     "group/context",
     "custom/nowplaying",
     "mpris",
+    "custom/media",
     "clock",
     "custom/notifications",
     "group/alerts",
@@ -72,7 +73,7 @@
   },
   "group/session": {
     "orientation": "horizontal",
-    "modules": ["battery", "custom/power-profile", "tray", "custom/power"]
+    "modules": ["battery", "custom/gaming", "tray", "custom/power"]
   },
 
   "custom/launcher": {
@@ -109,7 +110,9 @@
     "format": "{player_icon} {artist} — {title}",
     "format-paused": "{player_icon} {artist} — {title}",
     "max-length": 21,
-    "tooltip-format": "{player} • {album} • {position}/{length}",
+    // No {position}/{length} here: waybar leaves them at 00:00:00 for several
+    // players (mpv, Firefox video). The elapsed pill next to it asks playerctl.
+    "tooltip-format": "{player} • {album}",
     "player-icons": {
       "default": "\uf001",
       "mpv": "\uf03d",
@@ -125,8 +128,18 @@
   },
   "clock": {
     "format": "{:%d/%m %H:%M}",
-    "format-alt": "{:%H:%M}",
+    // No format-alt on purpose: waybar toggles it on every left click, and rapid
+    // clicking used to leave the pill flickering between two widths. The date
+    // never changes size, so the row stays put.
     "tooltip-format": "<tt>{calendar}</tt>"
+  },
+  "custom/media": {
+    "exec": "$HOME/.local/bin/archway-bar media",
+    "return-type": "json",
+    "interval": 1,
+    "on-click": "playerctl play-pause",
+    "on-click-right": "playerctl stop",
+    "tooltip": true
   },
   "custom/nowplaying": {
     "exec": "$HOME/.local/bin/archway-bar nowplaying",
@@ -166,7 +179,10 @@
     "exec": "$HOME/.local/bin/archway-bar updates",
     "return-type": "json",
     "interval": 1800,
-    "on-click": "kitty -e $HOME/.local/bin/archway update --dry-run",
+    // `checkupdates` prints the list and waits: a terminal keeps the output
+    // readable instead of a dry-run that only re-checks.
+    "on-click": "kitty --class floating-term -e sh -c 'checkupdates; echo; read'",
+    "on-click-right": "$HOME/.local/bin/archway update --dry-run",
     "tooltip": true
   },
   "custom/vault": {
@@ -271,11 +287,13 @@
     "tooltip-format": "{timeTo}",
     "on-click": "$HOME/.local/bin/archway applet power --rofi"
   },
-  "custom/power-profile": {
-    "exec": "$HOME/.local/bin/archway-bar power-profile",
+  // The rocket pill: gaming mode on the left click, power profile on the right.
+  "custom/gaming": {
+    "exec": "$HOME/.local/bin/archway-bar gaming",
     "return-type": "json",
-    "interval": 30,
-    "on-click": "$HOME/.local/bin/archway-bar power-profile --next",
+    "interval": 10,
+    "on-click": "$HOME/.local/bin/archway applet gaming toggle",
+    "on-click-right": "$HOME/.local/bin/archway-bar power-profile --next",
     "tooltip": true
   },
   "tray": {

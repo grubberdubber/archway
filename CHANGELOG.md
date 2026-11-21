@@ -9,6 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `window` applet and `Super+Shift+F` as **almost fullscreen**: the window fills
+  the whole work area (monitor minus the bar's reserved space) so the bar and
+  its icons stay visible, and pressing it again returns to the layout. True
+  fullscreen stays on `Super+F`. Measured on 1366x768: maximize is 1348x720 at
+  `9,39`, fullscreen is 1366x768 at `0,0`. Toggle floating moved to
+  `Super+Alt+F`, which also fixes the old key doing two unrelated things.
+- `gaming` applet and the rocket pill in the bar: one switch for performance
+  power profile, do-not-disturb and paused `hypridle` (SIGSTOP, not killed), all
+  restored on the way out. Right click on the pill still cycles the power
+  profile. `Super+Alt+G` toggles it too. No root, no service changes.
+- `archway applet terminal --pick | --set | --print`: choose the default
+  terminal (kitty, alacritty, ghostty, wezterm, foot) from rofi or the CLI; the
+  choice is stored in `~/.config/archway/terminal` and survives sessions.
+  `Super+Ctrl+Return` opens the picker. Added an `alacritty` theme module, so an
+  existing `alacritty.toml` can import
+  `~/.config/archway/theme.d/alacritty-theme.toml`; the config file itself stays
+  user-owned because many people (including this repo's owner) already run a
+  customised one.
+- Thunar as the file manager behind `Super+E` (Yazi moved to `Super+Alt+E`),
+  with a curated `thunar.xml` (details view, folders first, thumbnails, volume
+  management on, single click off), six custom actions (open terminal here, open
+  in yazi, edit with Neovim, copy path, extract here, refresh thumbnails) and the
+  packages that make them work (`thunar-volman`, `thunar-archive-plugin`,
+  `tumbler`, `ffmpegthumbnailer`, `poppler-glib`, `file-roller`).
+- `Super+Tab` opens the rofi window switcher.
+- `docs/keyd.md`: the one-hand numpad layer (CapsLock tap = Esc, hold = numpad),
+  install/reload/test steps, the optional navigation layer, known interactions
+  with games and other remappers, and how to remove it.
+- `custom/media` pill: real elapsed/length time from `playerctl`, refreshed every
+  second, next to the media title.
+
 - `terminal` applet, now behind `Super+Return`: the new terminal opens on the
   side of the workspace the cursor is on (`left`, `right`, `up`, `down`), not on
   the side dwindle guesses from the focused window, which turned a bottom-of-
@@ -135,6 +166,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   trackpad, classic wheel direction on mice (`hl.device` rule included).
 
 ### Fixed
+
+- An existing `~/.config/alacritty/alacritty.toml` is no longer replaced: the
+  first attempt at the terminal selector shipped one, and chezmoi overwrote a
+  customised config (restored from the backup; the file is now out of the repo).
+  Only the theme module is generated.
+- Every window is square (`square-windows` rule, `rounding = 0` for all classes):
+  a compositor-rounded corner arcs the border over the first cells of the
+  content, which shows as a frame inside terminals, editors and browsers.
+- **Themes reach open terminals.** `archway theme set` now sends the new colours
+  (and a config reload) to every kitty listening on
+  `/tmp/kitty-archway-<pid>`; before, it only worked from a kitty shell, because
+  it relied on `KITTY_LISTEN_ON`, which the applet launched from a keybind or
+  rofi never inherits. Running terminals now change theme without restarting.
+- **Wallpapers apply again.** hyprpaper 0.8 dropped the `hyprctl hyprpaper`
+  requests Archway used (`preload`, `unload`): every apply failed with
+  "invalid hyprpaper request". The applet now uses the two requests that still
+  exist (`wallpaper`, confirmed with `listactive`) and persists the choice in the
+  0.8 `wallpaper { monitor = / path = / fit_mode = }` block syntax, so the last
+  wallpaper also comes back at session start.
+- Bar button that looked dead: the pending-updates pill stays visible when the
+  system is up to date (muted check instead of a hidden module), and its click
+  opens the real `checkupdates` list instead of a dry-run.
+- Media tooltip no longer shows `00:00:00` forever (waybar's `{position}` is not
+  reported by several players); the elapsed pill next to it asks `playerctl`.
+- Clock no longer flickers between two widths on repeated clicks: `format-alt`
+  was toggled by every left click and is gone.
+- Notification control centre is a square sheet flush to the screen edge
+  (right and bottom margins 0, right corners square) instead of a rounded card
+  floating with a strip of wallpaper around it.
+- Terminal rendering of `==`, `==>`, `>=`, `<=` and `->`: ligatures are disabled,
+  so two-character operators stay two characters in kitty and in Neovim instead
+  of turning into arrows and math glyphs.
+- Touchpad scrolling in Neovim: `pixel_scroll no` plus
+  `touch_scroll_multiplier 1.0`. kitty >= 0.46 turns Wayland gestures into pixel
+  deltas with its own momentum, which kept scrolling after the fingers stopped
+  and made wheel-up at the end of a markdown buffer look ignored.
+- kitty is translucent (0.92) with fully opaque text, and terminals stay square,
+  so the wallpaper shows through without a ghost frame over the grid.
 
 - The touchpad lost its right click: `input.touchpad.clickfinger_behavior` was
   on, so a physical press counted fingers instead of using the button areas and

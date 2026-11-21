@@ -9,6 +9,10 @@
 # only exists while there is something to act on (AGENTS.md §9.2).
 set -Eeuo pipefail
 
+# `archway-bar` is a symlink into ~/.local/bin, so resolve the checkout from the
+# real path to reach the sibling applets.
+ARCHWAY_ROOT=${ARCHWAY_ROOT:-$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/../.." && pwd)}
+
 # Nerd Font glyphs as escapes: the terminal/tooling used to write this file
 # drops private-use characters, so they are built at runtime.
 icon() {
@@ -68,18 +72,60 @@ section_failed() {
 }
 
 # Pending package updates. `checkupdates` is offline-safe (sync db copy).
+# The pill stays visible at zero: hiding it made the button look broken ("the
+# updates button does nothing") exactly when the system was up to date.
 section_updates() {
   local count
   have checkupdates || {
-    emit ""
+    emit "$(icon f019) ?" "checkupdates is not installed (pacman-contrib)" muted
     return 0
   }
   count=$(checkupdates 2> /dev/null | grep -c . || true)
   if [[ ${count:-0} -eq 0 ]]; then
-    emit ""
+    emit "$(icon f00c)" "system is up to date — click to check again" muted
     return 0
   fi
-  emit "$(icon f019) ${count}" "${count} package update(s) available" warning
+  emit "$(icon f019) ${count}" "${count} package update(s) available — click to list them" warning
+}
+
+# Real playback position. waybar's `{position}`/`{length}` inside the mpris
+# tooltip stays at 00:00:00 for several players (mpv, Firefox video), so the
+# number comes from playerctl, which asks the player itself.
+section_media() {
+  local status
+  have playerctl || {
+    emit ""
+    return 0
+  }
+  status=$(playerctl status 2> /dev/null || true)
+  [[ -n $status ]] || {
+    emit ""
+    return 0
+  }
+  local elapsed length text
+  elapsed=$(playerctl position 2> /dev/null | awk '{printf "%d:%02d", $1 / 60, $1 % 60}' || true)
+  length=$(playerctl metadata --format '{{duration(mpris:length)}}' 2> /dev/null || true)
+  [[ -n $elapsed ]] || {
+    emit ""
+    return 0
+  }
+  text="${elapsed}"
+  [[ -n $length && $length != 0:00 ]] && text+="/${length}"
+  emit "$text" "${status} — ${text}" muted
+}
+
+# Gaming mode (applets/gaming): the rocket pill next to the power button.
+section_gaming() {
+  local applet="$ARCHWAY_ROOT/applets/gaming/gaming.sh"
+  [[ -x $applet ]] || {
+    emit ""
+    return 0
+  }
+  if "$applet" status --json 2> /dev/null | grep -q '"enabled":true'; then
+    emit "$(icon f135)" "gaming mode on — click to turn it off" active
+  else
+    emit "$(icon f135)" "gaming mode off — click for performance, DND, no idle" inactive
+  fi
 }
 
 # Bitwarden vault locked: warns before an autofill silently fails.
@@ -293,10 +339,11 @@ usage: bar.sh <section>
 sections:
   recording | failed | updates | vault | vpn | notifications
   resources | disk | nightlight | power-profile | scratchpad | language
-  nowplaying
+  nowplaying | media | gaming
 
   nightlight --toggle      turn the night light on or off
   power-profile --next     cycle performance -> balanced -> power-saver
+  gaming --toggle          enable or disable gaming mode
 
 Each section prints one waybar custom-module JSON object; an empty text means
 "hide this module", which is how the bar stays short.
@@ -313,6 +360,13 @@ main() {
     vpn) section_vpn ;;
     notifications) section_notifications ;;
     nowplaying) section_nowplaying ;;
+    media) section_media ;;
+    gaming)
+      if [[ ${2:-} == --toggle ]]; then
+        exec "$ARCHWAY_ROOT/applets/gaming/gaming.sh" toggle
+      fi
+      section_gaming
+      ;;
     resources) section_resources ;;
     disk) section_disk ;;
     scratchpad) section_scratchpad ;;

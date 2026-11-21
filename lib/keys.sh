@@ -234,7 +234,9 @@ keys_hypr_action() {
   case $disp in
     exec) printf 'hl.dsp.exec_cmd(%s)' "$(keys_lua_str "$arg")" ;;
     killactive) printf 'hl.dsp.window.close()' ;;
-    fullscreen) printf 'hl.dsp.window.fullscreen()' ;;
+    # Explicit mode: the no-argument form toggles whatever state the window is
+    # in, so a fullscreen bind could land on "maximized" instead.
+    fullscreen) printf 'hl.dsp.window.fullscreen({ mode = "fullscreen" })' ;;
     togglefloating) printf 'hl.dsp.window.float({ action = "toggle" })' ;;
     reload) printf 'hl.dsp.reload_config()' ;;
     movefocus) printf 'hl.dsp.focus({ direction = "%s" })' "$(keys_direction "$arg")" ;;

@@ -643,7 +643,9 @@ selection_bg= "#1F2A3A"
 | `Super+Shift+Return`  | Terminal flotante (scratchpad)       |
 | `Super+Q`             | Cerrar ventana                       |
 | `Super+D`             | Launcher                             |
-| `Super+E`             | Gestor de archivos (Yazi/Thunar)     |
+| `Super+E`             | Gestor de archivos (Thunar)          |
+| `Super+Alt+E`         | Gestor de archivos TUI (Yazi)        |
+| `Super+Ctrl+Return`   | Elegir terminal por defecto (rofi)   |
 | `Super+B`             | Navegador                            |
 | `Super+Escape`        | Bloquear                             |
 | `Super+Shift+Q`       | Menú de energía                      |
@@ -662,8 +664,10 @@ selection_bg= "#1F2A3A"
 | `Super+H/J/K/L`       | Foco                                 |
 | `Super+Shift+H/J/K/L` | Mover ventana                        |
 | `Super+Alt+H/J/K/L`   | Redimensionar                        |
-| `Super+F`             | Fullscreen                           |
-| `Super+Shift+F`       | Flotante                             |
+| `Super+F`             | Fullscreen (tapa la barra)           |
+| `Super+Shift+F`       | Semi-fullscreen / maximizar (la barra sigue visible) |
+| `Super+Alt+F`         | Flotante                             |
+| `Super+Alt+G`         | Modo gaming (rendimiento, DND, sin idle) |
 | `Super+Alt+R`         | Recargar WM                          |
 | `Super+Shift+E`       | Salir/cerrar sesión                  |
 | `Super+/`             | Cheatsheet                           |

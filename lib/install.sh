@@ -16,8 +16,12 @@ archway_config_paths() {
     "$XDG_CONFIG_HOME/waybar" \
     "$XDG_CONFIG_HOME/swaync" \
     "$XDG_CONFIG_HOME/kitty" \
+    "$XDG_CONFIG_HOME/alacritty" \
     "$XDG_CONFIG_HOME/rofi" \
     "$XDG_CONFIG_HOME/tmux" \
+    "$XDG_CONFIG_HOME/thunar" \
+    "$XDG_CONFIG_HOME/Thunar" \
+    "$XDG_CONFIG_HOME/xfce4" \
     "$XDG_CONFIG_HOME/zsh" \
     "$XDG_CONFIG_HOME/starship.toml"; do
     if [[ -e $p ]]; then

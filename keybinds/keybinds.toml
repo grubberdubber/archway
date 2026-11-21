@@ -35,9 +35,30 @@ description = "Application launcher"
 [[keybind]]
 id = "file-manager"
 keys = "super + e"
+command = "thunar"
+category = "apps"
+description = "File manager (Thunar)"
+
+[[keybind]]
+id = "file-manager-tui"
+keys = "super + alt + e"
 command = "kitty --class floating-term -e yazi"
 category = "apps"
-description = "File manager (yazi)"
+description = "File manager (yazi, TUI)"
+
+[[keybind]]
+id = "terminal-picker"
+keys = "super + ctrl + Return"
+command = "$HOME/.local/bin/archway applet terminal --pick"
+category = "apps"
+description = "Choose the default terminal"
+
+[[keybind]]
+id = "window-switcher"
+keys = "super + Tab"
+command = "rofi -show window"
+category = "navigation"
+description = "Switch window (rofi)"
 
 [[keybind]]
 id = "browser"
@@ -68,12 +89,30 @@ argument = "0"
 category = "windows"
 description = "Toggle fullscreen"
 
+# Super+Shift+F is "almost fullscreen": the window fills the work area and the
+# bar keeps its icons (true fullscreen is Super+F and paints over it). It
+# toggles: a maximised window goes back to the layout.
+[[keybind]]
+id = "window-maximize"
+keys = "super + shift + f"
+command = "$HOME/.local/bin/archway applet window maximize"
+category = "windows"
+description = "Maximize (keeps the bar visible)"
+
+# Floating moved here; Super+Shift+F now maximises.
 [[keybind]]
 id = "window-floating"
-keys = "super + shift + f"
+keys = "super + alt + f"
 dispatcher = "togglefloating"
 category = "windows"
 description = "Toggle floating"
+
+[[keybind]]
+id = "gaming-mode"
+keys = "super + alt + g"
+command = "$HOME/.local/bin/archway applet gaming toggle"
+category = "system"
+description = "Gaming mode (performance, DND, no idle)"
 
 [[keybind]]
 id = "focus-west"

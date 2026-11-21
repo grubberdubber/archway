@@ -96,6 +96,16 @@ hl.device({ name = ".*[Mm]ouse.*", natural_scroll = false })
 -- Three-finger horizontal swipe switches workspaces (no compositor animation).
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
+-- Every window is square. The theme still carries a corner radius for cards
+-- inside apps (rofi, swaync, the bar pills), but a compositor-rounded window
+-- arcs the border over the first cells of the content, which reads as a frame
+-- inside terminals, editors and browsers alike.
+hl.window_rule({
+  name = "square-windows",
+  match = { class = ".*" },
+  rounding = 0,
+})
+
 -- Some toolkits (kitty included) ask to be maximized on map; tiling is the
 -- whole point of this desktop, so the request is dropped instead of honoured.
 hl.window_rule({
