@@ -152,9 +152,10 @@ case $MODE in
     ;;
 esac
 
+# The program is only required when something is actually started; --dry-run and
+# --json must work on a machine without any terminal installed (CI containers).
 TERMINAL=$(default_terminal)
 TERMINAL_PROGRAM=$(program_of "$TERMINAL")
-have "$TERMINAL_PROGRAM" || die "default terminal '$TERMINAL_PROGRAM' is not installed (archway applet terminal --pick)" 3
 
 # ---------------------------------------------------------------- pointer ---
 
@@ -208,6 +209,8 @@ if ((DRY_RUN)); then
 fi
 
 # ----------------------------------------------------------------- spawn ---
+
+have "$TERMINAL_PROGRAM" || die "default terminal '$TERMINAL_PROGRAM' is not installed (archway applet terminal --pick)" 3
 
 # The window map is compared by pid: the terminal we started is the one to look
 # at, even when another window opens at the same time.
