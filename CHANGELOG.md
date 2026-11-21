@@ -126,6 +126,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from a keybind, so `Super+Alt+N` could not turn keyd off while the same command
   worked in a terminal. The keyd applet now says so explicitly (exit 3) instead
   of reporting a generic failure.
+- `archway doctor` gains `theme.yazi`: it compares the generated Yazi theme with
+  the live one, so a stale `theme.toml` (the app silently keeping the previous
+  palette) is one line of output instead of a mystery.
 - Thunar's remaining bright edges are gone: the menubar/toolbar, list column
   headers, treeview row separators and the scrollbar slider no longer inherit
   gradients or light borders from the stock GTK theme, the scroll edge shadows

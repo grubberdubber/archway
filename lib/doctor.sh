@@ -93,6 +93,19 @@ doctor_run() {
   detail=$(current_theme)
   doctor_add "theme.current" ok "$detail"
 
+  # Tools that read one generated file by fixed path. If the file drifts from
+  # what the theme renders, the app silently keeps the previous palette.
+  local yazi_live="$XDG_CONFIG_HOME/yazi/theme.toml" yazi_src="$THEME_D_DIR/yazi-theme.toml"
+  if [[ ! -d $XDG_CONFIG_HOME/yazi ]]; then
+    doctor_add "theme.yazi" ok "yazi not configured"
+  elif [[ ! -e $yazi_live ]]; then
+    doctor_add "theme.yazi" warn "theme.toml missing; run 'archway theme set $(current_theme)'"
+  elif [[ -f $yazi_src ]] && ! keys_same_content "$yazi_src" "$yazi_live"; then
+    doctor_add "theme.yazi" warn "theme.toml is stale; run 'archway theme set $(current_theme)'"
+  else
+    doctor_add "theme.yazi" ok "up to date"
+  fi
+
   # 5. Keybinds + generated artifacts
   if keys_validate > /dev/null 2>&1; then
     doctor_add "keybinds" ok "valid"
