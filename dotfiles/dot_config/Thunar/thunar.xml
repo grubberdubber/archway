@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Thunar settings tuned for a keyboard-first, 1366x768 laptop.
+     Colours come from the GTK theme (dot_config/gtk-3.0/gtk.css), not here.
+     Details view + ISO dates + folders first: sortable, unambiguous, dense. -->
+<channel name="thunar" version="1.0">
+  <property name="last-view" type="string" value="ThunarDetailsView"/>
+  <property name="last-location-bar" type="string" value="ThunarLocationEntry"/>
+  <property name="last-side-pane" type="string" value="THUNAR_SIDEPANE_SHORTCUTS"/>
+  <property name="last-details-view-zoom-level" type="string" value="THUNAR_ZOOM_LEVEL_100_PERCENT"/>
+  <property name="last-details-view-column-order" type="string" value="THUNAR_COLUMN_NAME,THUNAR_COLUMN_SIZE,THUNAR_COLUMN_TYPE,THUNAR_COLUMN_DATE_MODIFIED"/>
+  <property name="last-details-view-visible-columns" type="string" value="THUNAR_COLUMN_DATE_MODIFIED,THUNAR_COLUMN_NAME,THUNAR_COLUMN_SIZE,THUNAR_COLUMN_TYPE"/>
+  <property name="last-details-view-fixed-columns" type="bool" value="false"/>
+  <property name="last-window-width" type="int" value="1180"/>
+  <property name="last-window-height" type="int" value="720"/>
+  <property name="last-window-maximized" type="bool" value="false"/>
+  <property name="last-show-hidden" type="bool" value="false"/>
+
+  <!-- Single click stays off: with a keyboard-first setup, accidental opens
+       from a trackpad tap are the most common complaint. -->
+  <property name="misc-single-click" type="bool" value="false"/>
+  <property name="misc-folders-first" type="bool" value="true"/>
+  <property name="misc-text-beside-icons" type="bool" value="true"/>
+  <!-- LOCAL_ONLY: no network round-trips while browsing, and no thumbnail
+       daemon spinning on a remote mount. -->
+  <property name="misc-thumbnail-mode" type="string" value="THUNAR_THUMBNAIL_MODE_LOCAL_ONLY"/>
+  <property name="misc-date-style" type="string" value="THUNAR_DATE_STYLE_ISO"/>
+  <property name="misc-show-delete-action" type="bool" value="true"/>
+  <property name="misc-volume-management" type="bool" value="true"/>
+  <property name="misc-full-path-in-tab-title" type="bool" value="true"/>
+  <property name="misc-file-size-binary" type="bool" value="false"/>
+</channel>

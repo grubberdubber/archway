@@ -28,6 +28,7 @@ declare -gA THEME_TARGETS=(
   [fzf]=fzf.sh
   [bat]=archway.tmTheme
   [alacritty]=alacritty-theme.toml
+  [gtk]=gtk.css
 )
 
 # Templates shared by every theme live here; a theme only ships the modules it
@@ -361,6 +362,9 @@ theme_publish_generated() {
   local swaync_dir="$XDG_CONFIG_HOME/swaync"
   local swayosd_dir="$XDG_CONFIG_HOME/swayosd"
   local bat_dir="$XDG_CONFIG_HOME/bat/themes"
+  # GTK3 reads exactly one gtk.css per user; publishing as archway.css keeps it
+  # side by side with a gtk.css the user owns, which imports it in one line.
+  local gtk_dir="$XDG_CONFIG_HOME/gtk-3.0"
   local f
 
   if [[ -f $THEME_D_DIR/waybar.css ]]; then
@@ -378,6 +382,11 @@ theme_publish_generated() {
     mkdir -p -- "$swayosd_dir"
     cp -f -- "$THEME_D_DIR/swayosd.css" "$swayosd_dir/style.css"
     record_managed "$swayosd_dir/style.css" theme
+  fi
+  if [[ -f $THEME_D_DIR/gtk.css ]]; then
+    mkdir -p -- "$gtk_dir"
+    cp -f -- "$THEME_D_DIR/gtk.css" "$gtk_dir/archway.css"
+    record_managed "$gtk_dir/archway.css" theme
   fi
   for f in "$THEME_D_DIR"/*.tmTheme; do
     [[ -e $f ]] || continue

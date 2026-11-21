@@ -343,6 +343,110 @@ JSON
   assert_contains "$output" "is not installed"
 }
 
+# ------------------------------------------------------------ password -----
+
+@test "password status reports the tooling and the vault lock" {
+  mock_cmd rbw 'case $1 in unlocked) exit 1 ;; lock) exit 0 ;; esac'
+  mock_cmd rofi-rbw 'exit 0'
+  run "$ARCHWAY_ROOT/applets/password/password.sh" status --json
+  assert_eq 0 "$status"
+  assert_contains "$output" '"installed":true'
+  assert_contains "$output" '"unlocked":false'
+  assert_contains "$output" '"picker":true'
+}
+
+@test "password --rofi copies through rofi-rbw with a clipboard timeout" {
+  mock_cmd rbw 'case $1 in unlocked) exit 0 ;; esac'
+  mock_cmd rofi-rbw 'printf "%s\n" "$*" >> "$HOME/picker.log"'
+  mock_cmd notify-send 'exit 0'
+  run "$ARCHWAY_ROOT/applets/password/password.sh" --rofi
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/picker.log" "--action copy"
+  assert_file_contains "$HOME/picker.log" "--clear 30"
+}
+
+@test "password lock asks the agent to lock and never logs a secret" {
+  mock_cmd rbw 'printf "%s\n" "$*" >> "$HOME/rbw.log"'
+  mock_cmd notify-send 'exit 0'
+  run "$ARCHWAY_ROOT/applets/password/password.sh" lock
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/rbw.log" "lock"
+}
+
+@test "password dry-run prints the picker command without opening it" {
+  mock_cmd rbw 'exit 0'
+  mock_cmd rofi-rbw 'printf "%s\n" "$*" >> "$HOME/picker.log"'
+  run "$ARCHWAY_ROOT/applets/password/password.sh" --dry-run --rofi
+  assert_eq 0 "$status"
+  assert_contains "$output" "[dry-run] rofi-rbw"
+  assert_missing "$HOME/picker.log"
+}
+
+# ----------------------------------------------------------- bluetooth -----
+
+_bt_mocks() {
+  export BT_POWERED_FILE="$HOME/bt-powered"
+  printf 'yes\n' > "$BT_POWERED_FILE"
+  mock_cmd notify-send 'exit 0'
+  mock_cmd timeout 'shift; "$@"'
+  mock_cmd bluetoothctl 'case $1 in
+    show) printf "Controller AA:BB:CC:DD:EE:00\n\tPowered: %s\n" "$(cat "$BT_POWERED_FILE")" ;;
+    devices) printf "Device AA:BB:CC:DD:EE:01 Headphones\nDevice AA:BB:CC:DD:EE:02 Mouse\n" ;;
+    info) [[ $2 == *01 ]] && printf "\tConnected: yes\n" || printf "\tConnected: no\n" ;;
+    power) if [[ $2 == off ]]; then printf 'no\n' > "$BT_POWERED_FILE"; else printf 'yes\n' > "$BT_POWERED_FILE"; fi; printf "succeeded\n" ;;
+    connect) printf "Connection successful\n" ;;
+    disconnect) printf "Successful disconnected\n" ;;
+    *) exit 0 ;;
+  esac'
+}
+
+@test "bluetooth status lists the adapter and the connected devices" {
+  _bt_mocks
+  run "$ARCHWAY_ROOT/applets/bluetooth/bluetooth.sh" status
+  assert_eq 0 "$status"
+  assert_contains "$output" "bluetooth: yes"
+  assert_contains "$output" "Headphones"
+  [[ $output != *Mouse* ]] || fail "a disconnected device was reported"
+}
+
+@test "bluetooth status --json reports power and connections" {
+  _bt_mocks
+  run "$ARCHWAY_ROOT/applets/bluetooth/bluetooth.sh" status --json
+  assert_eq 0 "$status"
+  assert_contains "$output" '"powered":true'
+  assert_contains "$output" '"connected":["Headphones"]'
+}
+
+@test "bluetooth power toggle flips the adapter" {
+  _bt_mocks
+  run "$ARCHWAY_ROOT/applets/bluetooth/bluetooth.sh" --power toggle
+  assert_eq 0 "$status"
+  assert_file_contains "$BT_POWERED_FILE" "no"
+  run "$ARCHWAY_ROOT/applets/bluetooth/bluetooth.sh" --power toggle
+  assert_eq 0 "$status"
+  assert_file_contains "$BT_POWERED_FILE" "yes"
+}
+
+@test "bluetooth connect reports a failure instead of pretending" {
+  _bt_mocks
+  mock_cmd bluetoothctl '[[ $1 == show ]] && printf "\tPowered: yes\n" && exit 0
+    printf "Failed to connect: org.bluez.Error.NotReady\n"'
+  run "$ARCHWAY_ROOT/applets/bluetooth/bluetooth.sh" --connect AA:BB:CC:DD:EE:01
+  assert_eq 1 "$status"
+  assert_contains "$output" "could not connect"
+}
+
+@test "bluetooth dry-run prints the command and keeps the adapter state" {
+  _bt_mocks
+  mock_cmd bluetoothctl 'printf "%s\n" "$*" >> "$HOME/bt.log"
+    [[ $1 == show ]] && printf "\tPowered: yes\n" && exit 0
+    exit 0'
+  run "$ARCHWAY_ROOT/applets/bluetooth/bluetooth.sh" --dry-run --power off
+  assert_eq 0 "$status"
+  assert_contains "$output" "[dry-run] bluetoothctl power off"
+  [[ $(cat "$HOME/bt.log") != *"power off"* ]] || fail "dry-run changed the adapter"
+}
+
 # ---------------------------------------------------------------- keyd -----
 
 # The applet must be testable without root and without touching the real /etc:

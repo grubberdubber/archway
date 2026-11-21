@@ -105,6 +105,26 @@ doctor_run() {
     doctor_add "keybinds.generated" warn "generated files are stale (archway keys generate)"
   fi
 
+  # 5a. Did the running session actually load the generated binds? Editing
+  # keybinds.toml changes nothing until Hyprland reloads, and a chord that is
+  # not loaded leaks to the focused window instead of failing loudly.
+  keys_parse
+  local bind_count=${#K_ID[@]} missing_binds='' loaded_rc=0
+  missing_binds=$(keys_loaded_missing) || loaded_rc=$?
+  case $loaded_rc in
+    0) doctor_add "keybinds.loaded" ok "running session has all $bind_count binds" ;;
+    2) doctor_add "keybinds.loaded" warn "no running Hyprland session to query" ;;
+    *)
+      if keys_live_stale; then
+        doctor_add "keybinds.loaded" warn \
+          "$(grep -c . <<< "$missing_binds") of $bind_count not in the session; the live file is stale: archway keys generate"
+      else
+        doctor_add "keybinds.loaded" warn \
+          "$(grep -c . <<< "$missing_binds") of $bind_count not loaded; press Super+Alt+R or log out"
+      fi
+      ;;
+  esac
+
   # 5b. Compositor and session components (ADR-013, ADR-014)
   if [[ -f $COMPAT_FILE ]]; then
     local hypr_status hypr_detail

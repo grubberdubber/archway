@@ -9,8 +9,8 @@ Archway owns the whole lifecycle from one applet, so you never hand-edit `/etc`:
 
 | What you want | Command |
 |---|---|
-| Turn it on | `Super + Ctrl + K` (toggle) or `archway applet keyd on` |
-| Turn it off | `Super + Ctrl + K` again, or `archway applet keyd off` |
+| Turn it on | `Super + Alt + N` (toggle) or `archway applet keyd on` |
+| Turn it off | `Super + Alt + N` again, or `archway applet keyd off` |
 | See the state | `archway applet keyd status [--json]` |
 | Write the layer | `archway applet keyd install` (add `--replace` to reset an edit) |
 | Apply an edit | `archway applet keyd reload` |
@@ -28,6 +28,13 @@ sudo pacman -S keyd
 `archway install` already provides it. The service is **not** enabled by the
 installer: a keyboard remap can fight an existing one (or a game that reads
 evdev directly), so it stays off until you ask for it.
+
+Why `Super+Alt+N` and not a `Ctrl` chord: a keybind only works once Hyprland
+has reloaded it. If the session is running an older config, the chord is
+forwarded to the focused window instead — and `Ctrl+K` is readline's kill-line,
+so it silently eats the line you were typing in a terminal. `N` is the numpad
+mnemonic, and `archway doctor` reports binds that the running session never
+loaded (`keybinds.loaded`) so the failure is visible instead of mysterious.
 
 ## 2. Turn it on
 

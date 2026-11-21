@@ -1,0 +1,30 @@
+# Ember theme metadata.
+id = "ember"
+name = "Ember"
+variant = "dark"
+schema = 1
+version = "0.1.0"
+description = "Warm dark theme: charcoal-brown surfaces, peach accent, square corners. Proves the palette engine: a full theme is one palette file plus this metadata."
+inspiration = "Emberlight / low-blue-light terminals; hand-mixed, no vendor assets."
+license = "GPL-3.0-or-later"
+wallpapers = "none (original assets required before shipping any; Super+Alt+W picks from your own folders)"
+
+[variants]
+dark = "palette.toml"
+light = "planned"
+high_contrast = "planned"
+
+[targets]
+kitty = "terminal"
+hyprland = "compositor (borders, gaps, opacity)"
+waybar = "status bar"
+swaync = "notifications"
+swayosd = "volume / brightness OSD"
+hyprlock = "lock screen"
+rofi = "launcher and applets"
+tmux = "multiplexer"
+starship = "shell prompt"
+fzf = "fuzzy finder"
+bat = "pager / syntax highlighting"
+gtk = "GTK3 apps (Thunar, file dialogs)"
+nvim = "artifact consumed through grubberdubber/nvim-config hook"

@@ -96,3 +96,20 @@ EOF
   assert_eq "|Print" "$(keys_split_chord 'Print')"
   assert_eq "CTRL ALT|Escape" "$(keys_split_chord 'ctrl + alt + Escape')"
 }
+
+@test "binds not loaded by the running session are named" {
+  # A stale compositor is silent: the chord falls through to the focused app.
+  export HYPRLAND_INSTANCE_SIGNATURE=fake-session
+  mock_cmd hyprctl 'printf "%s\n" "[{\"modmask\":64,\"key\":\"K\"},{\"modmask\":65,\"key\":\"K\"},{\"modmask\":72,\"key\":\"K\"}]"'
+  run keys_loaded_missing
+  assert_eq 1 "$status"
+  assert_contains "$output" "super + alt + n"
+  assert_contains "$output" "super + slash"
+}
+
+@test "no compositor session skips the loaded-bind check" {
+  unset HYPRLAND_INSTANCE_SIGNATURE
+  run keys_loaded_missing
+  assert_eq 2 "$status"
+  assert_eq "" "$output"
+}

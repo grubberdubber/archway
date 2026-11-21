@@ -9,7 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `keyd` applet and `Super+Ctrl+K`: turn the one-hand numpad layer on and off
+- `password` applet behind `Super+P`: rbw/rofi-rbw with a notification, a
+  `--type username` option, `lock`, and a clipboard that clears after 30 s
+  (`PASSWORD_CLEAR_SECONDS`). Secrets stay in the vault; the applet never logs
+  them. Replaces the bare `rofi-rbw` binding.
+- `bluetooth` applet behind `Super+Shift+B`: adapter on/off, scan, connect and
+  disconnect through `bluetoothctl` in a rofi menu, plus `status --json` for the
+  bar and `doctor`. Forgetting a pairing stays a manual, deliberate action.
+- Second selectable theme, **Ember**: warm charcoal-brown surfaces with a peach
+  accent and square corners. It is one `palette.toml` plus metadata — no app was
+  touched — which is the point: `archway theme set ember` (or the Super+Space
+  selector) recolours the whole desktop, GTK included.
+- `keyd` applet and `Super+Alt+N`: turn the one-hand numpad layer on and off
   without touching `/etc` by hand. `on`/`off`/`toggle` only touch the systemd
   service (idempotent, no root kept around), `install` writes the packaged
   `applets/keyd/default.conf` and refuses a file Archway does not own unless
@@ -93,6 +104,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rofi/waybar icons.
 
 ### Changed
+
+- **keyd moved to `Super+Alt+N`** and the applet reports what it actually did.
+  `Super+Ctrl+K` was a bad chord: if the bind is not loaded (a session running
+  an older config, a failed reload) the keypress is forwarded to the focused
+  window, and Ctrl+K is readline's kill-line, so it ate text in terminals
+  instead of failing visibly. `archway doctor` now asks `hyprctl binds` what the
+  running session loaded (`keybinds.loaded`) and names the chords that are
+  missing, which turns that whole class of bug into one line of output.
+- GTK3 is now a theme module: `themes/_shared/gtk/gtk.css` recolours every GTK3
+  app from `palette.toml` (window/sidebar/list surfaces, selection, focus
+  outline, square corners) and is published as `~/.config/gtk-3.0/archway.css`,
+  imported by the tracked `gtk.css`. Thunar, file dialogs and the rest of the
+  GTK stack now follow the active theme instead of a separate GTK theme.
+- Thunar is tuned for a keyboard-first 1366x768 laptop: details view with ISO
+  dates, folders first, single click off, name/size/type/modified columns, path
+  entry instead of breadcrumbs, `LOCAL_ONLY` thumbnails and a delete action in
+  the menu (`dotfiles/dot_config/Thunar/thunar.xml`).
 
 - Workspaces now show where the windows are: a workspace with windows keeps
   full-brightness text plus a `primary` hairline under the number, an empty one

@@ -1,0 +1,9 @@
+/* Archway entry point for GTK3.
+ *
+ * The real stylesheet is generated from the active palette and published next
+ * to this file as archway.css by `archway theme set`, so switching themes
+ * recolours Thunar, file dialogs and every other GTK3 app without touching
+ * anything here. Keeping the import in a tracked file means a user's own rules
+ * can live in this file below the import and survive theme changes.
+ */
+@import url("archway.css");

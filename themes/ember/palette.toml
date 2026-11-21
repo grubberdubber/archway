@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Ember — warm dark theme: charcoal-brown surfaces with a peach accent.
+# Hand-written, contrast-checked by `archway theme validate`.
+# Applications ship one template set in themes/_shared; only the palette changes,
+# which is why a new colour scheme is one file and not fifteen.
+
+[palette]
+theme_name  = "Ember"
+bg          = "#0F0B09"
+surface     = "#16110E"
+surface_alt = "#1F1813"
+overlay     = "#2A211A"
+border      = "#3B2F25"
+text        = "#F3EBE3"
+text_muted  = "#B4A295"
+primary     = "#F5A97F"
+secondary   = "#E7C07B"
+tertiary    = "#E8A0B4"
+error       = "#F08C8C"
+warning     = "#FDD663"
+success     = "#9FD08A"
+selection   = "#F5A97F"
+selection_bg = "#3A2A20"
+
+[geometry]
+radius_window = 0
+radius_input  = 0
+radius_pill   = 999
+padding       = 12
+border_width  = 1
+focus_width   = 2
+
+[typography]
+font_mono     = "JetBrainsMono Nerd Font"
+font_ui       = "Inter"
+font_fallback = "Noto Sans"
+font_size     = 11
+
+[effects]
+opacity      = 0.98
+transitions  = 120
+reduce_motion = 1

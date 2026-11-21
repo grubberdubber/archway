@@ -1,0 +1,255 @@
+/* Archway — GTK3 recolour from the active palette. Generated; do not edit.
+ *
+ * This does not ship a GTK theme: it overrides the theme variables every GTK3
+ * widget reads, so Thunar, file pickers and the rest of the GTK stack follow
+ * `palette.toml` while keeping whatever engine the user already had. Square
+ * corners are deliberate (Archway is square by design, AGENTS.md §9.2).
+ */
+
+/* --- Core theme colours ------------------------------------------------ */
+@define-color theme_fg_color @text@;
+@define-color theme_text_color @text@;
+@define-color theme_bg_color @bg@;
+@define-color theme_base_color @surface@;
+@define-color theme_selected_bg_color @selection_bg@;
+@define-color theme_selected_fg_color @text@;
+@define-color theme_unfocused_fg_color @text_muted@;
+@define-color theme_unfocused_text_color @text_muted@;
+@define-color theme_unfocused_bg_color @surface_alt@;
+@define-color theme_unfocused_base_color @surface@;
+@define-color theme_unfocused_selected_bg_color @overlay@;
+@define-color theme_unfocused_selected_fg_color @text@;
+@define-color insensitive_fg_color @text_muted@;
+@define-color insensitive_bg_color @surface_alt@;
+@define-color insensitive_base_color @surface@;
+@define-color borders @border@;
+@define-color unfocused_borders @border@;
+@define-color content_view_bg @surface@;
+
+/* --- Accents (libadwaita names, honoured by recent GTK3 themes) --------- */
+@define-color accent_color @primary@;
+@define-color accent_bg_color @primary@;
+@define-color accent_fg_color @bg@;
+@define-color destructive_color @error@;
+@define-color destructive_bg_color @error@;
+@define-color success_color @success@;
+@define-color warning_color @warning@;
+@define-color error_color @error@;
+
+/* --- Geometry ---------------------------------------------------------- */
+window,
+.background,
+headerbar,
+.titlebar,
+button,
+entry,
+spinbutton,
+combobox button,
+menubar,
+menu,
+menuitem,
+popover,
+popover.background,
+tooltip,
+notebook,
+treeview.view,
+scrollbar slider,
+trough,
+progressbar trough,
+progressbar progress,
+levelbar trough,
+levelbar block {
+  border-radius: 0;
+}
+
+/* Focus must be visible without relying on a coloured background. */
+*:focus {
+  outline: 2px solid @primary@;
+  outline-offset: -2px;
+}
+
+/* --- Surfaces ---------------------------------------------------------- */
+window,
+.background {
+  background-color: @bg@;
+  color: @text@;
+}
+
+headerbar,
+.titlebar {
+  background-image: none;
+  background-color: @surface@;
+  color: @text@;
+  border-bottom: 1px solid @border@;
+  box-shadow: none;
+  padding: 4px 8px;
+}
+
+headerbar button,
+.titlebar button {
+  background-image: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: @text_muted@;
+  padding: 4px 8px;
+}
+
+headerbar button:hover,
+.titlebar button:hover {
+  background-color: @surface_alt@;
+  color: @text@;
+}
+
+button {
+  background-image: none;
+  background-color: @surface_alt@;
+  border: 1px solid @border@;
+  box-shadow: none;
+  color: @text@;
+  padding: 4px 10px;
+}
+
+button:hover {
+  background-color: @overlay@;
+  border-color: @primary@;
+}
+
+button:checked,
+button:active {
+  background-color: @selection_bg@;
+  border-color: @primary@;
+}
+
+button:disabled {
+  color: @text_muted@;
+  background-color: @surface@;
+}
+
+entry,
+spinbutton {
+  background-image: none;
+  background-color: @surface_alt@;
+  border: 1px solid @border@;
+  box-shadow: none;
+  color: @text@;
+  padding: 4px 8px;
+  caret-color: @primary@;
+}
+
+entry:focus,
+spinbutton:focus {
+  border-color: @primary@;
+}
+
+menu,
+.menu,
+popover.background,
+tooltip {
+  background-color: @surface_alt@;
+  border: 1px solid @border@;
+  color: @text@;
+}
+
+menuitem:hover {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+separator {
+  background-color: @border@;
+}
+
+scrollbar {
+  background-color: transparent;
+}
+
+scrollbar slider {
+  background-color: @border@;
+  min-width: 8px;
+  min-height: 8px;
+}
+
+scrollbar slider:hover {
+  background-color: @text_muted@;
+}
+
+/* --- Thunar ------------------------------------------------------------ */
+/* Thunar is GTK3 and reads the classes below; the generic rules above already
+ * cover most of it, these only fix the parts that look wrong on a dark theme:
+ * the sidebar and the shortcut pane keep the window colour, the list gets the
+ * surface colour so rows separate from the chrome, and the location bar
+ * follows the entry styling instead of the old white box. */
+.thunar .sidebar,
+.thunar .shortcuts-pane,
+.thunar .standard-view {
+  background-color: @bg@;
+  border-color: @border@;
+}
+
+.thunar .sidebar .view:selected,
+.thunar .shortcuts-pane .view:selected {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+.thunar treeview.view {
+  background-color: @surface@;
+  color: @text@;
+}
+
+.thunar treeview.view:selected,
+.thunar iconview:selected {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+.thunar treeview.view:hover {
+  background-color: @surface_alt@;
+}
+
+.thunar .location-bar,
+.thunar .path-bar {
+  background-color: @surface@;
+  border-bottom: 1px solid @border@;
+}
+
+.thunar .location-bar entry,
+.thunar .path-bar button {
+  min-height: 24px;
+}
+
+.thunar .statusbar {
+  background-color: @surface@;
+  border-top: 1px solid @border@;
+  color: @text_muted@;
+  padding: 2px 8px;
+}
+
+/* Progress and the rename/delete shortcuts should never look like alerts. */
+.thunar .shortcut,
+.thunar .shortcuts-pane row {
+  color: @text@;
+}
+
+/* --- Misc -------------------------------------------------------------- */
+tooltip {
+  padding: 4px 8px;
+}
+
+checkbutton check,
+radiobutton radio {
+  background-color: @surface_alt@;
+  border: 1px solid @border@;
+}
+
+checkbutton check:checked,
+radiobutton radio:checked {
+  background-color: @primary@;
+  color: @bg@;
+}
+
+treeview.view:selected:focus,
+.view:selected:focus {
+  background-color: @selection_bg@;
+}

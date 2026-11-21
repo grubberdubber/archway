@@ -37,8 +37,9 @@ hl.bind("SUPER + ALT + F", hl.dsp.window.float({ action = "toggle" }))
 
 -- --- system ---
 
-hl.bind("SUPER + CTRL + K", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet keyd toggle"))
+hl.bind("SUPER + ALT + N", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet keyd toggle"))
 hl.bind("SUPER + ALT + G", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet gaming toggle"))
+hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet bluetooth --rofi"))
 hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet power --rofi"))
 hl.bind("SUPER + Escape", hl.dsp.exec_cmd("hyprlock"))
 hl.bind("SUPER + ALT + R", hl.dsp.reload_config())
@@ -69,7 +70,7 @@ hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet ne
 hl.bind("SUPER + ALT + W", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet wallpaper --rofi"))
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot region"))
 hl.bind("Print", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot full"))
-hl.bind("SUPER + P", hl.dsp.exec_cmd("rofi-rbw --type password --action copy"))
+hl.bind("SUPER + P", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet password --rofi"))
 
 -- --- media ---
 

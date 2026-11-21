@@ -109,9 +109,15 @@ description = "Toggle floating"
 
 # keyd lives in /etc and needs root, so the layer is toggled from one bind:
 # on when off, off when on. Nothing changes while it is off.
+#
+# The chord is Super+Alt+N ("numpad"), not Super+Ctrl+K: Ctrl+K is readline's
+# kill-line, so whenever the bind is not loaded (an older running compositor,
+# a failed reload) the keypress leaks into the terminal and eats text. Alt
+# chords leak far more politely, and N is the mnemonic. `archway doctor` now
+# checks that the running session actually loaded every generated bind.
 [[keybind]]
 id = "keyd-toggle"
-keys = "super + ctrl + k"
+keys = "super + alt + n"
 command = "$HOME/.local/bin/archway applet keyd toggle"
 category = "system"
 description = "keyd numpad layer on/off (CapsLock)"
@@ -373,9 +379,16 @@ description = "Screenshot: whole screen"
 [[keybind]]
 id = "password-manager"
 keys = "super + p"
-command = "rofi-rbw --type password --action copy"
+command = "$HOME/.local/bin/archway applet password --rofi"
 category = "archway"
 description = "Password manager (rbw)"
+
+[[keybind]]
+id = "bluetooth-menu"
+keys = "super + shift + b"
+command = "$HOME/.local/bin/archway applet bluetooth --rofi"
+category = "system"
+description = "Bluetooth devices"
 
 [[keybind]]
 id = "power-menu"

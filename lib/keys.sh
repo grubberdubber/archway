@@ -344,6 +344,54 @@ keys_generate() {
   mkdir -p -- "$(dirname -- "$HYPRBINDS_TARGET")"
   keys_generate_hypr "$HYPRBINDS_TARGET"
   keys_generate_doc "$KEYDOC_TARGET"
+  keys_apply_live
+}
+
+# Where the running compositor actually reads the binds from.
+keys_live_path() { printf '%s/hypr/conf.d/20-keybinds.lua' "$XDG_CONFIG_HOME"; }
+
+keys_live_stale() {
+  local live
+  live=$(keys_live_path)
+  [[ -e $live ]] || return 1
+  keys_same_content "$HYPRBINDS_TARGET" "$live" && return 1
+  return 0
+}
+
+keys_reload_session() {
+  [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || return 0
+  have hyprctl || return 0
+  if hyprctl reload > /dev/null 2>&1; then
+    ok "Hyprland reloaded; new binds are live"
+  else
+    warn "could not reload Hyprland; press Super+Alt+R"
+  fi
+}
+
+# The checkout is not what Hyprland reads. The generated file reaches the session
+# through $XDG_CONFIG_HOME/hypr/conf.d and only a reload makes the new chords
+# live — that gap is exactly how a new bind looks dead while every test passes.
+keys_apply_live() {
+  local live src
+  live=$(keys_live_path)
+  [[ -e $live ]] || return 0
+  keys_same_content "$HYPRBINDS_TARGET" "$live" && return 0
+
+  if ((DRY_RUN)); then
+    ui_note "[dry-run] would copy $HYPRBINDS_TARGET -> $live"
+    return 0
+  fi
+  cp -f -- "$HYPRBINDS_TARGET" "$live"
+  record_managed "$live"
+  ok "live Hyprland binds updated: $live"
+  # Keep the chezmoi source in step, otherwise the next apply would undo this.
+  if have chezmoi; then
+    src=$(chezmoi source-path 2> /dev/null || true)
+    if [[ -n $src && -f $src/dot_config/hypr/conf.d/20-keybinds.lua ]]; then
+      cp -f -- "$HYPRBINDS_TARGET" "$src/dot_config/hypr/conf.d/20-keybinds.lua"
+    fi
+  fi
+  keys_reload_session
 }
 
 # Content comparison without diffutils: a bare Arch container has coreutils but
@@ -401,6 +449,43 @@ keys_list() {
   for i in "${!K_ID[@]}"; do
     printf '%-28s %-34s %s\n' "${K_KEYS[i]}" "${K_DESC[i]}" "${K_CAT[i]}"
   done
+}
+
+# Binds defined in the checkout but absent from the running compositor.
+#
+# A stale session is silent by nature: the chord simply falls through to the
+# focused app (Ctrl+K kills the line in a terminal). Asking Hyprland what it
+# actually loaded is the only way to catch the whole class of bug.
+#
+# Returns 0 when every bind is live, 1 with one chord per line on stdout when
+# some are missing, and 2 when there is no session to ask.
+keys_loaded_missing() {
+  local sig=${HYPRLAND_INSTANCE_SIGNATURE:-}
+  have hyprctl && have jq || return 2
+  [[ -n $sig ]] || return 2
+
+  local loaded
+  loaded=$(hyprctl binds -j 2> /dev/null | jq -r '.[] | "\(.modmask)\(.key)"' | tr '[:lower:]' '[:upper:]') || return 2
+  [[ -n $loaded ]] || return 2
+
+  keys_parse
+  local i mods key mask bit missing=()
+  for i in "${!K_ID[@]}"; do
+    IFS='|' read -r mods key < <(keys_split_chord "${K_KEYS[i]}")
+    mask=0
+    for bit in $mods; do
+      case $bit in
+        SHIFT) mask=$((mask + 1)) ;;
+        CTRL) mask=$((mask + 4)) ;;
+        ALT) mask=$((mask + 8)) ;;
+        SUPER) mask=$((mask + 64)) ;;
+      esac
+    done
+    grep -qxF -- "$mask${key^^}" <<< "$loaded" || missing+=("${K_KEYS[i]}")
+  done
+  ((${#missing[@]})) || return 0
+  printf '%s\n' "${missing[@]}"
+  return 1
 }
 
 keys_search() {
