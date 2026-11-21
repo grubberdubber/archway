@@ -571,6 +571,8 @@ _keyd_mocks() {
 }
 
 @test "keyd explains a missing polkit agent instead of failing on /dev/tty" {
+  # root never reaches pkexec, so the failure mode cannot be reproduced there
+  ((EUID == 0)) && skip "needs a non-root shell"
   K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
   export KEYD_DIR="$HOME/etc-keyd"
   export KEYD_BIN=keyd
