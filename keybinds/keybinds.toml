@@ -14,9 +14,9 @@
 [[keybind]]
 id = "terminal"
 keys = "super + Return"
-command = "kitty"
+command = "$HOME/.local/bin/archway applet terminal"
 category = "apps"
-description = "Terminal"
+description = "Terminal (opens towards the cursor)"
 
 [[keybind]]
 id = "terminal-floating"

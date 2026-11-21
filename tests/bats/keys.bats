@@ -63,7 +63,8 @@ EOF
 @test "binds emit Hyprland Lua dispatchers, not shell wrappers" {
   local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
   assert_file_contains "$f" 'hl.bind("SUPER + Q", hl.dsp.window.close())'
-  assert_file_contains "$f" 'hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))'
+  # The terminal opens on the side of the cursor, so it goes through the applet.
+  assert_file_contains "$f" 'hl.bind("SUPER + Return", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet terminal"))'
   # Every modifier needs its own separator or Hyprland rejects the chord.
   assert_file_contains "$f" 'hl.bind("SUPER + SHIFT + Return"'
   run grep -q 'SUPER SHIFT +' "$f"

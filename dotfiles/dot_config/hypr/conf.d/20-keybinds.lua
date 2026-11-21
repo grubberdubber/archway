@@ -3,7 +3,7 @@
 
 -- --- apps ---
 
-hl.bind("SUPER + Return", hl.dsp.exec_cmd("kitty"))
+hl.bind("SUPER + Return", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet terminal"))
 hl.bind("SUPER + SHIFT + Return", hl.dsp.exec_cmd("kitty --class floating-term"))
 hl.bind("SUPER + D", hl.dsp.exec_cmd("rofi -show drun"))
 hl.bind("SUPER + E", hl.dsp.exec_cmd("kitty --class floating-term -e yazi"))

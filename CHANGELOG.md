@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `terminal` applet, now behind `Super+Return`: the new terminal opens on the
+  side of the workspace the cursor is on (`left`, `right`, `up`, `down`), not on
+  the side dwindle guesses from the focused window, which turned a bottom-of-
+  screen spawn between two side-by-side terminals into a thin column. When the
+  pointer stays in the middle band nothing is forced and dwindle decides as
+  before.
 - **Nine monochrome themes** next to the flagship palette: `mono-blue`,
   `mono-teal`, `mono-green`, `mono-yellow`, `mono-orange`, `mono-red`,
   `mono-pink`, `mono-purple` and `mono-slate`. Application templates moved to

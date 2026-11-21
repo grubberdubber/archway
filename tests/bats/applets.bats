@@ -157,3 +157,77 @@ teardown() {
   assert_contains "$output" "power-profile"
   assert_contains "$output" "scratchpad"
 }
+
+# --- terminal: open on the side of the workspace the cursor is on -------------
+
+# Fake compositor: one 1366x768 monitor with a 32 px bar reserved at the top, so
+# the work area is 0,32 1366x736 and its centre is 683,400.
+mock_hypr_for_terminal() {
+  printf '%s\n' \
+    '[{"x":0,"y":0,"width":1366,"height":768,"reserved":[0,32,0,0],"focused":true}]' \
+    > "$HOME/monitors.json"
+  mock_cmd hyprctl 'case "$*" in
+    "monitors -j") cat "$HOME/monitors.json" ;;
+    "cursorpos") printf "%s, %s\n" "$T_CX" "$T_CY" ;;
+    *) printf "[]\n" ;;
+  esac'
+}
+
+@test "terminal picks the side of the cursor over the workspace area" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  mock_hypr_for_terminal
+  # A real terminal must never be started by a report: --json is read-only.
+  mock_cmd kitty 'printf "spawned\n" >> "$HOME/spawned"'
+  export T_CX=683 T_CY=730
+  run "$TERM_APP" --json
+  assert_eq 0 "$status"
+  assert_contains "$output" '"direction": "down"'
+
+  export T_CX=683 T_CY=90
+  run "$TERM_APP" --json
+  assert_contains "$output" '"direction": "up"'
+
+  export T_CX=1300 T_CY=420
+  run "$TERM_APP" --json
+  assert_contains "$output" '"direction": "right"'
+
+  export T_CX=40 T_CY=420
+  run "$TERM_APP" --json
+  assert_contains "$output" '"direction": "left"'
+  assert_missing "$HOME/spawned"
+}
+
+@test "terminal leaves the pointer in the middle band to dwindle" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  mock_hypr_for_terminal
+  export T_CX=690 T_CY=405
+  run "$TERM_APP" --dry-run
+  assert_eq 0 "$status"
+  assert_contains "$output" "[dry-run] centre:"
+}
+
+@test "terminal dry-run reports the decision without starting anything" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  mock_hypr_for_terminal
+  mock_cmd kitty 'printf "spawned\n" >> "$HOME/spawned"'
+  export T_CX=683 T_CY=730
+  run "$TERM_APP" --dry-run
+  assert_eq 0 "$status"
+  assert_contains "$output" "[dry-run] down:"
+  assert_contains "$output" "[dry-run] kitty &"
+  assert_missing "$HOME/spawned"
+}
+
+@test "terminal fails clearly without a Hyprland session" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  mock_cmd hyprctl 'printf "Could not connect to socket\n" >&2; exit 1'
+  run "$TERM_APP"
+  assert_eq 3 "$status"
+  assert_contains "$output" "monitor geometry"
+}
+
+@test "terminal rejects an unknown option with the usage exit code" {
+  TERM_APP="$ARCHWAY_ROOT/applets/terminal/terminal.sh"
+  run "$TERM_APP" --nope
+  assert_eq 2 "$status"
+}

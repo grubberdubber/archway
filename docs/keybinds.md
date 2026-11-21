@@ -8,7 +8,7 @@ Press `Super + /` at any time to open this list in a floating terminal.
 
 | Key | Action | Command |
 |---|---|---|
-| `super + Return` | Terminal | `kitty` |
+| `super + Return` | Terminal (opens towards the cursor) | `$HOME/.local/bin/archway applet terminal` |
 | `super + shift + Return` | Floating scratchpad terminal | `kitty --class floating-term` |
 | `super + d` | Application launcher | `rofi -show drun` |
 | `super + e` | File manager (yazi) | `kitty --class floating-term -e yazi` |
