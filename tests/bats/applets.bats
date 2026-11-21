@@ -64,9 +64,11 @@ teardown() {
   mkdir -p "$XDG_DATA_HOME/archway/wallpapers"
   printf 'x' > "$XDG_DATA_HOME/archway/wallpapers/a.png"
   mock_cmd pgrep 'exit 0'
-  # A real hyprpaper must never start from a test: it inherits the test's stdout
-  # and keeps the runner waiting for EOF.
-  mock_cmd hyprpaper 'sleep 300'
+  # A real hyprpaper must never start from a test, and a mock that sleeps would
+  # keep the runner's stdout open until it exits (that is how the first CI run
+  # hung for five minutes after the last test printed "ok").
+  mock_cmd hyprpaper 'exit 0'
+  export HYPRLAND_INSTANCE_SIGNATURE=test-instance
   # hyprpaper 0.8: `wallpaper ,<path>` applies and `listactive` confirms it.
   # `preload`/`unload` are gone, so the applet must not call them any more.
   mock_cmd hyprctl 'printf "%s\n" "$*" >> "$HOME/hyprctl.log"

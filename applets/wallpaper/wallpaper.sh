@@ -148,7 +148,10 @@ wp_restart() {
   fi
   mkdir -p -- "$STATE_DIR"
   : > "$HYPRPAPER_LOG"
-  setsid hyprpaper > "$HYPRPAPER_LOG" 2>&1 &
+  # stdin and the usual inherited descriptors are closed: a daemon that keeps
+  # them open holds the caller's pipe (a test runner, an ssh session, a script
+  # pipeline) and that caller never sees EOF.
+  setsid hyprpaper < /dev/null > "$HYPRPAPER_LOG" 2>&1 3>&- 4>&- 5>&- 6>&- 7>&- 8>&- 9>&- &
   for ((i = 0; i < 30; i++)); do
     wp_running && return 0
     sleep 0.1
