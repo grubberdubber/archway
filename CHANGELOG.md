@@ -282,6 +282,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The failed-units pill opened a terminal that closed before it could be read:
+  `on-click` was a bare `kitty -e systemctl --failed`, which printed the unit
+  list and exited immediately. It now runs `--no-pager`, prints "Press Enter to
+  close" and waits with `read -r _ </dev/tty` — the tty kitty gives the child,
+  not waybar's stdin, which is not a usable terminal. The updates pill got the
+  same closing line so both behave alike.
 - The media pill no longer prints a running timer. `custom/media` renders
   `icon + artist — title` (14 characters, dimmed while paused) and the
   position/length moved into its tooltip, so hovering the music button shows

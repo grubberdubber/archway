@@ -287,6 +287,18 @@ teardown() {
   assert_contains "$output" "no media player is running"
 }
 
+# A click command that ends on its own closes the terminal it just opened, so
+# both "show me this list" pills have to wait for a keypress on the tty that
+# kitty gives them (waybar itself spawns the command with no usable stdin).
+@test "bar click commands wait for a keypress instead of closing instantly" {
+  local cfg="$ARCHWAY_ROOT/dotfiles/dot_config/waybar/config.jsonc"
+  run grep -c 'read -r _ </dev/tty' "$cfg"
+  assert_eq 0 "$status"
+  assert_eq 2 "$output"
+  run grep -c '"on-click": "kitty -e systemctl --failed"' "$cfg"
+  assert_eq 1 "$status"
+}
+
 @test "bar power-profile cycles performance to balanced" {
   mock_cmd powerprofilesctl 'case $1 in get) echo performance ;; set) printf "%s\n" "$2" > "$HOME/pp" ;; esac'
   run "$BAR" power-profile --next

@@ -151,7 +151,10 @@
     "exec": "$HOME/.local/bin/archway-bar failed",
     "return-type": "json",
     "interval": 15,
-    "on-click": "kitty -e systemctl --failed",
+    // waybar spawns the click command without a shell stdin, so a bare
+    // `systemctl --failed` printed and the window closed before it could be
+    // read. The `read` waits on the terminal itself, not on waybar's stdin.
+    "on-click": "kitty --class floating-term -e sh -c 'systemctl --failed --no-pager; printf \"\n%s\n\" \"Press Enter to close\"; read -r _ </dev/tty'",
     "tooltip": true
   },
   "custom/updates": {
@@ -160,7 +163,7 @@
     "interval": 1800,
     // `--list` runs `checkupdates` on a private sync-db copy, so clicking while
     // the module refreshes no longer trips its lock ("Cannot fetch updates").
-    "on-click": "kitty --class floating-term -e sh -c '$HOME/.local/bin/archway-bar updates --list; echo; read'",
+    "on-click": "kitty --class floating-term -e sh -c '$HOME/.local/bin/archway-bar updates --list; printf \"\n%s\n\" \"Press Enter to close\"; read -r _ </dev/tty'",
     "on-click-right": "$HOME/.local/bin/archway update --dry-run",
     "tooltip": true
   },
