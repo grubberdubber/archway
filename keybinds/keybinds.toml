@@ -370,6 +370,20 @@ category = "archway"
 description = "Screenshot: region"
 
 [[keybind]]
+id = "record-toggle"
+keys = "super + shift + r"
+command = "$HOME/.local/bin/archway applet record toggle"
+category = "archway"
+description = "Screen recording: start/stop"
+
+[[keybind]]
+id = "emoji-picker"
+keys = "super + period"
+command = "$HOME/.local/bin/archway applet emoji --rofi"
+category = "archway"
+description = "Emoji picker"
+
+[[keybind]]
 id = "screenshot-full"
 keys = "Print"
 command = "$HOME/.local/bin/archway applet screenshot full"

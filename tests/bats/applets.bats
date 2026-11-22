@@ -122,6 +122,64 @@ teardown() {
   assert_file_contains "$HOME/rofi-input.log" "(connected)"
 }
 
+@test "emoji picker lists entries, copies a glyph and remembers it" {
+  local E="$ARCHWAY_ROOT/applets/emoji/emoji.sh"
+  export XDG_STATE_HOME="$HOME/state"
+  mock_cmd wl-copy 'cat > "$HOME/copied.txt"'
+  mock_cmd notify-send 'exit 0'
+
+  run "$E" --json
+  assert_eq 0 "$status"
+  assert_contains "$output" '"entries":'
+
+  run "$E" --copy "$(printf '🙂')"
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/copied.txt" "🙂"
+  assert_file_contains "$XDG_STATE_HOME/archway/emoji-recent" "🙂"
+}
+
+@test "emoji menu rows use single spaces so rofi does not split columns" {
+  local E="$ARCHWAY_ROOT/applets/emoji/emoji.sh"
+  run "$E" --dry-run --rofi
+  assert_eq 0 "$status"
+  assert_contains "$output" "grinning"
+  run grep -c '  ' <<< "$output"
+  assert_contains "$output" "0"
+}
+
+@test "record starts, reports and stops the recorder with SIGINT" {
+  local R="$ARCHWAY_ROOT/applets/record/record.sh"
+  export XDG_STATE_HOME="$HOME/state"
+  export XDG_VIDEOS_DIR="$HOME/videos"
+  mock_cmd notify-send 'exit 0'
+  # A fake recorder: creates the file, waits for SIGINT, then exits cleanly.
+  mock_cmd wf-recorder 'out=""
+    while (($#)); do [[ $1 == -f ]] && out=$2; shift; done
+    : > "$out"
+    trap ": > \"$out\"; exit 0" INT
+    while :; do sleep 0.2; done'
+
+  run "$R" start
+  assert_eq 0 "$status"
+  run "$R" status --json
+  assert_contains "$output" '"recording":true'
+  assert_contains "$output" "videos/Recordings/recording-"
+
+  run "$R" stop
+  assert_eq 0 "$status"
+  run "$R" status --json
+  assert_contains "$output" '"recording":false'
+}
+
+@test "record dry-run prints the command and needs nothing installed" {
+  local R="$ARCHWAY_ROOT/applets/record/record.sh"
+  export XDG_VIDEOS_DIR="$HOME/videos"
+  run "$R" --dry-run start --region --audio
+  assert_eq 0 "$status"
+  assert_contains "$output" "wf-recorder -f"
+  assert_contains "$output" "--audio"
+}
+
 @test "clipboard reports an empty history and starts the watcher" {
   mock_cmd cliphist 'if [[ $1 == list ]]; then exit 0; fi'
   mock_cmd wl-paste 'sleep 5'

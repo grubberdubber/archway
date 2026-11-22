@@ -1,0 +1,324 @@
+# Archway emoji set — glyph<TAB>name and search keywords.
+# Exactly one tab separates the glyph from the searchable text: everything after
+# it is matched by rofi, so the visible label is also the keyword list. Two
+# fields, not three — the picker reads field 1 as the glyph to copy from a line.
+#
+# Curated rather than exhaustive: the picker should be reachable by memory, and a
+# 3.000-entry table makes every search slower to read. Keywords are what rofi
+# filters on, so they carry the synonyms (English first, common Spanish second);
+# the glyph and name are what you see.
+#
+# Order groups by intent (faces, hands, symbols, dev, objects, food, nature) and
+# is preserved in the menu, so muscle memory survives additions at the end.
+😀	grinning smile happy feliz
+😄	smile happy grin
+😁	grin happy
+😆	laughing laugh
+😂	joy tears laugh llorar
+🙂	slight smile
+😉	wink guiño
+😊	blush smile
+😍	heart eyes love amor
+😘	kiss blow
+😎	cool sunglasses
+🤔	thinking think pensar
+🤨	raised eyebrow doubt
+😐	neutral
+😑	expressionless
+🙄	eye roll
+😏	smirk
+😴	sleeping sleep dormir
+😪	sleepy
+🤯	exploding head mind blown
+🥳	party celebrate fiesta
+😤	triumph huff
+😭	sob cry llorar
+😱	scream shock
+😳	flushed
+🤢	nauseated sick
+🤮	vomit
+🤒	sick thermometer
+🤕	bandage hurt
+🥺	pleading please
+😇	innocent angel
+🤠	cowboy
+🤖	robot bot
+👻	ghost
+💀	skull dead
+👽	alien
+💩	poop
+🙈	see no evil
+🙉	hear no evil
+🙊	speak no evil
+
+👍	thumbs up like bien
+👎	thumbs down dislike
+👌	ok perfect
+✌️	peace victory
+🤞	fingers crossed luck
+🤟	love you
+🤘	rock horns
+🤙	call me
+👈	point left
+👉	point right
+👆	point up
+👇	point down
+☝️	index up
+🙏	thanks please pray gracias
+👏	clap applause
+🙌	raised hands
+🤝	handshake deal trato
+💪	muscle strong fuerza
+🫡	salute
+👋	wave hello bye hola
+🖐️	hand
+✋	stop hand
+🤷	shrug
+🤦	facepalm
+
+❤️	red heart love corazon
+🧡	orange heart
+💛	yellow heart
+💚	green heart
+💙	blue heart
+💜	purple heart
+🖤	black heart
+🤍	white heart
+💔	broken heart
+💯	hundred perfect
+🔥	fire hot fuego
+✨	sparkles new
+⭐	star
+🌟	glowing star
+⚡	bolt fast rayo
+💥	boom collision
+💫	dizzy
+🎉	tada party fiesta
+🎊	confetti
+🏆	trophy win
+🥇	gold medal first
+🎯	target goal
+🚀	rocket ship launch
+🧨	firecracker
+💡	idea light bulb
+🔔	bell notification
+🔕	bell off mute
+🔇	mute
+🔊	sound on
+📌	pin
+📍	round pin location
+🔗	link chain url
+🔒	lock secure
+🔓	unlock
+🔑	key llave
+🛡️	shield security
+⚠️	warning alert
+🚧	construction wip
+❌	cross no error
+✅	check yes done hecho
+✔️	check mark
+✖️	multiply no
+❗	exclamation
+❓	question
+💤	sleep zzz
+🆗	ok button
+🆕	new
+🆘	sos help
+♻️	recycle
+
+💻	laptop code dev
+⌨️	keyboard
+🖥️	desktop monitor
+🖨️	printer
+🖱️	mouse
+💾	floppy save guardar
+💿	cd disk
+📀	dvd
+📱	phone movil
+📟	pager
+☎️	telephone
+📞	phone receiver
+📠	fax
+🔋	battery
+🔌	plug power
+💡	bulb idea
+🔦	flashlight
+🕯️	candle
+🧲	magnet
+🔧	wrench fix tool
+🔨	hammer
+⚙️	gear settings config
+🛠️	tools build
+🧰	toolbox
+🗜️	clamp compress
+🔬	microscope science
+🔭	telescope
+🧪	test tube lab
+🧬	dna
+🖇️	paperclip
+📎	attachment
+📁	folder carpeta
+📂	open folder
+🗂️	dividers
+🗃️	card box
+🗄️	cabinet
+📊	bar chart
+📈	chart up growth
+📉	chart down
+📋	clipboard
+📝	memo note nota
+✏️	pencil
+🖊️	pen
+🖌️	brush
+🖍️	crayon
+📅	calendar
+📆	tear calendar
+⏱️	stopwatch
+⏲️	timer
+⏰	alarm clock
+⌛	hourglass
+🕐	clock
+🧭	compass
+🗺️	map
+🌐	globe web internet
+🛰️	satellite
+📡	antenna
+📶	signal
+🔍	search zoom lupa
+🔎	search right
+🧹	broom clean
+🗑️	trash delete basura
+📦	package box
+📫	mailbox
+📮	postbox
+✉️	envelope mail
+📧	email
+📨	incoming mail
+📩	outgoing mail
+💌	love letter
+📢	loudspeaker
+📣	megaphone
+🔊	speaker
+
+☕	coffee cafe
+🍵	tea
+🍺	beer
+🍻	cheers
+🍷	wine
+🥤	cup straw
+🍕	pizza
+🍔	burger
+🌮	taco
+🍣	sushi
+🥗	salad
+🍎	apple
+🍌	banana
+🍇	grapes
+🍓	strawberry
+🥑	avocado
+🍞	bread
+🧀	cheese
+🍫	chocolate
+🍪	cookie
+🎂	cake birthday
+🍰	cake slice
+🥧	pie
+🧂	salt
+🍳	egg fry
+🥘	pan food
+🍜	ramen noodles
+🍚	rice
+🥟	dumpling
+🌶️	chili spicy
+🍋	lemon
+
+🌱	seedling
+🌿	herb
+🍀	clover luck
+🌳	tree
+🌲	evergreen
+🌵	cactus
+🌴	palm
+🌷	tulip
+🌹	rose
+🌻	sunflower
+🌸	blossom
+💐	bouquet
+🍄	mushroom
+🌙	moon
+🌕	full moon
+☀️	sun
+⛅	cloud sun
+☁️	cloud
+🌧️	rain
+⛈️	storm
+❄️	snow
+🔥	fire
+🌊	wave
+🌈	rainbow
+🌍	earth
+🗻	mountain
+🏔️	snow mountain
+🏕️	camping
+🏠	home house casa
+🏢	office
+🏫	school
+🏥	hospital
+🏦	bank
+🏭	factory
+🌆	city
+🌃	night city
+🛣️	road
+🚗	car
+🚲	bike
+✈️	plane
+🚂	train
+🚢	ship
+🛸	ufo
+
+⏳	waiting
+🔄	refresh reload
+🔁	repeat loop
+🔂	repeat one
+▶️	play
+⏸️	pause
+⏹️	stop
+⏺️	record
+⏭️	next
+⏮️	previous
+⏩	fast forward
+⏪	rewind
+🔀	shuffle
+🔃	sync
+➕	plus add
+➖	minus remove
+➗	divide
+✳️	asterisk
+🔢	numbers
+🔤	letters abc
+🅰️	a button
+🆎	ab
+🆑	cl
+🅾️	o button
+🅿️	parking
+💠	diamond
+🔶	orange diamond
+🔷	blue diamond
+🔸	small orange
+🔹	small blue
+🔺	up triangle
+🔻	down triangle
+⬆️	up arrow
+⬇️	down arrow
+⬅️	left arrow
+➡️	right arrow
+↗️	up right
+↘️	down right
+↙️	down left
+↖️	up left
+🔃	clockwise
+🔁	loop
+🏳️	white flag
+🏁	finish flag
+🚩	flag
+🎌	crossed flags

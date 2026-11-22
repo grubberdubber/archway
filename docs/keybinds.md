@@ -84,6 +84,8 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + shift + n` | Wi-Fi menu | `$HOME/.local/bin/archway applet network --rofi` |
 | `super + alt + w` | Wallpaper picker | `$HOME/.local/bin/archway applet wallpaper --rofi` |
 | `super + shift + s` | Screenshot: region | `$HOME/.local/bin/archway applet screenshot region` |
+| `super + shift + r` | Screen recording: start/stop | `$HOME/.local/bin/archway applet record toggle` |
+| `super + period` | Emoji picker | `$HOME/.local/bin/archway applet emoji --rofi` |
 | `Print` | Screenshot: whole screen | `$HOME/.local/bin/archway applet screenshot full` |
 | `super + p` | Password manager (rbw) | `$HOME/.local/bin/archway applet password --rofi` |
 

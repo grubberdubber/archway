@@ -69,6 +69,8 @@ hl.bind("SUPER + V", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet clipboard 
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet network --rofi"))
 hl.bind("SUPER + ALT + W", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet wallpaper --rofi"))
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot region"))
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet record toggle"))
+hl.bind("SUPER + period", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet emoji --rofi"))
 hl.bind("Print", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet screenshot full"))
 hl.bind("SUPER + P", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet password --rofi"))
 

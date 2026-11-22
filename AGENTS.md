@@ -361,6 +361,7 @@ archway/
 - Los temas son datos + plantillas; no scripts ad-hoc por app.
 - Los atajos se definen una vez en `keybinds/keybinds.toml` y se generan la config de Hyprland (y sway), cheatsheet y docs. Un test verifica duplicados y conflictos.
 - Los applets son scripts pequeños, con `--help`, sin dependencias ocultas, y se declaran en un manifiesto.
+- Un applet que arranca un proceso persistente (p. ej. `record` con `wf-recorder`) escribe su estado en `~/.local/state/archway/` y detiene el proceso con la señal que le permite cerrar el archivo, nunca con `kill -9`. Un comando lanzado con `&` hereda `SIGINT` ignorado (POSIX): usar `env --default-signal=INT` antes de `exec` o el proceso no podrá finalizar su salida.
 - La config de Neovim es un checkout externo pinneado en `deps/nvim-config.lock`; no se copia a `dotfiles/`, no se convierte en submódulo y no se edita en runtime. Los overrides viven en archivos locales ignorados por el repo upstream.
 - Nada de rutas absolutas con username; usar `$HOME`, XDG y `chezmoi` templates.
 - Nada de `eval` innecesario; nada de `rm -rf "$VAR"` sin guardas.
@@ -657,6 +658,8 @@ selection_bg= "#1F2A3A"
 | `Super+Space`         | Selector de tema                     |
 | `Super+Alt+W`         | Selector de wallpaper                |
 | `Super+Shift+S`       | Screenshot (región/ventana/pantalla) |
+| `Super+Shift+R`       | Grabación de pantalla (iniciar/detener) |
+| `Super+.`             | Selector de emojis                   |
 | `Super+V`             | Historial de portapapeles            |
 | `Super+P`             | Gestor de contraseñas (rbw/rofi-rbw) |
 | `Super+Shift+M`       | Android Mount                        |

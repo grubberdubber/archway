@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `emoji` applet behind `Super+.`: a rofi picker over ~300 curated emojis with
+  English and Spanish keywords, most-recent-first ordering
+  (`~/.local/state/archway/emoji-recent`) and `wl-copy` straight into the
+  clipboard. Rows use one space between fields because rofi 2.x splits on
+  whitespace runs, and a test enforces it.
+- `record` applet behind `Super+Shift+R`: `wf-recorder` behind
+  `status`/`start`/`stop`/`toggle` with `--region` (slurp selection), `--audio`,
+  `--json` and `--dry-run`. Files land in `~/Videos/Recordings`; pid and path
+  live in `~/.local/state/archway/record` so a second press finds the running
+  recorder, `stop` sends the SIGINT wf-recorder needs to finalise the container
+  and waits instead of killing it, and the bar's existing recording pill needs
+  no new module. A recorder that dies on start is reported immediately with the
+  log tail instead of leaving an empty file behind.
 - Yazi is a theme module: `themes/_shared/yazi/theme.toml` maps the manager,
   tabs, mode, status, popups and file-type colours to `palette.toml` and is
   published as `~/.config/yazi/theme.toml`; a pre-existing file is copied to
