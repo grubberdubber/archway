@@ -53,11 +53,9 @@ window#waybar {
   min-height: 21px;
 }
 
-/* Zone breaks: a wider gap closes each of the two leading groups, so the row
- * reads as three zones. They hang off the last always-visible pill of a group
- * (workspaces, clock) instead of the first pill of the next one, because a
- * hidden module would otherwise swallow the break. */
-#workspaces,
+/* Zone break: the window title belongs to the workspaces it describes, so it
+ * sits right next to them (plain 3px pill gap) and the wider break moved to the
+ * clock, where the media pills end and the status ones begin. */
 #clock {
   margin-right: 15px;
 }
@@ -160,7 +158,10 @@ window#waybar {
 #window {
   color: @text_muted@;
   font-size: 10.5px;
-  min-width: 100px;
+  /* A reservation, not a limit: max-length in config.jsonc truncates the title.
+   * It stays wide enough that switching windows does not resize the row, which
+   * would slide every pill on a centred bar. */
+  min-width: 72px;
   padding: 0 3px;
 }
 
@@ -178,7 +179,7 @@ window#waybar {
 #custom-nowplaying {
   color: @text@;
   font-size: 10.5px;
-  min-width: 156px;
+  min-width: 104px;
 }
 
 /* Elapsed time of the current track (playerctl, one second resolution). Zero
@@ -201,7 +202,7 @@ window#waybar {
  * the window title keeps its own: a centred row re-centres whenever a pill
  * grows or disappears, and that is what made the workspace buttons slide. */
 #context {
-  min-width: 146px;
+  min-width: 96px;
 }
 
 #mpris.empty,

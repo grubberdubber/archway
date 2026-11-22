@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `theme-selector --rofi`: `Super+Space` now opens the picker directly instead
+  of asking rofi for a `-show theme` mode. That mode was declared by embedding a
+  quoted shell command in a TOML value, and one escaping layer was double-escaped
+  into `-modi \"theme:...`, so rofi answered "mode theme not found". The menu
+  lists display names only (a tab is drawn as a column separator) and maps the
+  chosen row back to its exact id.
 - `emoji` applet behind `Super+.`: a rofi picker over ~300 curated emojis with
   English and Spanish keywords, most-recent-first ordering
   (`~/.local/state/archway/emoji-recent`) and `wl-copy` straight into the
@@ -276,6 +282,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keybind parsing now undoes TOML's `\"` and `\\` escapes. Before, a command
+  containing a double quote reached Hyprland with an extra backslash — the
+  visible break was the theme picker, but any quoted argument would have hit it.
+- Bar: the window title sits next to the workspaces instead of after a 15px zone
+  break, and both the title and the media pills are shorter (`max-length` 11 and
+  14, reserved widths 72px and 104px), so the right-hand status cluster starts
+  further left without the row resizing on every window switch.
 - The updates pill no longer dies with `==> ERROR: Cannot fetch updates` when
   clicked. `checkupdates` locks a shared sync-db directory, so the bar refresh
   and the click handler collided. Each invocation now gets a private

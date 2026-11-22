@@ -101,7 +101,7 @@
     "tooltip": true
   },
   "hyprland/window": {
-    "max-length": 16,
+    "max-length": 11,
     "separate-outputs": true,
     "tooltip": false
   },
@@ -109,7 +109,7 @@
   "mpris": {
     "format": "{player_icon} {artist} — {title}",
     "format-paused": "{player_icon} {artist} — {title}",
-    "max-length": 21,
+    "max-length": 14,
     // No {position}/{length} here: waybar leaves them at 00:00:00 for several
     // players (mpv, Firefox video). The elapsed pill next to it asks playerctl.
     "tooltip-format": "{player} • {album}",

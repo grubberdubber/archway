@@ -330,7 +330,7 @@ description = "Move window to workspace 6"
 [[keybind]]
 id = "theme-selector"
 keys = "super + space"
-command = "rofi -show theme -modi \"theme:$HOME/.local/bin/archway applet theme-selector\""
+command = "$HOME/.local/bin/archway applet theme-selector --rofi"
 category = "archway"
 description = "Theme selector"
 

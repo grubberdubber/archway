@@ -63,7 +63,7 @@ hl.bind("SUPER + SHIFT + 6", hl.dsp.window.move({ workspace = 6, follow = false 
 
 -- --- archway ---
 
-hl.bind("SUPER + Space", hl.dsp.exec_cmd("rofi -show theme -modi \\\"theme:$HOME/.local/bin/archway applet theme-selector\\\""))
+hl.bind("SUPER + Space", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet theme-selector --rofi"))
 hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet android-mount --rofi"))
 hl.bind("SUPER + V", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet clipboard --rofi"))
 hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet network --rofi"))

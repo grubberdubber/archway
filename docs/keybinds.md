@@ -78,7 +78,7 @@ Press `Super + /` at any time to open this list in a floating terminal.
 
 | Key | Action | Command |
 |---|---|---|
-| `super + space` | Theme selector | `rofi -show theme -modi \"theme:$HOME/.local/bin/archway applet theme-selector\"` |
+| `super + space` | Theme selector | `$HOME/.local/bin/archway applet theme-selector --rofi` |
 | `super + shift + m` | Mount / unmount Android device (MTP) | `$HOME/.local/bin/archway applet android-mount --rofi` |
 | `super + v` | Clipboard history | `$HOME/.local/bin/archway applet clipboard --rofi` |
 | `super + shift + n` | Wi-Fi menu | `$HOME/.local/bin/archway applet network --rofi` |

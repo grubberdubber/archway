@@ -147,6 +147,24 @@ teardown() {
   assert_contains "$output" "0"
 }
 
+@test "theme selector builds its own menu with display names only" {
+  local T="$ARCHWAY_ROOT/applets/theme-selector/theme-selector.sh"
+  run "$T" --dry-run --rofi
+  assert_eq 0 "$status"
+  assert_contains "$output" "Android Mount"
+  # A tab would be drawn as a column separator and leave a gap in the menu.
+  run grep -c $'\t' <<< "$output"
+  assert_eq 0 "$output"
+}
+
+@test "theme selector modi path applies the theme named in the row" {
+  local T="$ARCHWAY_ROOT/applets/theme-selector/theme-selector.sh"
+  mock_cmd archway 'echo "archway $*" > "$HOME/called.txt"'
+  run env ARCHWAY="$SANDBOX/bin/archway" "$T" "ember	Ember"
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/called.txt" "theme set ember"
+}
+
 @test "record starts, reports and stops the recorder with SIGINT" {
   local R="$ARCHWAY_ROOT/applets/record/record.sh"
   export XDG_STATE_HOME="$HOME/state"

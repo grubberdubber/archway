@@ -35,6 +35,11 @@ keys_parse() {
     if [[ $line =~ ^([a-z_]+)[[:space:]]*=[[:space:]]*\"(.*)\"$ ]]; then
       key=${BASH_REMATCH[1]}
       val=${BASH_REMATCH[2]}
+      # TOML basic strings escape `"` and `\\`; a one-level parser has to undo
+      # them, or the backslashes reach Hyprland and rofi and break the command
+      # (a `-modi 'theme:...'` argument became `\"theme:..."`).
+      val=${val//\\\"/\"}
+      val=${val//\\\\/\\}
     else
       die "malformed line in $file: $line" "$EX_PREFLIGHT"
     fi
