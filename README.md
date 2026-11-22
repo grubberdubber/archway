@@ -67,7 +67,7 @@ Arch Linux x86_64, `bash >= 5.2`, `git`, `chezmoi`, `pacman`, a non-root user.
 | `archway theme` | `list [--names]`, `current`, `set`, `preview`, `validate`, `render` |
 | `archway nvim` | `install`, `pin`, `status`, `doctor`, `rollback` |
 | `archway keys` | `list`, `search`, `generate`, `validate`, `check` |
-| `archway applet` | run a bundled applet (`android-mount`, `bluetooth`, `clipboard`, `keyd`, `network`, `osd`, `password`, `power`, `screenshot`, `theme-selector`, `wallpaper`, `window`) |
+| `archway applet` | run a bundled applet (`android-mount`, `bluetooth`, `clipboard`, `emoji`, `keyd`, `network`, `osd`, `password`, `power`, `record`, `screenshot`, `theme-selector`, `wallpaper`, `window`) |
 | `archway pkg` | `list`, `why`, `export`, `check` |
 | `archway backup` / `restore` | manual backup and restore |
 | `archway uninstall` | remove managed files, restore backups |
