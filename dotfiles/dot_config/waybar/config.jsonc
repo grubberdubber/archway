@@ -179,9 +179,9 @@
     "exec": "$HOME/.local/bin/archway-bar updates",
     "return-type": "json",
     "interval": 1800,
-    // `checkupdates` prints the list and waits: a terminal keeps the output
-    // readable instead of a dry-run that only re-checks.
-    "on-click": "kitty --class floating-term -e sh -c 'checkupdates; echo; read'",
+    // `--list` runs `checkupdates` on a private sync-db copy, so clicking while
+    // the module refreshes no longer trips its lock ("Cannot fetch updates").
+    "on-click": "kitty --class floating-term -e sh -c '$HOME/.local/bin/archway-bar updates --list; echo; read'",
     "on-click-right": "$HOME/.local/bin/archway update --dry-run",
     "tooltip": true
   },

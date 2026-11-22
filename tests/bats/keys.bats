@@ -71,6 +71,15 @@ EOF
   assert_eq 1 "$status"
 }
 
+@test "sending a window to a workspace does not follow it" {
+  local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
+  # `follow = false` is movetoworkspacesilent; without it Super+Shift+4 dragged
+  # the whole session to workspace 4 instead of just the window.
+  assert_file_contains "$f" 'hl.bind("SUPER + SHIFT + 4", hl.dsp.window.move({ workspace = 4, follow = false }))'
+  run grep -c 'window.move({ workspace = [0-9] })' "$f"
+  assert_eq 1 "$status"
+}
+
 @test "media keys repeat and go through the OSD applet" {
   local f="$ARCHWAY_ROOT/dotfiles/dot_config/hypr/conf.d/20-keybinds.lua"
   assert_file_contains "$f" 'hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("$HOME/.local/bin/archway applet osd volume up"), { repeating = true })'

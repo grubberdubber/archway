@@ -253,7 +253,10 @@ keys_hypr_action() {
       ;;
     movetoworkspace)
       [[ $arg =~ ^[0-9]+$ ]] || die "movetoworkspace needs a number, got '$arg'" "$EX_PREFLIGHT"
-      printf 'hl.dsp.window.move({ workspace = %s })' "$arg"
+      # `follow = false` is Hyprland's `movetoworkspacesilent`: send the window
+      # and stay where you are. Following dragged the whole session to the
+      # target workspace, so Super+Shift+4 moved you instead of the window.
+      printf 'hl.dsp.window.move({ workspace = %s, follow = false })' "$arg"
       ;;
     *) die "no Hyprland Lua mapping for dispatcher '$disp'" "$EX_PREFLIGHT" ;;
   esac

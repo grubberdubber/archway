@@ -578,6 +578,8 @@ selection_bg= "#1F2A3A"
 - Seguridad: nunca `sudo`, nunca montar en `/mnt` global, validar nombres de dispositivo, escapar rutas, no seguir symlinks.
 - Test: mock de `simple-mtpfs`/`mount`/`fusermount` en `tests/bats`.
 
+**Menús Rofi (regla de UI).** En rofi 2.x, `-dmenu` divide cada línea en columnas por las **secuencias de espacios**: alinear con padding produce columnas separadas, la última alineada a la derecha, y el texto se corta. Por eso los applets no usan `-display-columns` ni padding con espacios: un espacio simple entre campos, ancho fijo obtenido del propio glifo (p. ej. cuatro puntos de señal), y `-format i` + un array de acciones para recuperar la elección sin parsear el texto visible. Un test comprueba que las filas no contienen dobles espacios. Ver `applets/network/network.sh`.
+
 ### 9.4 Selector de temas
 
 - `Super+Space` abre selector con previews (Rofi/Walker).
@@ -720,7 +722,7 @@ h = /
 - `capslock` tap = Esc; hold = capa numpad.
 - Añadir una capa `nav` en otra tecla (p. ej. `rightalt = overload(nav, compose)`) con `h/j/k/l` = flechas, `u/i` = Home/End, `n/m` = PgDn/PgUp, `,`/`.` = Insert/Delete. No romper AltGr.
 - `keyd reload` tras cambios; test manual en TTY y en la sesión Wayland.
-- El toggle de keyd necesita root y desde un atajo no hay TTY: se usa `sudo -n` o `pkexec`, y `pkexec` requiere un **agente polkit** corriendo (`hyprpolkitagent`). Sin agente falla con "textual authentication agent" y el atajo parece roto aunque el comando funcione en terminal. Hyprland lo arranca con la sesión (`hyprland.start`) y el applet detecta la ausencia y sale con código `3` explicando qué falta.
+- El toggle de keyd necesita root y desde un atajo no hay TTY: la vía correcta es `archway applet keyd grant`, que instala una regla polkit **estrecha** (`/etc/polkit-1/rules.d/49-archway-keyd.rules`: solo `keyd.service`, solo verbos start/stop/restart/reload, solo `wheel`, solo sesión local activa). Con la regla el atajo no pide nada. Sin ella: `sudo -n`, luego `pkexec` (que requiere agente polkit, `hyprpolkitagent`), y si no hay agente el applet sale con código `3` diciendo qué ejecutar. Nunca ampliar esa regla a otras unidades ni a autenticación genérica.
 - Alternativas documentadas: `kanata` (home-row mods, tap-dance), `interception-tools` + `caps2esc`, `xremap`, `kmonad`, `evremap`, `input-remapper` (GUI).
 - No activar keyd por defecto sin preguntar; puede chocar con remaps existentes y con algunos juegos. El paquete se instala, el servicio arranca desactivado; se enciende con `Super+Alt+N` o `archway applet keyd on`.
 - **No usar combinaciones con Ctrl como atajo del WM**: si el bind no está cargado (sesión vieja, reload fallido), la tecla se filtra a la terminal y Ctrl+K hace kill-line. `archway doctor` verifica con `hyprctl binds` qué atajos cargó realmente la sesión (`keybinds.loaded`).

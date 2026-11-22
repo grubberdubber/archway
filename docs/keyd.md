@@ -14,17 +14,24 @@ Archway owns the whole lifecycle from one applet, so you never hand-edit `/etc`:
 | See the state | `archway applet keyd status [--json]` |
 | Write the layer | `archway applet keyd install` (add `--replace` to reset an edit) |
 | Apply an edit | `archway applet keyd reload` |
+| Stop asking for a password | `archway applet keyd grant` (once, from a terminal) |
+| Undo that | `archway applet keyd revoke` |
 
 `on`/`off` only touch the systemd service. Turning it off restores the firmware
 mapping immediately and leaves `/etc/keyd/default.conf` alone.
 
-Both need root. From a terminal `sudo` asks for the password normally; from the
-shortcut there is no terminal, so the applet uses cached `sudo -n` credentials or
-`pkexec`, which needs a running polkit agent. Archway starts `hyprpolkitagent`
-with the Hyprland session for exactly this reason; if you run a different
-compositor setup, start an agent (or run the command once from a terminal) and
-the shortcut will prompt graphically instead of failing with
-`Error creating textual authentication agent`.
+Both need root, and a keybind has no terminal to type a password into. Run
+`archway applet keyd grant` once: it installs
+`/etc/polkit-1/rules.d/49-archway-keyd.rules`, a rule that lets members of
+`wheel` start, stop, restart and reload `keyd.service` — nothing else — without
+authentication. After that `Super+Alt+N` just works, with no dialog and no
+polkit agent involved.
+
+Without the rule the applet falls back to cached `sudo -n` credentials or
+`pkexec`. `pkexec` needs a running agent (`hyprpolkitagent`, which Archway
+starts with the session); with none running it fails with
+`Error creating textual authentication agent` and the applet exits `3` telling
+you to run `grant`.
 
 ## 1. Install the package
 
@@ -35,7 +42,9 @@ sudo pacman -S keyd
 `keyd` is in `extra` and is part of the desktop manifest, so a normal
 `archway install` already provides it. The service is **not** enabled by the
 installer: a keyboard remap can fight an existing one (or a game that reads
-evdev directly), so it stays off until you ask for it.
+evdev directly), so it stays off until you ask for it. The installer does not
+install the polkit rule either — `archway applet keyd grant` is a deliberate
+one-time choice, not something a dotfiles install grants on your behalf.
 
 Why `Super+Alt+N` and not a `Ctrl` chord: a keybind only works once Hyprland
 has reloaded it. If the session is running an older config, the chord is
@@ -52,9 +61,8 @@ archway applet keyd on
 
 That is it: the applet writes the packaged layer when
 `/etc/keyd/default.conf` does not exist yet, then enables and starts the
-service. Root is requested once, through `sudo -n` if the credentials are
-already cached (a terminal) or `pkexec` otherwise (the keybind, through
-`hyprpolkitagent`).
+service. Root is requested once, through the `grant` rule if installed, `sudo -n`
+if the credentials are already cached (a terminal), or `pkexec` otherwise.
 
 An existing `default.conf` that Archway did not write is **not** replaced. The
 applet reports it and leaves it in charge, so your own mapping keeps working:
@@ -184,10 +192,15 @@ let the applet report the config as `modified`.
 ## 8. Remove
 
 ```bash
-archway applet keyd off        # service disabled, typing back to normal
-sudo pacman -Rns keyd          # optional: drop the package
-sudo rm /etc/keyd/default.conf # optional: drop the layer file
+archway applet keyd off           # service disabled, typing back to normal
+archway applet keyd revoke        # optional: drop the polkit rule
+sudo pacman -Rns keyd             # optional: drop the package
+sudo rm /etc/keyd/default.conf    # optional: drop the layer file
 ```
+
+If the shortcut ever stops responding while the layer is on, the terminal is
+always the escape hatch: `sudo systemctl disable --now keyd` restores the
+firmware mapping with nothing else touched.
 
 Turning it off is enough to get the old keyboard back; removing the package and
 the file only cleans up. Nothing else on the system was changed.

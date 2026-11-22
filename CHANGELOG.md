@@ -126,9 +126,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from a keybind, so `Super+Alt+N` could not turn keyd off while the same command
   worked in a terminal. The keyd applet now says so explicitly (exit 3) instead
   of reporting a generic failure.
+- **`archway applet keyd grant`** is the actual fix for toggling the numpad
+  from a shortcut. A keybind has no terminal and no guarantee that a polkit
+  agent is up, so the applet now installs one narrow rule
+  (`/etc/polkit-1/rules.d/49-archway-keyd.rules`: `keyd.service` only, start/
+  stop/restart/reload only, local active `wheel` sessions only) and then calls
+  `systemctl` directly. `revoke` removes it. `reload` falls back to a service
+  restart when only the rule is available, since `keyd reload` needs its root
+  socket.
 - `archway doctor` gains `theme.yazi`: it compares the generated Yazi theme with
   the live one, so a stale `theme.toml` (the app silently keeping the previous
   palette) is one line of output instead of a mystery.
+- Sending a window to a workspace no longer follows it: `Super+Shift+4` moved the
+  session to workspace 4 instead of moving the window there, because the
+  generated bind used `hl.dsp.window.move({ workspace = N })`. Binds now emit
+  `follow = false` (Hyprland's `movetoworkspacesilent`).
+- The Wi-Fi menu is rebuilt around a rofi 2.x quirk: dmenu splits a line into
+  columns on runs of whitespace, so the old tab/`-display-columns 3` rows showed
+  a signal glyph on the left and truncated SSIDs on the right. Rows are now one
+  space between fields with a fixed-width four-dot signal meter, the selection is
+  read back with `-format i` and an action array (no parsing of visible text),
+  nmcli's column padding is trimmed, and the password prompt is a single-line
+  dialog (the SSID as prompt, masked entry) instead of an eight-row empty list
+  with a cramped input.
 - Thunar's remaining bright edges are gone: the menubar/toolbar, list column
   headers, treeview row separators and the scrollbar slider no longer inherit
   gradients or light borders from the stock GTK theme, the scroll edge shadows
@@ -243,6 +263,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The updates pill no longer dies with `==> ERROR: Cannot fetch updates` when
+  clicked. `checkupdates` locks a shared sync-db directory, so the bar refresh
+  and the click handler collided. Each invocation now gets a private
+  `CHECKUPDATES_DB`, and the click runs `archway-bar updates --list`, which
+  prints the pending packages (or says the system is current) in a floating
+  terminal. A failed check reports "could not check updates" instead of a
+  confident zero.
 - An existing `~/.config/alacritty/alacritty.toml` is no longer replaced: the
   first attempt at the terminal selector shipped one, and chezmoi overwrote a
   customised config (restored from the backup; the file is now out of the repo).

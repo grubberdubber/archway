@@ -1,0 +1,23 @@
+// Managed by Archway (applet: keyd). Remove with: archway applet keyd revoke
+//
+// `Super+Alt+N` has no terminal to ask for a password on, and asking a graphical
+// prompt to appear for a keyboard remap is a lot of ceremony for one service.
+// This rule lets a member of `wheel` start, stop, restart and reload keyd.service
+// without authentication — and nothing else: any other unit, or any other action,
+// falls through to the normal polkit policy.
+polkit.addRule(function(action, subject) {
+  if (action.id != "org.freedesktop.systemd1.manage-units") {
+    return polkit.Result.NOT_HANDLED;
+  }
+  if (!subject.local || !subject.active || !subject.isInGroup("wheel")) {
+    return polkit.Result.NOT_HANDLED;
+  }
+  if (action.lookup("unit") != "keyd.service") {
+    return polkit.Result.NOT_HANDLED;
+  }
+  var verb = action.lookup("verb");
+  if (verb == "start" || verb == "stop" || verb == "restart" || verb == "reload") {
+    return polkit.Result.YES;
+  }
+  return polkit.Result.NOT_HANDLED;
+});

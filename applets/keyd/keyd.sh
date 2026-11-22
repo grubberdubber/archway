@@ -12,9 +12,9 @@
 #   * `reload` applies an edit without restarting the service, so a syntax error
 #     leaves the previous mapping in place.
 #
-# Root is obtained through `sudo -n` when the credentials are already cached and
-# through `pkexec` otherwise, so the same command works from a keybind (polkit
-# agent) and from a terminal. Never runs as root itself.
+# Root: first `sudo -n` (cached credentials), then plain `systemctl` if the
+# `grant` polkit rule is installed (no prompt, no agent — the normal case), then
+# pkexec with a graphical dialog, then a clear error. Never runs as root itself.
 set -Eeuo pipefail
 
 DRY_RUN=0
@@ -31,6 +31,8 @@ KEYD_BIN=${KEYD_BIN:-keyd}
 SELF_DIR=$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")" && pwd)
 PACKAGED_CONF="$SELF_DIR/default.conf"
 MARKER='# Managed by Archway (applet: keyd).'
+POLKIT_RULE=${POLKIT_RULE:-/etc/polkit-1/rules.d/49-archway-keyd.rules}
+PACKAGED_RULE="$SELF_DIR/49-archway-keyd.rules"
 
 usage() {
   cat << 'EOF'
@@ -41,20 +43,24 @@ Usage:
   keyd.sh on | off | toggle
   keyd.sh install [--replace]
   keyd.sh reload
+  keyd.sh grant | revoke
   keyd.sh --dry-run <action>
 
 on        install the layer if /etc/keyd/default.conf is missing, then
           enable and start the keyd service (root via sudo -n or pkexec).
 off       disable and stop the service; typing goes back to the firmware
           mapping immediately. The config file is left untouched.
-          Needs root: sudo when credentials are cached, otherwise a pkexec
-          prompt, which requires a running polkit agent (hyprpolkitagent on
-          Hyprland; Archway starts it with the session).
+          Needs root. Run `keyd.sh grant` once (from a terminal, with your
+          password) and the shortcut works with no prompt at all; without the
+          rule it falls back to pkexec, which needs hyprpolkitagent.
 toggle    on when keyd is off, off when it is on (this is the keybind).
 install   write the packaged layer. A config Archway does not own is refused
           unless --replace is given; the previous file is kept as
           default.conf.bak.<timestamp>.
-reload    keyd reload: apply an edited config without a restart.
+reload    apply an edited config without a restart.
+grant     install a polkit rule that lets members of wheel start/stop/restart
+          keyd.service without a password. One-time, reversible with `revoke`.
+revoke    remove that rule.
 
 The layer: tap CapsLock = Escape, hold CapsLock + j k l = 4 5 6, u i o = 7 8 9,
 m , . = 1 2 3, n = 0. Nothing is remapped while the service is off.
@@ -111,8 +117,11 @@ polkit_agent_running() {
     > /dev/null 2>&1
 }
 
+granted() { [[ -e $POLKIT_RULE ]]; }
+
 # sudo only when it cannot prompt (a keybind has no terminal to prompt on);
-# otherwise pkexec, which the polkit agent renders as a graphical dialog.
+# then the `grant` rule, which polkit answers without a dialog; otherwise pkexec,
+# which an agent renders graphically.
 root_exec() {
   if ((EUID == 0)); then
     "$@"
@@ -122,12 +131,17 @@ root_exec() {
     sudo -n "$@"
     return
   fi
+  if granted; then
+    "$@"
+    return
+  fi
   if have pkexec; then
     if ! polkit_agent_running; then
-      die "no polkit agent is running, so the password prompt cannot open; start hyprpolkitagent (Archway autostarts it on Hyprland) or run this from a terminal" 3
+      die "root is needed and no polkit agent is running; run 'archway applet keyd grant' once in a terminal to make the shortcut work without a password, or start hyprpolkitagent" 3
     fi
-    pkexec "$@"
-    return
+    pkexec "$@" || return $?
+    printf 'keyd: tip — run %s applet keyd grant once so this stops asking\n' "${ARCHWAY:-archway}" >&2
+    return 0
   fi
   die "root is required for '$*' and neither sudo nor pkexec is usable" 3
 }
@@ -217,10 +231,40 @@ stop_service() {
   notify "off — firmware keyboard mapping restored"
 }
 
+grant_rule() {
+  [[ -r $PACKAGED_RULE ]] || die "packaged rule is missing: $PACKAGED_RULE" 3
+  if granted; then
+    printf 'keyd: polkit rule already installed (%s)\n' "$POLKIT_RULE"
+    return 0
+  fi
+  run_root install -d -m 755 -- "$(dirname -- "$POLKIT_RULE")"
+  run_root install -m 644 -- "$PACKAGED_RULE" "$POLKIT_RULE"
+  ((DRY_RUN)) && return 0
+  granted || die "the rule was not written to $POLKIT_RULE" 1
+  printf 'keyd: granted — Super+Alt+N now toggles keyd with no password\n'
+  notify "granted — the toggle no longer asks for a password"
+}
+
+revoke_rule() {
+  if ! granted; then
+    printf 'keyd: no polkit rule to revoke\n'
+    return 0
+  fi
+  run_root rm -f -- "$POLKIT_RULE"
+  ((DRY_RUN)) && return 0
+  printf 'keyd: rule removed; toggling asks for a password again\n'
+}
+
 reload_service() {
   require_keyd
   service_active || die "keyd is not running; turn it on first" 1
-  run_root "$KEYD_BIN" reload || die "keyd reload failed; the previous mapping is still active" 1
+  # `keyd reload` needs root for its control socket; via the grant rule we only
+  # have the unit, and a restart re-reads the config just the same.
+  if ((EUID == 0)) || sudo -n true > /dev/null 2>&1; then
+    run_root "$KEYD_BIN" reload || die "keyd reload failed; the previous mapping is still active" 1
+  else
+    run_root systemctl restart keyd || die "could not reload keyd" 1
+  fi
   ((DRY_RUN)) && return 0
   printf 'keyd: configuration reloaded\n'
   notify "configuration reloaded"
@@ -254,7 +298,7 @@ while (($#)); do
     --dry-run) DRY_RUN=1 ;;
     --json) JSON=1 ;;
     --replace) REPLACE=1 ;;
-    status | on | off | toggle | install | reload) ACTION=$1 ;;
+    status | on | off | toggle | install | reload | grant | revoke) ACTION=$1 ;;
     *)
       printf 'keyd: unknown option: %s\n' "$1" >&2
       exit 2
@@ -273,6 +317,8 @@ case ${ACTION:-} in
   on) start_service ;;
   off) stop_service ;;
   reload) reload_service ;;
+  grant) grant_rule ;;
+  revoke) revoke_rule ;;
   toggle)
     if service_active; then
       stop_service

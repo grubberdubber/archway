@@ -93,6 +93,21 @@ teardown() {
   assert_missing "$HOME/nmcli.log"
 }
 
+@test "network menu trims nmcli's column padding" {
+  mock_cmd nmcli 'case "$*" in
+    "radio wifi") printf "enabled\n" ;;
+    *"device wifi list"*) printf "IN-USE:                                 *\nSSID:                                   HomeNet\nSIGNAL:                                 82\nSECURITY:                               WPA2\n" ;;
+    *) printf "\n" ;;
+  esac'
+  mock_cmd rofi 'cat > "$HOME/rofi-input.log"; printf ""'
+  run "$NET" --rofi
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/rofi-input.log" "HomeNet 82%"
+  # rofi 2.x turns a run of spaces into columns, so the row must not contain one.
+  run grep -c '  ' "$HOME/rofi-input.log"
+  assert_contains "$output" "0"
+}
+
 @test "network menu lists networks with signal and lock state" {
   mock_cmd nmcli 'case "$*" in
     "radio wifi") printf "enabled\n" ;;
@@ -124,6 +139,17 @@ teardown() {
   assert_eq 0 "$status"
   assert_contains "$output" '"class": "muted"'
   assert_contains "$output" "up to date"
+}
+
+@test "bar update list survives a busy checkupdates" {
+  # The click handler used to run a second `checkupdates`, which fails with
+  # "Cannot fetch updates" while the bar module holds its lock. Each run now
+  # gets a private CHECKUPDATES_DB, so the two cannot collide.
+  mock_cmd checkupdates 'printf "linux 6.9 -> 6.10\n"'
+  run "$BAR" updates --list
+  assert_eq 0 "$status"
+  assert_contains "$output" "linux 6.9 -> 6.10"
+  assert_contains "$output" "archway update"
 }
 
 @test "bar updates reports the pending count" {
@@ -455,6 +481,7 @@ _keyd_mocks() {
   export KEYD_DIR="$HOME/etc-keyd"
   unset KEYD_BIN
   export KEYD_BIN=keyd
+  export POLKIT_RULE="$HOME/etc-polkit/49-archway-keyd.rules"
   mock_cmd keyd 'printf "%s\n" "$*" >> "$HOME/keyd.log"'
   mock_cmd notify-send 'exit 0'
   mock_cmd sudo '[[ $1 == -n ]] && shift
@@ -520,6 +547,26 @@ _keyd_mocks() {
   run "$K" toggle
   assert_eq 0 "$status"
   [[ ! -e $HOME/active ]] || fail "toggle did not stop the service"
+}
+
+@test "keyd grant installs a narrow polkit rule and removes sudo from the toggle" {
+  K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
+  _keyd_mocks
+  # No cached credentials: the first grant still needs a password, which the
+  # test fakes with pkexec. After it, nothing should ask again.
+  mock_cmd sudo 'exit 1'
+  mock_cmd pkexec '"$@"'
+  mock_cmd pgrep 'exit 0' # a polkit agent is up, so pkexec can ask for the password
+  run "$K" grant
+  assert_eq 0 "$status"
+  assert_file_contains "$POLKIT_RULE" 'subject.isInGroup("wheel")'
+  assert_file_contains "$POLKIT_RULE" 'org.freedesktop.systemd1.manage-units'
+  run "$K" toggle
+  assert_eq 0 "$status"
+  [[ -e $HOME/active ]] || fail "toggle did not start keyd after grant"
+  run "$K" revoke
+  assert_eq 0 "$status"
+  [[ ! -e $POLKIT_RULE ]] || fail "revoke left the rule in place"
 }
 
 @test "keyd install never overwrites a config Archway does not own" {

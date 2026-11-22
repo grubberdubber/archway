@@ -74,18 +74,55 @@ section_failed() {
 # Pending package updates. `checkupdates` is offline-safe (sync db copy).
 # The pill stays visible at zero: hiding it made the button look broken ("the
 # updates button does nothing") exactly when the system was up to date.
+# `checkupdates` keeps its sync-db copy in one shared temp directory and takes
+# a lock there, so the bar refresh and a click on the pill used to collide:
+# the second copy printed "==> ERROR: Cannot fetch updates" into the terminal.
+# A private CHECKUPDATES_DB per invocation removes the shared lock entirely.
+pending_updates() {
+  local db
+  db=$(mktemp -d)
+  CHECKUPDATES_DB="$db" checkupdates 2> /dev/null || true
+  rm -rf -- "$db" 2> /dev/null || true
+}
+
 section_updates() {
-  local count
+  local count err
   have checkupdates || {
     emit "$(icon f019) ?" "checkupdates is not installed (pacman-contrib)" muted
     return 0
   }
-  count=$(checkupdates 2> /dev/null | grep -c . || true)
+  err=$(mktemp)
+  count=$(pending_updates 2> "$err" | grep -c . || true)
+  # `checkupdates` takes a lock on its sync-db copy, so a second copy (the
+  # click handler, a manual run) fails with "Cannot fetch updates". Say so
+  # instead of reporting zero updates, which is a lie the user cannot see.
+  if [[ ${count:-0} -eq 0 ]] && grep -qi 'error' "$err"; then
+    rm -f -- "$err"
+    emit "$(icon f019) ?" "could not check updates just now — click to retry" warning
+    return 0
+  fi
+  rm -f -- "$err"
   if [[ ${count:-0} -eq 0 ]]; then
     emit "$(icon f00c)" "system is up to date — click to check again" muted
     return 0
   fi
   emit "$(icon f019) ${count}" "${count} package update(s) available — click to list them" warning
+}
+
+# `custom/updates` on-click: plain `pacman -Qu` instead of a second
+# `checkupdates`. It needs no lock and no network, so clicking while the module
+# refreshes cannot fail, and the list is the same one pacman would install.
+updates_list() {
+  local list count
+  list=$(pending_updates)
+  count=$(printf '%s\n' "$list" | grep -c . || true)
+  if [[ ${count:-0} -eq 0 ]]; then
+    printf 'No package updates pending.\n'
+    return 0
+  fi
+  printf '%s\n\n' "$list"
+  printf '%s pending update(s).\n' "$count"
+  printf 'Update with: archway update\n'
 }
 
 # Real playback position. waybar's `{position}`/`{length}` inside the mpris
@@ -341,6 +378,7 @@ sections:
   resources | disk | nightlight | power-profile | scratchpad | language
   nowplaying | media | gaming
 
+  updates --list           print pending updates (no lock, safe to click)
   nightlight --toggle      turn the night light on or off
   power-profile --next     cycle performance -> balanced -> power-saver
   gaming --toggle          enable or disable gaming mode
@@ -355,7 +393,9 @@ main() {
   case $section in
     recording) section_recording ;;
     failed) section_failed ;;
-    updates) section_updates ;;
+    updates)
+      if [[ ${2:-} == --list ]]; then updates_list; else section_updates; fi
+      ;;
     vault) section_vault ;;
     vpn) section_vpn ;;
     notifications) section_notifications ;;

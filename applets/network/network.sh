@@ -63,11 +63,15 @@ wifi_rows() {
   nmcli -m multiline \
     -f IN-USE,SSID,SIGNAL,SECURITY device wifi list 2> /dev/null |
     awk -F': ' '
-      /^IN-USE:/   { inuse = (substr($0, 8) == "*") ? "*" : ""; next }
-      /^SSID:/     { ssid = substr($0, 6); next }
-      /^SIGNAL:/   { sig = substr($0, 8) + 0; next }
+      # nmcli aligns its multiline output into a column, so every value arrives
+      # with leading padding (sometimes trailing too). Untrimmed, that padding
+      # ends up inside the rofi rows and pushes the names off to the right.
+      function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
+      /^IN-USE:/   { inuse = (trim(substr($0, 8)) == "*") ? "*" : ""; next }
+      /^SSID:/     { ssid = trim(substr($0, 6)); next }
+      /^SIGNAL:/   { sig = trim(substr($0, 8)) + 0; next }
       /^SECURITY:/ {
-        sec = substr($0, 10)
+        sec = trim(substr($0, 10))
         # A leading empty field would be swallowed by `read -r` (tabs are IFS
         # whitespace), shifting every column. Print a placeholder instead.
         mark = (inuse == "*") ? "*" : "-"
@@ -81,12 +85,17 @@ wifi_rows() {
 
 signal_icon() {
   local sig=$1
-  # Single glyph plus the numeric value; the private-use characters are
-  # generated with printf so the source stays pure ASCII.
-  if ((sig >= 60)); then
-    printf '\uf1eb'
+  # Four blocks, filled by quartile. Blocks are monospace in every terminal font,
+  # unlike the Nerd Font signal glyphs, which vary in width and made the list
+  # look ragged. The private-use characters stay out of the source.
+  if ((sig >= 75)); then
+    printf '\u25cf\u25cf\u25cf\u25cf'
+  elif ((sig >= 50)); then
+    printf '\u25cf\u25cf\u25cf\u25cb'
+  elif ((sig >= 25)); then
+    printf '\u25cf\u25cf\u25cb\u25cb'
   else
-    printf '\uf012'
+    printf '\u25cf\u25cb\u25cb\u25cb'
   fi
 }
 
@@ -137,11 +146,18 @@ json_str() {
   printf '"%s"' "$s"
 }
 
+ROFI_THEME=${ROFI_THEME:-$HOME/.config/archway/theme.d/rofi.rasi}
+
+# A single-line masked prompt: the list is removed from mainbox entirely, so the
+# window is as tall as the entry instead of reserving eight empty rows (the
+# "empty panel with a cramped input on top" from before). The network name is
+# the prompt; `password` sets the mask character so typing is visible.
 ask_password() {
   local ssid=$1
   have rofi || return 1
-  rofi -dmenu -password -p "Password for $ssid" \
-    -theme "$HOME/.config/archway/theme.d/rofi.rasi"
+  ((${#ssid} > 20)) && ssid="${ssid:0:19}…"
+  rofi -dmenu -password -p "$ssid" -theme "$ROFI_THEME" \
+    -theme-str 'mainbox { children: [ inputbar ]; } window { width: 24em; } inputbar { padding: 10px 12px; } entry { placeholder: "wi-fi password"; password: "●"; }'
 }
 
 connect_ssid() {
@@ -190,40 +206,65 @@ wifi_toggle() {
   esac
 }
 
+# rofi 2.x splits a dmenu line into columns on runs of whitespace, so padding
+# with spaces does not align anything: it renders as ragged columns with the
+# last one right-aligned. Rows below therefore use exactly one space between
+# fields; the four signal blocks are a constant width, which is what keeps the
+# names on one column.
 net_menu() {
   have rofi || die "rofi is required for the menu" 3
-  local rows choice action ssid sec
+  local choice idx ssid sec
+  local -a labels=() actions=()
   while true; do
-    local menu
-    if wifi_on; then
+    labels=()
+    actions=()
+    local rows name inuse sig security line
+    if ! wifi_on; then
+      labels+=('Enable Wi-Fi' 'Network settings')
+      actions+=('radio' 'settings')
+    else
+      labels+=('Disable Wi-Fi' 'Rescan networks' 'Network settings')
+      actions+=('radio' 'rescan' 'settings')
       rows=$(wifi_rows)
-      menu=$(printf 'radio\t\tDisable Wi-Fi\nrescan\t\tRescan networks\nsettings\t\tNetwork settings\n')
+      # One pass to size the name column, one to build the rows: rofi shows a
+      # single string per line, so alignment has to be baked into the text
+      # instead of requested through -display-columns (which right-aligned the
+      # last column and spaced everything else across the window).
       if [[ -n $rows ]]; then
         while IFS=$'\t' read -r inuse name sig security; do
-          local suffix=''
-          [[ $inuse == "*" ]] && suffix=' (connected)'
-          menu+=$(printf '\nwifi\t%s\t%s %s %s%s' "$name" "$(signal_icon "$sig")" \
-            "$name" "$sig" "$suffix")
-          [[ -n $security ]] && [[ $security != -- ]] && menu+=$(printf ' %s' "$(security_icon "$security")")
+          line="$(signal_icon "$sig") $name ${sig}%"
+          [[ $inuse == "*" ]] && line+=' (connected)'
+          [[ -n $security && $security != -- ]] && line+=" $(security_icon "$security")"
+          labels+=("$line")
+          actions+=("wifi:$name")
         done <<< "$rows"
       else
-        menu+=$(printf '\ninfo\t\tNo networks found')
+        labels+=('No networks found')
+        actions+=('info')
       fi
-    else
-      menu=$(printf 'radio\t\tEnable Wi-Fi\nsettings\t\tNetwork settings')
     fi
 
-    choice=$(printf '%s\n' "$menu" |
-      rofi -dmenu -i -p network -display-columns 3 -format s \
-        -theme "$HOME/.config/archway/theme.d/rofi.rasi") || return 0
-    [[ -n $choice ]] || return 0
+    # Debug hook: print exactly what rofi is fed, then stop.
+    if [[ ${NETWORK_MENU_DUMP:-0} == 1 ]]; then
+      printf '%s\n' "${labels[@]}" | cat -A
+      return 0
+    fi
 
-    IFS=$'\t' read -r action ssid _ <<< "$choice"
-    case $action in
+    # -format i returns the row number, so the action never has to survive a
+    # round trip through the visible text (which is what mangled SSIDs with
+    # spaces and made the old tab columns unreadable).
+    choice=$(printf '%s\n' "${labels[@]}" |
+      rofi -dmenu -i -p network -format i -theme "$ROFI_THEME") || return 0
+    [[ -n $choice ]] || return 0
+    idx=$choice
+    ((idx >= 0 && idx < ${#actions[@]})) || return 0
+
+    case ${actions[idx]} in
       radio) wifi_toggle toggle ;;
       rescan) nmcli device wifi rescan > /dev/null 2>&1 || true ;;
       settings) run nm-connection-editor > /dev/null 2>&1 || die "nm-connection-editor not found" 3 ;;
-      wifi)
+      wifi:*)
+        ssid=${actions[idx]#wifi:}
         sec=$(wifi_rows | awk -F'\t' -v want="$ssid" '$2 == want { print $4; exit }')
         connect_ssid "$ssid" "$sec"
         return 0
