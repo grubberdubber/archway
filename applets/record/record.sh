@@ -82,9 +82,13 @@ state_clear() {
 }
 
 pid_alive() {
-  local pid=${1:-}
+  local pid=${1:-} state
   [[ -n $pid ]] || return 1
-  kill -0 "$pid" 2> /dev/null
+  # kill -0 succeeds for a zombie, and a container whose pid 1 is not an init
+  # does not reap orphans — `stop` would then wait the full 6s and report a
+  # failure for a recorder that already exited.
+  state=$(ps -o stat= -p "$pid" 2> /dev/null) || return 1
+  [[ -n $state && ${state:0:1} != Z ]]
 }
 
 # True when a recorder is running, whether Archway started it or not: the pill
