@@ -116,15 +116,17 @@ menu_labels() {
 }
 
 run_menu() {
-  have rofi || die "rofi is required for the picker" 3
   local labels idx glyph
   labels=$(menu_labels)
   [[ -n $labels ]] || die "no entries in $DATA_FILE" 3
 
+  # --dry-run prints the rows so CI can check them without rofi installed.
   if ((DRY_RUN)); then
     printf '%s\n' "$labels"
     return 0
   fi
+
+  have rofi || die "rofi is required for the picker" 3
 
   # -format i returns the row index; the glyph is the first field of that row, so
   # nothing has to be parsed out of the visible text.

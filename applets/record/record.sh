@@ -96,10 +96,10 @@ recording_pid() {
     printf '%s' "$pid"
     return 0
   fi
-  # Comm is not reliable across builds/packagers, so fall back to the command
-  # line as well (a recorder started by something other than Archway).
+  # Only an exact process name: matching the command line would also hit the
+  # applet itself, its tests and any shell that merely mentions the recorder
+  # (a container's pid 1 does), and `start` would refuse to record.
   pid=$(pgrep -x wf-recorder 2> /dev/null | head -n 1 || true)
-  [[ -z $pid ]] && pid=$(pgrep -f 'wf-recorder( |$)' 2> /dev/null | head -n 1 || true)
   [[ -n $pid ]] && printf '%s' "$pid"
 }
 
