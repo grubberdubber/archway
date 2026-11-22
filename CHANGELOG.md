@@ -282,6 +282,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The media pill no longer prints a running timer. `custom/media` renders
+  `icon + artist — title` (14 characters, dimmed while paused) and the
+  position/length moved into its tooltip, so hovering the music button shows
+  "0:37 / 2:40". A clock on the bar changed the pill width every second and kept
+  dragging the centred row. The clock line is skipped when a player reports no
+  length (streams, some Firefox pages) instead of showing a meaningless `0:00`.
+  `mpris` and `custom/nowplaying` are gone: the same custom module now stands in
+  while nothing plays, which is what kept the slot from collapsing.
 - Keybind parsing now undoes TOML's `\"` and `\\` escapes. Before, a command
   containing a double quote reached Hyprland with an extra backslash — the
   visible break was the theme picker, but any quoted argument would have hit it.

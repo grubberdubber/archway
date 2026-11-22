@@ -125,30 +125,67 @@ updates_list() {
   printf 'Update with: archway update\n'
 }
 
-# Real playback position. waybar's `{position}`/`{length}` inside the mpris
-# tooltip stays at 00:00:00 for several players (mpv, Firefox video), so the
-# number comes from playerctl, which asks the player itself.
+# The media pill. The bar itself only shows icon + "artist — title"; the
+# playback clock lives in the tooltip, where you look when you actually want it.
+# A visible timer changed the pill width every second and dragged the whole
+# centred row around with it. waybar's own mpris `{position}`/`{length}` stay at
+# 00:00:00 for several players (mpv, Firefox video), so the numbers come from
+# playerctl, which asks the player itself. It also keeps the pill in place while
+# nothing plays, so the row never re-centres when a player stops.
 section_media() {
   local status
   have playerctl || {
-    emit ""
+    emit "$(icon f001) —" "playerctl is not installed" muted
     return 0
   }
   status=$(playerctl status 2> /dev/null || true)
-  [[ -n $status ]] || {
-    emit ""
+  if [[ -z $status ]]; then
+    emit "$(icon f001) —" "no media player is running" muted
     return 0
-  }
-  local elapsed length text
-  elapsed=$(playerctl position 2> /dev/null | awk '{printf "%d:%02d", $1 / 60, $1 % 60}' || true)
-  length=$(playerctl metadata --format '{{duration(mpris:length)}}' 2> /dev/null || true)
-  [[ -n $elapsed ]] || {
-    emit ""
-    return 0
-  }
-  text="${elapsed}"
-  [[ -n $length && $length != 0:00 ]] && text+="/${length}"
-  emit "$text" "${status} — ${text}" muted
+  fi
+  local player artist title album glyph full text tooltip clock cls=normal
+  player=$(playerctl metadata --format '{{playerName}}' 2> /dev/null || true)
+  artist=$(playerctl metadata --format '{{artist}}' 2> /dev/null || true)
+  title=$(playerctl metadata --format '{{title}}' 2> /dev/null || true)
+  album=$(playerctl metadata --format '{{album}}' 2> /dev/null || true)
+  case ${player,,} in
+    mpv*) glyph=$(icon f03d) ;;
+    firefox*) glyph=$(icon f269) ;;
+    spotify*) glyph=$(icon f1bc) ;;
+    *) glyph=$(icon f001) ;;
+  esac
+  if [[ -n $artist && -n $title ]]; then
+    full="$artist — $title"
+  elif [[ -n $title ]]; then
+    full=$title
+  else
+    full=${player:-media}
+  fi
+  # 14 characters, same budget the mpris module used: the pill is a reminder of
+  # what is playing, not a scroller.
+  text=$full
+  if ((${#text} > 14)); then text="${text:0:13}…"; fi
+  [[ $status == Playing ]] || cls=paused
+
+  # <position> / <length>, resolved when the player reports both. Streams and
+  # some Firefox pages answer position 0 with no length at all, and "0:00" on its
+  # own is noise: then the line is left out and the tooltip keeps player + hint.
+  clock=""
+  local pos len
+  pos=$(playerctl position 2> /dev/null || true)
+  len=$(playerctl metadata --format '{{duration(mpris:length)}}' 2> /dev/null || true)
+  if [[ -n $pos && -n $len && $len != 0:00 ]]; then
+    pos=$(awk -v p="$pos" 'BEGIN{ printf "%d:%02d", p / 60, p % 60 }')
+    clock="${pos} / ${len}"
+  fi
+
+  # Real newlines, not "\n": waybar draws the tooltip as Pango text and would
+  # print a literal backslash-n. json_escape then turns them into JSON \n.
+  tooltip=${player:-player}
+  [[ -n $album ]] && tooltip+=$'\n'"$album"
+  [[ -n $clock ]] && tooltip+=$'\n'"$clock"
+  tooltip+=$'\nclick: play/pause · right-click: stop'
+  emit "${glyph} ${text}" "$tooltip" "$cls"
 }
 
 # Gaming mode (applets/gaming): the rocket pill next to the power button.
@@ -223,21 +260,6 @@ section_notifications() {
   else
     emit "$(icon f0f3) ${count}" "${count} unread notification(s)" normal
   fi
-}
-
-# Placeholder for the media pill. `mpris` disappears when no player is running,
-# and a vanished pill re-centres the row; this keeps the slot while it is away,
-# and hides as soon as a real player is back.
-section_nowplaying() {
-  have playerctl || {
-    emit ""
-    return 0
-  }
-  if [[ -n $(playerctl status 2> /dev/null || true) ]]; then
-    emit ""
-    return 0
-  fi
-  emit "$(icon f001) —" "no media player is running" muted
 }
 
 # CPU, RAM and temperature, hidden until something is actually hot or full.
@@ -376,7 +398,7 @@ usage: bar.sh <section>
 sections:
   recording | failed | updates | vault | vpn | notifications
   resources | disk | nightlight | power-profile | scratchpad | language
-  nowplaying | media | gaming
+  media | gaming
 
   updates --list           print pending updates (no lock, safe to click)
   nightlight --toggle      turn the night light on or off
@@ -399,7 +421,6 @@ main() {
     vault) section_vault ;;
     vpn) section_vpn ;;
     notifications) section_notifications ;;
-    nowplaying) section_nowplaying ;;
     media) section_media ;;
     gaming)
       if [[ ${2:-} == --toggle ]]; then

@@ -257,6 +257,36 @@ teardown() {
   assert_contains "$output" '"text": ""'
 }
 
+# The media pill shows the track, never the playback clock: a timer printed on
+# the bar changed the pill width every second and slid the centred row around.
+@test "bar media keeps the clock in the tooltip and out of the pill" {
+  mock_cmd playerctl 'case "$*" in
+    status) printf "Playing\n" ;;
+    position) printf "37.0\n" ;;
+    *mpris:length*) printf "2:40\n" ;;
+    *playerName*) printf "firefox\n" ;;
+    *artist*) printf "Tally Hall\n" ;;
+    *title*) printf "The Bidding\n" ;;
+    *) printf "\n" ;;
+  esac'
+  run "$BAR" media
+  assert_eq 0 "$status"
+  local text tooltip
+  text=$(printf '%s\n' "$output" | sed -n 's/.*"text": "\([^"]*\)".*/\1/p')
+  tooltip=$(printf '%s\n' "$output" | sed -n 's/.*"tooltip": "\([^"]*\)".*/\1/p')
+  assert_contains "$text" "Tally Hall"
+  [[ $text != *"0:37"* ]] || fail "the pill still prints the elapsed time"
+  assert_contains "$tooltip" "0:37 / 2:40"
+}
+
+@test "bar media holds the slot with a placeholder when nothing plays" {
+  mock_cmd playerctl 'exit 0'
+  run "$BAR" media
+  assert_eq 0 "$status"
+  assert_contains "$output" '"class": "muted"'
+  assert_contains "$output" "no media player is running"
+}
+
 @test "bar power-profile cycles performance to balanced" {
   mock_cmd powerprofilesctl 'case $1 in get) echo performance ;; set) printf "%s\n" "$2" > "$HOME/pp" ;; esac'
   run "$BAR" power-profile --next

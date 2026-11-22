@@ -26,8 +26,6 @@
     "custom/launcher",
     "hyprland/workspaces",
     "group/context",
-    "custom/nowplaying",
-    "mpris",
     "custom/media",
     "clock",
     "custom/notifications",
@@ -106,26 +104,6 @@
     "tooltip": false
   },
 
-  "mpris": {
-    "format": "{player_icon} {artist} — {title}",
-    "format-paused": "{player_icon} {artist} — {title}",
-    "max-length": 14,
-    // No {position}/{length} here: waybar leaves them at 00:00:00 for several
-    // players (mpv, Firefox video). The elapsed pill next to it asks playerctl.
-    "tooltip-format": "{player} • {album}",
-    "player-icons": {
-      "default": "\uf001",
-      "mpv": "\uf03d",
-      "firefox": "\uf269"
-    },
-    "status-icons": {
-      "paused": "\uf04b",
-      "playing": "\uf04c"
-    },
-    "on-click": "playerctl play-pause",
-    "on-scroll-up": "playerctl next",
-    "on-scroll-down": "playerctl previous"
-  },
   "clock": {
     "format": "{:%d/%m %H:%M}",
     // No format-alt on purpose: waybar toggles it on every left click, and rapid
@@ -133,18 +111,19 @@
     // never changes size, so the row stays put.
     "tooltip-format": "<tt>{calendar}</tt>"
   },
+  // The one media pill: icon + "artist — title", with the playback position and
+  // length in the tooltip. A timer printed on the bar changed the pill width
+  // every second, so the row never stopped moving; hover is where the clock
+  // belongs. It also stands in while no player is running, which keeps the slot
+  // from disappearing and re-centring the row.
   "custom/media": {
     "exec": "$HOME/.local/bin/archway-bar media",
     "return-type": "json",
     "interval": 1,
     "on-click": "playerctl play-pause",
     "on-click-right": "playerctl stop",
-    "tooltip": true
-  },
-  "custom/nowplaying": {
-    "exec": "$HOME/.local/bin/archway-bar nowplaying",
-    "return-type": "json",
-    "interval": 5,
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous",
     "tooltip": true
   },
 
