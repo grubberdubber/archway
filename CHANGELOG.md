@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `doctor` now reports `keyd.grant`: when `keyd` is installed but the narrow
+  polkit rule is missing, `Super+Alt+N` will raise an authentication dialog on
+  every toggle (or fail when no agent is running), and the check says so with
+  the one command that fixes it. `docs/keyd.md` explains why this uses a polkit
+  rule instead of a setuid helper or a `NOPASSWD` sudoers line.
 - `archway nvim pin --commit <sha>`, plus the first real pin: the lock now
   records commit `e309ab9` of `nvim-config` with the SHA256 of its archive.
   Upstream has no tags yet, and pinning by tag was the only option the CLI

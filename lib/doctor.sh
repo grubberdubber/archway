@@ -171,12 +171,30 @@ doctor_run() {
     doctor_add "uwsm" warn "uwsm missing; start Hyprland through uwsm for systemd integration"
   fi
 
+  # keyd lives in /etc, so toggling it needs root once. The narrow polkit rule
+  # is what makes Super+Alt+N quiet; without it every toggle raises an
+  # authentication dialog, and fails outright when no agent is running.
+  if have keyd; then
+    if [[ -r ${KEYD_POLKIT_RULE:-/etc/polkit-1/rules.d/49-archway-keyd.rules} ]]; then
+      doctor_add "keyd.grant" ok "polkit rule present; the toggle needs no password"
+    else
+      doctor_add "keyd.grant" warn "run 'archway applet keyd grant' once to toggle without a password"
+    fi
+  else
+    doctor_add "keyd" ok "not installed (optional)"
+  fi
+
   # 6. Package manifests
   doctor_manifest_overlap
 
   # 7. Neovim pin (never fatal for the desktop)
   if nvim_lock_verified; then
-    doctor_add "nvim.pin" ok "$(lock_get tag) @ $(lock_get commit)"
+    # A commit pin has no tag; printing " @ sha" reads like a missing value.
+    if [[ -n $(lock_get tag) ]]; then
+      doctor_add "nvim.pin" ok "$(lock_get tag) @ $(lock_get commit)"
+    else
+      doctor_add "nvim.pin" ok "commit $(lock_get commit)"
+    fi
   else
     doctor_add "nvim.pin" warn "unpinned placeholder (archway nvim pin <tag>)"
   fi

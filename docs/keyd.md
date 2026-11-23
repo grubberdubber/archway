@@ -27,6 +27,33 @@ Both need root, and a keybind has no terminal to type a password into. Run
 authentication. After that `Super+Alt+N` just works, with no dialog and no
 polkit agent involved.
 
+## Why not SUID, or a passwordless sudo rule
+
+A root-owned binary with the setuid bit is a permanent privilege-escalation
+surface: anyone who finds an argument-parsing bug, an inherited `PATH`, or a
+writable file it reads gets root, and no amount of care in the applet makes that
+go away. The kernel ignores setuid on scripts anyway, so shipping one would need
+a compiled helper — more code, more surface, for a keyboard toggle.
+
+A `NOPASSWD` sudoers line is not much better. `sudo` matches on the command
+path, so a wrapper that calls `systemctl` becomes a wrapper that can be pointed
+at any unit, and the rule says nothing about *who* or *where*.
+
+polkit can express exactly what this needs, which is why the rule is written
+that way:
+
+- **one action** — `org.freedesktop.systemd1.manage-units`, nothing else;
+- **one unit** — `keyd.service`; a rule for another unit does not match;
+- **four verbs** — start, stop, restart, reload; `mask`, `disable`, `link` and
+  friends stay behind authentication;
+- **one kind of caller** — a local, active session of a `wheel` member, so a
+  remote or background context still gets the normal policy.
+
+The rule is a file in `/etc/polkit-1/rules.d/`, readable and removable with
+`archway applet keyd revoke`; it grants no shell, no file access and no other
+service. If you would rather keep the password prompt, never run `grant` and the
+toggle keeps asking.
+
 Without the rule the applet falls back to cached `sudo -n` credentials or
 `pkexec`. `pkexec` needs a running agent (`hyprpolkitagent`, which Archway
 starts with the session); with none running it fails with
