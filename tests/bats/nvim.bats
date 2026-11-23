@@ -7,6 +7,9 @@ setup() {
   setup_sandbox
   # The real lock lives in the checkout; every test here pins into a copy.
   NVIM_LOCK="$SANDBOX/nvim-config.lock"
+  # The suite runs as root in the CI container; refuse-to-run-as-root is a CLI
+  # guard, not part of what these tests exercise.
+  require_not_root() { :; }
   cat > "$NVIM_LOCK" << 'EOF'
 schema = 1
 url = "https://github.com/example/nvim-config"
