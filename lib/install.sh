@@ -425,7 +425,12 @@ cmd_install() {
   if [[ $editor == neovim ]] && ((! skip_nvim)); then
     section "Neovim"
     if nvim_lock_verified; then
-      nvim_install || warn "Neovim step failed; the desktop is unaffected (see 'archway nvim doctor')"
+      # Runs in a subshell on purpose: nvim_install calls `die`, which exits the
+      # calling shell, and a missing Neovim must not take the desktop install
+      # down with it (AGENTS.md §7.1).
+      if ! (nvim_install); then
+        warn "Neovim step failed; the desktop is unaffected (see 'archway nvim doctor')"
+      fi
     else
       warn "Neovim pin is a placeholder; skipping Neovim."
       warn "Run 'archway nvim pin <tag>' first, then 'archway nvim install'."
