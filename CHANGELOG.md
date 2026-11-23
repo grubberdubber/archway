@@ -327,6 +327,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `doctor` warned "run `archway applet keyd grant`" on a machine where the
+  grant worked: `/etc/polkit-1/rules.d` is `0750 root:polkitd`, so a normal user
+  cannot `[[ -r ]]` the rule file. The check now probes the capability itself
+  (`systemctl --no-ask-password start keyd` on the already-active unit, which is
+  a no-op systemd still authorises) and says plainly when keyd is stopped.
 - File uploads from a browser opened a picker where no shortcut seemed to work.
   Since Firefox 149 the XDG portal picker is the default: it opens as its own
   window, Hyprland tiled it behind the browser, and an unfocused dialog ignores

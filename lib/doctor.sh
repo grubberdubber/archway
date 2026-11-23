@@ -175,10 +175,24 @@ doctor_run() {
   # is what makes Super+Alt+N quiet; without it every toggle raises an
   # authentication dialog, and fails outright when no agent is running.
   if have keyd; then
-    if [[ -r ${KEYD_POLKIT_RULE:-/etc/polkit-1/rules.d/49-archway-keyd.rules} ]]; then
-      doctor_add "keyd.grant" ok "polkit rule present; the toggle needs no password"
+    # The rule file itself is unreadable for a normal user: /etc/polkit-1/rules.d
+    # is 0750 root:polkitd, so `[[ -r ]]` warned on a machine where the toggle
+    # demonstrably worked. Test the capability instead, with the same action the
+    # shortcut uses and with prompting disabled, so a missing grant fails fast
+    # instead of opening a dialog in the middle of a health check. `reload` is
+    # the cheapest verb the rule allows and changes no state.
+    if systemctl is-active --quiet keyd 2> /dev/null; then
+      # `start` on an already-active unit is a no-op that polkit still
+      # authorises, so a 0 here is the same verdict the shortcut gets.
+      if systemctl --no-ask-password --quiet start keyd 2> /dev/null; then
+        doctor_add "keyd.grant" ok "polkit rule works; the toggle needs no password"
+      else
+        doctor_add "keyd.grant" warn "run 'archway applet keyd grant' once to toggle without a password"
+      fi
     else
-      doctor_add "keyd.grant" warn "run 'archway applet keyd grant' once to toggle without a password"
+      # Nothing to probe without changing state (starting keyd would remap the
+      # keyboard mid-check); say which state it is instead of guessing.
+      doctor_add "keyd.grant" warn "keyd is stopped; start it with Super+Alt+N and re-run doctor"
     fi
   else
     doctor_add "keyd" ok "not installed (optional)"
