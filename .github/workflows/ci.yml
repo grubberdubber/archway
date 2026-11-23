@@ -47,7 +47,9 @@ jobs:
         run: yamllint .
 
       - name: Workflows
-        run: actionlint
+        # Explicit paths: in a container job actionlint cannot discover the
+        # project root (no git metadata above GITHUB_WORKSPACE) and exits 3.
+        run: actionlint .github/workflows/*.yml
 
       - name: Spelling
         run: typos
