@@ -1,0 +1,44 @@
+# pre-commit — the same checks CI runs, available before the commit exists.
+#
+#   pre-commit install
+#   pre-commit run --all-files
+#
+# Hook revisions are pinned, not floating: a hook that silently changes is a
+# hook that fails someone's commit for a rule they never agreed to.
+default_install_hook_types: [pre-commit]
+fail_fast: false
+
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.11.0
+    hooks:
+      - id: shellcheck
+        args: [-x]
+        # bin/archway has no .sh suffix; install.sh does.
+        files: ^(bin/archway|install\.sh|.*\.sh)$
+
+  - repo: https://github.com/mvdan/sh
+    rev: v3.14.1
+    hooks:
+      - id: shfmt
+        args: [-i, "2", -ci, -sr, -d]
+        files: ^(bin/archway|install\.sh|.*\.sh)$
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.24.2
+    hooks:
+      - id: markdownlint-cli2
+        files: \.md$
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.52.2
+    hooks:
+      - id: typos
+        # The repository mixes English identifiers with Spanish prose; typos is
+        # checked against its own dictionary and .typos.toml if one is added.
+        types: [text]

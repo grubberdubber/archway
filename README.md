@@ -22,9 +22,10 @@ without a backup, a manifest entry and your explicit consent.
   **swaync** + `hyprlock`/`hypridle` + XDG portals; `sway` is the planned fallback
 - **kitty** terminal, native modular **zsh** (no Oh-My-Zsh), `starship`, `tmux`
 - **Neovim** from the pinned [`grubberdubber/nvim-config`](https://github.com/grubberdubber/nvim-config)
-- **Ten themes out of the box**: the flagship **Android Mount** palette plus
-  monochrome variants (blue, teal, green, yellow, orange, red, pink, purple,
-  slate). Switch with `Super+Space`; every app follows the same palette.
+- **Eleven themes out of the box**: the flagship **Android Mount** palette,
+  **Ember** (warm charcoal and peach, the squarest of them) and nine monochrome
+  variants (blue, teal, green, yellow, orange, red, pink, purple, slate). Switch
+  with `Super+Space`; every app follows the same palette.
 - A small, square **OSD** for volume/brightness (`swayosd`), a **Wi-Fi menu**
   in rofi (`Super+Shift+N`), a **wallpaper picker** (`Super+Alt+W`) and a
   clipboard history that starts its own watcher (`Super+V`).

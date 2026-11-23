@@ -1,0 +1,28 @@
+# gitleaks — kept deliberately close to the upstream defaults.
+#
+# The default rule set is the maintained one; redefining rules here only makes
+# it rot faster. The single addition is an allowlist for the fake credentials
+# that tests need, which are the only place a secret-shaped string is allowed to
+# exist in this repository.
+title = "Archway"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Fake credentials inside test fixtures and test bodies"
+paths = [
+  '''tests/fixtures/.*''',
+  '''tests/bats/.*''',
+]
+
+# Docs quote example commands; a token-shaped sample must not block a commit.
+[[allowlists]]
+description = "Placeholder values in documentation"
+paths = [
+  '''docs/.*\.md''',
+]
+regexTarget = "match"
+regexes = [
+  '''(?i)(example|placeholder|dummy|fake|redacted|xxxx+|<[a-z_-]+>)''',
+]

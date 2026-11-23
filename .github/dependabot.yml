@@ -1,0 +1,29 @@
+# Dependabot — keeps the pinned automation pinned *and* fresh.
+#
+# Only two ecosystems exist here: the actions in .github/workflows and the hook
+# revisions in .pre-commit-config.yaml. Package manifests are Arch packages
+# checked by `archway pkg check`, not a lockfile Dependabot can read.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(ci)"
+    labels: [ci, dependencies]
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: pre-commit
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(pre-commit)"
+    labels: [dependencies]

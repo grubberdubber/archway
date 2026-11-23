@@ -298,7 +298,7 @@ cmd_nvim() {
     doctor) nvim_doctor ;;
     rollback) nvim_rollback ;;
     pin)
-      nvim_pin "${ARGS[0]:-}"
+      nvim_pin "${ARGS[@]}"
       ;;
     help | *)
       cat << 'EOF'
@@ -306,6 +306,7 @@ archway nvim — pinned grubberdubber/nvim-config checkout
 
 Usage:
   archway nvim pin <tag>          # resolve commit + tarball SHA256 into deps/nvim-config.lock
+  archway nvim pin --commit <sha> # pin an untagged commit (upstream has no tags)
   archway nvim install
   archway nvim update [--to <tag>]
   archway nvim status [--json]

@@ -326,7 +326,11 @@ keys_generate_doc() {
     while IFS= read -r cat; do cats+=("$cat"); done < <(
       for i in "${!K_CAT[@]}"; do printf '%s\n' "${K_CAT[i]}"; done | awk '!seen[$0]++'
     )
+    local first=1
     for cat in "${cats[@]}"; do
+      # The blank line goes *between* sections: trailing blanks at EOF trip
+      # markdownlint's MD012 and no reader ever sees them.
+      if ((first)); then first=0; else printf '\n'; fi
       printf '## %s\n\n' "$(printf '%s' "$cat" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
       printf '| Key | Action | Command |\n|---|---|---|\n'
       for i in "${!K_ID[@]}"; do
@@ -334,7 +338,6 @@ keys_generate_doc() {
         action=$(keys_action_text "$i")
         printf '| `%s` | %s | `%s` |\n' "${K_KEYS[i]}" "${K_DESC[i]}" "${action//|/\\|}"
       done
-      printf '\n'
     done
   } > "$target.tmp"
 

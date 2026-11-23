@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `archway nvim pin --commit <sha>`, plus the first real pin: the lock now
+  records commit `e309ab9` of `nvim-config` with the SHA256 of its archive.
+  Upstream has no tags yet, and pinning by tag was the only option the CLI
+  offered, so `unpinned = true` could not be cleared without inventing a tag.
+  A full 40-character SHA is just as reproducible; the lock keeps `tag = ""`
+  and `channel = "edge"` to say where it came from, and `nvim install` already
+  cloned and checked out a commit.
+- The project files the repository was missing: `SECURITY.md` (private
+  reporting, what is in scope, how secrets are handled), `CONTRIBUTING.md`,
+  `.gitleaks.toml`, `.pre-commit-config.yaml` (secret scan, shellcheck, shfmt,
+  markdownlint, typos), `.github/dependabot.yml`, `.markdownlint-cli2.yaml`,
+  `.yamllint.yml` and `.typos.toml`.
+- CI now lints markdown, YAML, workflows and spelling (`markdownlint-cli2`,
+  `yamllint`, `actionlint`, `typos`) and pins `actions/checkout` to the commit
+  behind `v4.2.1` instead of a mutable tag. `corner3.png` moved out of the
+  repository root to `docs/assets/`.
 - `theme-selector --rofi`: `Super+Space` now opens the picker directly instead
   of asking rofi for a `-show theme` mode. That mode was declared by embedding a
   quoted shell command in a TOML value, and one escaping layer was double-escaped
@@ -282,6 +298,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- GTK file dialogs — the chooser Firefox opens for an upload — painted their
+  places pane white while the rest of the window followed the palette. That pane
+  is `placessidebar` (one word), a different node from Thunar's `.sidebar`, and
+  nothing in the stylesheet matched it; the engine underneath was light because
+  `gsettings` still said `Adwaita` and `gtk-application-prefer-dark-theme` was
+  never set. The pane, the chooser's list and toolbar, dialogs and the backdrop
+  state now all come from `palette.toml`, and the session prefers dark.
+- Thunar and the chooser got the accessibility pass they were missing: place
+  rows are 30px tall, keyboard focus draws the accent ring on the selected row
+  instead of relying on colour, toolbar targets have a 24px floor and disabled
+  controls keep the muted colour that still clears 4.5:1.
+- The Wi-Fi pill printed the whole SSID, which pushed the right-hand icon group
+  off the edge of a 1366px bar. `custom/net` replaces the native module with a
+  12-character pill and a tooltip holding the full name, signal, address and
+  gateway; low signal turns it `warning`.
 - The failed-units pill opened a terminal that closed before it could be read:
   `on-click` was a bare `kitty -e systemctl --failed`, which printed the unit
   list and exited immediately. It now runs `--no-pager`, prints "Press Enter to

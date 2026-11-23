@@ -133,7 +133,7 @@ window#waybar {
 #custom-updates,
 #custom-vault,
 #custom-vpn,
-#network,
+#custom-net,
 #bluetooth,
 #custom-resources,
 #custom-disk,
@@ -235,18 +235,19 @@ window#waybar {
   color: @secondary@;
 }
 
-#network {
+/* The SSID is truncated in `archway-bar net`; the fixed floor keeps the pill
+ * from growing when a short name is followed by a long one. */
+#custom-net {
   color: @text@;
-  min-width: 62px;
+  min-width: 78px;
 }
 
-#network.disconnected,
-#network.disabled {
+#custom-net.muted {
   color: @text_muted@;
 }
 
-#network.linked {
-  color: @primary@;
+#custom-net.warning {
+  color: @warning@;
 }
 
 #bluetooth {

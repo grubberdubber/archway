@@ -319,6 +319,13 @@ scrollbar slider:active {
   color: @text@;
 }
 
+/* Same target size as the chooser's pane: Thunar and the dialog should not
+ * disagree about how tall a place row is. */
+.sidebar-row {
+  min-height: 30px;
+  padding: 2px 6px;
+}
+
 .sidebar-row:hover,
 .places-sidebar row:hover,
 .thunar .sidebar row:hover,
@@ -406,6 +413,165 @@ scrollbar slider:active {
 .thunar .shortcut,
 .thunar .shortcuts-pane row {
   color: @text@;
+}
+
+/* --- GTK file chooser (browser uploads, Save as, zenity) --------------- */
+/* `GtkFileChooserWidget` is the dialog a browser opens to pick a file, and its
+ * places pane is `placessidebar` — one word, a different node from Thunar's
+ * `.sidebar`. Nothing above matched it, so on a light engine that pane stayed
+ * white while the rest of the window followed the palette: that is the bright
+ * strip on the left of an upload dialog. Everything it draws is listed here
+ * explicitly instead of relying on inheritance from the theme engine. */
+placessidebar,
+placessidebar list,
+placessidebar .view {
+  background-image: none;
+  background-color: @bg@;
+  color: @text@;
+  border-right: 1px solid @border@;
+}
+
+/* A sidebar row is a button you click with a trackpad: 30px is the smallest
+ * height that stays comfortable at 1366x768 without wasting the pane. */
+placessidebar row {
+  background-image: none;
+  background-color: transparent;
+  color: @text@;
+  padding: 4px 8px;
+  min-height: 30px;
+}
+
+placessidebar row:hover {
+  background-color: @surface_alt@;
+}
+
+placessidebar row:selected,
+placessidebar row:selected:hover {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+placessidebar row:selected label {
+  color: @text@;
+}
+
+/* Keyboard focus has to be visible on its own: the selected row and the
+ * focused row are often the same one, and colour alone does not show that. */
+placessidebar row:focus,
+placessidebar row:focus-within,
+.sidebar-row:focus {
+  outline: 2px solid @primary@;
+  outline-offset: -2px;
+}
+
+placessidebar image,
+placessidebar .sidebar-icon {
+  color: @text_muted@;
+}
+
+placessidebar row:selected image,
+placessidebar row:selected .sidebar-icon {
+  color: @primary@;
+}
+
+filechooser,
+filechooser .view,
+filechooser stack,
+filechooser box,
+.file-chooser,
+.dialog-action-area {
+  background-image: none;
+  background-color: @bg@;
+  color: @text@;
+}
+
+filechooser toolbar,
+filechooser .toolbar {
+  background-image: none;
+  background-color: @surface@;
+  border-bottom: 1px solid @border@;
+}
+
+/* The fast-search entry and the location popover float over the file list. */
+filechooser entry,
+filechooser .search-bar,
+.dialog-vbox entry {
+  background-color: @surface_alt@;
+  color: @text@;
+  border: 1px solid @border@;
+}
+
+dialog,
+messagedialog,
+window.dialog {
+  background-image: none;
+  background-color: @bg@;
+  color: @text@;
+}
+
+dialog button,
+messagedialog button {
+  background-image: none;
+  background-color: @surface_alt@;
+  border: 1px solid @border@;
+  color: @text@;
+}
+
+list,
+list row {
+  background-color: @surface@;
+  color: @text@;
+}
+
+list row:hover {
+  background-color: @surface_alt@;
+}
+
+list row:selected {
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+/* The backdrop state (window unfocused) is what leaks the stock light colour:
+ * a chooser opened from a browser and then left behind keeps painting its pane
+ * with the engine's unfocused background. */
+window:backdrop,
+.background:backdrop {
+  background-color: @bg@;
+  color: @text_muted@;
+}
+
+headerbar:backdrop {
+  background-color: @surface@;
+  color: @text_muted@;
+}
+
+/* --- Accessibility ----------------------------------------------------- */
+/* In a file view the selected row is also the focused one, so selection colour
+ * alone does not say where the keyboard cursor is. The outline does, and it is
+ * the same ring every other widget uses. */
+.thunar treeview.view:selected:focus,
+.thunar iconview:selected:focus,
+filechooser treeview.view:selected:focus {
+  outline: 2px solid @primary@;
+  outline-offset: -2px;
+}
+
+/* Toolbar buttons are click targets; below 24px they are hard to hit and the
+ * icon stops reading as a control. Only the height is forced, so text buttons
+ * keep their natural width. */
+toolbar button,
+.thunar .toolbar button,
+filechooser button {
+  min-height: 24px;
+}
+
+/* Disabled controls have to stay legible: the palette's muted colour is still
+ * above 4.5:1 on the surface, the stock engine's disabled grey is not. */
+button:disabled,
+menuitem:disabled,
+toolbar button:disabled {
+  color: @text_muted@;
 }
 
 /* --- Misc -------------------------------------------------------------- */

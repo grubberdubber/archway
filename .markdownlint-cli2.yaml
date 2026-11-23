@@ -1,0 +1,32 @@
+# markdownlint-cli2 — shared by pre-commit and CI.
+#
+# AGENTS.md §13.2 asks for lines under 120 columns, headings in order and links
+# that resolve. The defaults here are stricter than this repository's existing
+# documents in two places only, and both are deliberate:
+#
+#   MD013  line length 120, not 80; long URLs and code samples are allowed to
+#          stay on one line, which keeps the rewrite history readable.
+#   MD060  the "compact table" style arrived after the README tables were
+#          written; enforcing it would rewrite every table for no reader gain.
+config:
+  MD013:
+    line_length: 120
+    code_blocks: false
+    tables: false
+    headings: false
+  MD060: false
+  MD041: false
+  # Keep a Changelog repeats `Added`/`Fixed` under every release.
+  MD024: false
+
+globs:
+  - "*.md"
+  - "docs/*.md"
+
+ignores:
+  - ".github/**"
+  - "node_modules/**"
+  # The constitution is a prompt, not a web page: its catalogue of packages is
+  # one-per-line by design and running the linter over it would force reflows
+  # that change what the agent reads.
+  - "AGENTS.md"

@@ -53,7 +53,7 @@
   },
   "group/net": {
     "orientation": "horizontal",
-    "modules": ["custom/vpn", "network", "bluetooth"]
+    "modules": ["custom/vpn", "custom/net", "bluetooth"]
   },
   "group/resources": {
     "orientation": "horizontal",
@@ -182,14 +182,16 @@
     "on-click": "kitty -e nmtui",
     "tooltip": true
   },
-  "network": {
-    "format-wifi": "\uf1eb {essid}",
-    "format-ethernet": "\uf0e8 {ifname}",
-    "format-linked": "\uf0e8 {ifname}",
-    "format-disconnected": "\uf05e offline",
-    "tooltip-format": "{ifname} via {gwaddr}\n{ipaddr}/{cidr}",
+  // Custom instead of the native module: waybar prints the whole SSID, and a
+  // long network name pushed the icon group off the edge of a 1366px bar. The
+  // applet truncates it and keeps the full name in the tooltip.
+  "custom/net": {
+    "exec": "$HOME/.local/bin/archway-bar net",
+    "return-type": "json",
+    "interval": 5,
     "on-click": "$HOME/.local/bin/archway applet network --rofi",
-    "on-click-right": "nm-connection-editor"
+    "on-click-right": "nm-connection-editor",
+    "tooltip": true
   },
   "bluetooth": {
     "format": "\uf293 {status}",

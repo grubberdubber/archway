@@ -102,4 +102,3 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `XF86AudioPrev` | Previous track | `playerctl previous` |
 | `XF86MonBrightnessUp` | Brightness up | `$HOME/.local/bin/archway applet osd brightness up` |
 | `XF86MonBrightnessDown` | Brightness down | `$HOME/.local/bin/archway applet osd brightness down` |
-

@@ -391,12 +391,59 @@ section_scratchpad() {
   emit "$(icon f2d0) ${n}" "${n} window(s) in the scratchpad — Super+grave" normal
 }
 
+# Wi-Fi / ethernet pill. waybar's native `network` module prints the whole
+# SSID, so a long network name pushed the icon group past the edge of the bar
+# on a 1366px screen. The pill keeps a short form and the tooltip carries the
+# full name, address and gateway, which is what you want when you hover it.
+section_net() {
+  local iface ssid signal ip gw glyph text tooltip cls=normal
+  if have nmcli; then
+    iface=$(nmcli -t -f DEVICE,TYPE,STATE device status 2> /dev/null |
+      awk -F: '$2 == "wifi" && $3 == "connected" { print $1; exit }')
+  fi
+  if [[ -n $iface ]]; then
+    # The IN-USE row of a scan is the only place that reliably has both the
+    # SSID and the signal; a restored profile can be connected while missing
+    # from a fresh scan, so the profile name is the fallback.
+    ssid=$(nmcli -t -f ACTIVE,SSID,SIGNAL device wifi list 2> /dev/null |
+      awk -F: '$1 == "yes" { print $2; exit }')
+    signal=$(nmcli -t -f ACTIVE,SSID,SIGNAL device wifi list 2> /dev/null |
+      awk -F: '$1 == "yes" { print $3; exit }')
+    [[ -n $ssid ]] || ssid=$(nmcli -t -f GENERAL.CONNECTION device show "$iface" 2> /dev/null | cut -d: -f2-)
+    [[ -n $ssid && $ssid != -- ]] || ssid=$iface
+    glyph=$(icon f1eb)
+    # 12 characters: long enough to recognise the network, short enough that
+    # the bar never has to give space back to the right-hand cluster.
+    text=$ssid
+    if ((${#text} > 12)); then text="${text:0:11}…"; fi
+    if [[ -n $signal && ${signal:-0} -lt 35 ]]; then cls=warning; fi
+  elif have nmcli; then
+    iface=$(nmcli -t -f DEVICE,TYPE,STATE device status 2> /dev/null |
+      awk -F: '$2 == "ethernet" && $3 == "connected" { print $1; exit }')
+    [[ -n $iface ]] && glyph=$(icon f0e8) && text=$iface
+  fi
+
+  if [[ -z ${text:-} ]]; then
+    emit "$(icon f05e) offline" "no network connection — click for the menu" muted
+    return 0
+  fi
+
+  ip=$(ip -4 -o addr show dev "$iface" scope global 2> /dev/null | awk '{ print $4; exit }')
+  gw=$(ip route show default dev "$iface" 2> /dev/null | awk '{ print $3; exit }')
+  tooltip=$ssid
+  [[ -n $signal ]] && tooltip+=$'\n'"signal ${signal}%"
+  [[ -n $ip ]] && tooltip+=$'\n'"$ip"
+  [[ -n $gw ]] && tooltip+=$'\n'"via $gw"
+  tooltip+=$'\nclick: network menu · right-click: connections'
+  emit "${glyph} ${text}" "$tooltip" "$cls"
+}
+
 usage() {
   cat << 'EOF'
 usage: bar.sh <section>
 
 sections:
-  recording | failed | updates | vault | vpn | notifications
+  recording | failed | updates | vault | vpn | net | notifications
   resources | disk | nightlight | power-profile | scratchpad | language
   media | gaming
 
@@ -420,6 +467,7 @@ main() {
       ;;
     vault) section_vault ;;
     vpn) section_vpn ;;
+    net) section_net ;;
     notifications) section_notifications ;;
     media) section_media ;;
     gaming)

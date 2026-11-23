@@ -1,0 +1,22 @@
+# typos — spell checking for code and English prose.
+#
+# AGENTS.md is deliberately written in Spanish (see its header); typos' English
+# dictionary reads `oficial` and `secretos` as misspellings of English words, so
+# the file is excluded rather than filled with hundreds of allowlist entries.
+[files]
+extend-exclude = [
+  "AGENTS.md",
+  # The user-facing README is currently written in Spanish (README.es.md is the
+  # long-term home for it; English is the target for the primary one).
+  "README.md",
+  "tests/fixtures/**",
+  "themes/*/walls/**",
+]
+
+[default]
+# Package names and identifiers that are not English words.
+extend-ignore-re = [
+  "(?i)\\bINSUCO\\b",
+  # Arch package codename: nodejs-lts-jod.
+  "nodejs-lts-jod",
+]

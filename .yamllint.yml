@@ -1,0 +1,15 @@
+# yamllint — workflows, Dependabot and anything else YAML in the repository.
+extends: default
+
+rules:
+  # GitHub Actions keys are `on:`, which the truthy rule reads as a boolean.
+  truthy: disable
+  document-start: disable
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+  comments:
+    min-spaces-from-content: 1
+  braces:
+    max-spaces-inside: 1
+  comments-indentation: disable
