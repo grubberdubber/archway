@@ -1,0 +1,25 @@
+/* Archway — Firefox content chrome (about: pages, view-source, error pages).
+ * Web content is left alone on purpose: recolouring sites fights the page's own
+ * design and breaks contrast on pages nobody here has seen. This only covers
+ * the surfaces Firefox itself draws. */
+
+@-moz-document url-prefix("about:")
+{
+  :root {
+    --in-content-page-background: @bg@ !important;
+    --in-content-page-color: @text@ !important;
+    --in-content-box-background: @surface@ !important;
+    --in-content-box-border-color: @border@ !important;
+    --in-content-item-hover: @surface_alt@ !important;
+    --in-content-item-selected: @selection_bg@ !important;
+    --in-content-accent-color: @primary@ !important;
+    --in-content-table-background: @surface@ !important;
+    scrollbar-color: @overlay@ transparent;
+  }
+
+  html,
+  body {
+    background: @bg@ !important;
+    color: @text@ !important;
+  }
+}

@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# imv — minimal image viewer. Colours follow the Android Mount palette, and the
+# overlay only shows what is useful at a glance: name, dimensions, zoom.
+
+[options]
+background = #0B0F14
+overlay_background = #11161D
+overlay_foreground = #E6EDF3
+overlay_border = #2A3441
+overlay_error = #F28B82
+overlay_success = #81C995
+overlay_text = $name  ($widthx$height)  $scale%
+title_text = $name - imv
+# Nearest keeps pixel art crisp; the wheel still zooms.
+scale_mode = next_nearest
+# Start fitted to the window instead of 100% (a 4000px photo at 100% shows a
+# corner of a face on a 1366px screen).
+initial_scale_mode = both
+# Never animate: motion is the first thing to cost a frame on a laptop.
+animate = false
+
+[binds]
+# vim motions, on top of imv's defaults.
+<Shift+j> = prev
+<Shift+k> = next
+<Shift+h> = rotate -90
+<Shift+l> = rotate 90
+<Shift+f> = fullscreen
+<Shift+s> = slideshow
+<Shift+r> = reset
+# Space toggles fit-to-window, which is the one key a mouse user also needs.
+<Space> = fit

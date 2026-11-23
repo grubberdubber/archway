@@ -1,0 +1,87 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Git — system-wide behaviour for Archway. Identity stays in ~/.gitconfig (or a
+# per-directory includeIf), because that is personal data, not a dotfile.
+# Git reads this file as $XDG_CONFIG_HOME/git/config, before ~/.gitconfig.
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+
+[merge]
+	conflictStyle = zdiff3
+
+[rerere]
+	enabled = true
+
+[diff]
+	algorithm = histogram
+	colorMoved = zebra
+	mnemonicPrefix = true
+	renames = copies
+
+[fetch]
+	prune = true
+	pruneTags = true
+
+[push]
+	autoSetupRemote = true
+	default = simple
+	followTags = true
+
+[branch]
+	sort = -committerdate
+
+[tag]
+	sort = version:refname
+
+[color]
+	ui = auto
+
+[help]
+	autoCorrect = prompt
+
+[core]
+	# editor and pager are set to the tools Archway installs; a missing binary
+	# makes git fall back to its built-in pager instead of failing.
+	pager = delta
+	editor = nvim
+	autocrlf = input
+	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false
+	hyperlinks = true
+	true-color = auto
+	syntax-theme = none
+	minus-style = "syntax #3a1d1d"
+	minus-emph-style = "syntax #5a2a2a"
+	plus-style = "syntax #12291c"
+	plus-emph-style = "syntax #1d4530"
+	file-style = "#8AB4F8"
+	hunk-header-style = "file line-number"
+	hunk-header-decoration-style = "blue box"
+	file-decoration-style = "blue ul"
+
+[commit]
+	verbose = true
+
+# Sign commits when a key exists. Uncomment after `git config user.signingkey`
+# is set (Archway documents the SSH-key workflow in docs/git.md):
+# [commit]
+# 	gpgsign = true
+# [tag]
+# 	gpgsign = true
+# [gpg]
+# 	format = ssh

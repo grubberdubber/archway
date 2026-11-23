@@ -104,6 +104,8 @@ docs/                keybinds, troubleshooting, uninstall
 ## Documentation
 
 - [`docs/keybinds.md`](docs/keybinds.md) — generated cheatsheet
+- [`docs/cli-tools.md`](docs/cli-tools.md) — zathura, mpv, lazygit, ripgrep, Thunar, idle/lock
+- [`docs/firefox.md`](docs/firefox.md) — Firefox theme and the file-picker fix
 - [`docs/troubleshooting.md`](docs/troubleshooting.md)
 - [`docs/uninstall.md`](docs/uninstall.md)
 - [`AGENTS.md`](AGENTS.md) — engineering constitution (Spanish)

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# mise — one version manager for node, python, go, rust, java, terraform.
+# Tools are pinned per project in that project's mise.toml; nothing global is
+# pinned here on purpose, so a new shell never silently changes a language
+# version under a repository that has its own pin.
+
+[settings]
+# Read .nvmrc / .python-version / .ruby-version before asking for mise.toml.
+idiomatic_version_file_enable_tools = ["node", "python", "ruby"]
+# Prompt before switching to a tool version a directory asks for; auto-switching
+# silently in the background is what makes `node -v` differ between shells.
+activate_aggressive = false

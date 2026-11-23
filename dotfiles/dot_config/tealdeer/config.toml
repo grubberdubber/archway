@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# tealdeer — offline tldr pages. Compact output so a page fits a 1366x768
+# terminal without scrolling, and the cache updates at most once a week (a
+# network call on every `tldr` is exactly the latency the tool exists to avoid).
+
+[display]
+compact = true
+use_pager = true
+show_title = false
+
+[updates]
+auto_update = true
+
+[style]
+command_name = { foreground = "magenta", bold = true }
+example_description = { foreground = "green" }
+example_code = { foreground = "white" }

@@ -144,6 +144,19 @@ hl.window_rule({ name = "pavucontrol", match = { class = "^(pavucontrol)$" }, fl
 hl.window_rule({ name = "nm-connection-editor", match = { class = "^(nm-connection-editor)$" }, float = true })
 hl.window_rule({ name = "blueman-manager", match = { class = "^(blueman-manager)$" }, float = true })
 
+-- File choosers opened through the portal (Flatpak apps, and any GTK app that
+-- sets GTK_USE_PORTAL) are their own top-level window. Tiled, they land in a
+-- half-screen tile and can open behind the caller; the dialog is alive but
+-- unfocused, so no shortcut and no Ctrl+click seems to work. Floating, centred
+-- and unfocused-free is what the GTK picker expects.
+hl.window_rule({
+  name = "portal-file-chooser",
+  match = { class = "^(xdg-desktop-portal-gtk|xdg-desktop-portal-gnome)$" },
+  float = true,
+  center = true,
+  size = "72% 78%",
+})
+
 -- Session components. Started from the compositor so they exit with it; when
 -- the session came from uwsm they inherit its systemd scope. Optional tools are
 -- probed first: a missing package must not produce a failed unit on every boot.

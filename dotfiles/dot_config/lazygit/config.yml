@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# lazygit — square borders, Android Mount palette, delta for diffs.
+# Keys stay lazygit's defaults (vim-like); only the look and the pager change.
+
+gui:
+  border: single
+  nerdFontsVersion: "3"
+  showIcons: false
+  showFileTree: true
+  showListFooter: false
+  showRandomTip: false
+  showCommandLog: false
+  showBottomLine: false
+  sidePanelWidth: 0.28
+  mainPanelSplitMode: vertical
+  splitDiff: auto
+  scrollHeight: 2
+  skipUnstageLineWarning: false
+  # Colours come from ~/.config/archway/theme.d/lazygit-theme.yml, merged
+  # through $LG_CONFIG_FILE (see zsh/conf.d/00-env.zsh). Keeping them out of
+  # this file is what makes `archway theme set` repaint lazygit too.
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never --line-numbers
+  autoFetch: true
+  autoRefresh: true
+  fetchAll: true
+  parseEmoji: false
+  log:
+    order: topo-order
+    showGraph: always
+    showWholeGraph: false
+  commit:
+    signOff: false
+    autoWrapCommitMessage: true
+    autoWrapWidth: 72
+  merging:
+    manualCommit: false
+
+refresher:
+  refreshInterval: 3
+  fetchInterval: 60
+
+update:
+  method: never
+
+confirmOnQuit: false
+os:
+  editPreset: nvim
+  editCommand: ""
+  editCommandTemplate: "kitty -e nvim {{filename}}"
+  openCommand: xdg-open {{filename}}
+  copyToClipboardCmd: "wl-copy < {{text}}"
+
+keybinding:
+  universal:
+    quit: q
+    return: <esc>
+    prevItem: k
+    nextItem: j
+    prevPage: ","
+    nextPage: "."
+    scrollLeft: H
+    scrollRight: L

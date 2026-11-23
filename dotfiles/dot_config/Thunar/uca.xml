@@ -70,4 +70,36 @@
     <patterns>*.zip;*.tar;*.tar.gz;*.tgz;*.tar.xz;*.txz;*.tar.zst;*.tzst;*.tar.bz2;*.7z;*.rar</patterns>
     <other-files/>
   </action>
+  <action>
+    <icon>image-x-generic</icon>
+    <name>View Image</name>
+    <unique-id>archway-open-imv</unique-id>
+    <command>imv %f</command>
+    <description>Open the image in the keyboard-driven viewer</description>
+    <range>*</range>
+    <patterns>*.png;*.jpg;*.jpeg;*.webp;*.gif;*.bmp;*.tif;*.tiff;*.avif</patterns>
+    <other-files/>
+  </action>
+
+  <action>
+    <icon>video-x-generic</icon>
+    <name>Play with mpv</name>
+    <unique-id>archway-open-mpv</unique-id>
+    <command>mpv --player-operation-mode=pseudo-gui %f</command>
+    <description>Play the video or audio file in mpv</description>
+    <range>*</range>
+    <patterns>*.mp4;*.mkv;*.webm;*.avi;*.mov;*.m4v;*.flac;*.opus;*.m4a;*.mp3;*.ogg</patterns>
+    <other-files/>
+  </action>
+
+  <action>
+    <icon>x-office-document</icon>
+    <name>Read in zathura</name>
+    <unique-id>archway-open-zathura</unique-id>
+    <command>zathura %f</command>
+    <description>Read the PDF or EPUB with vim-style keys</description>
+    <range>*</range>
+    <patterns>*.pdf;*.epub;*.djvu;*.cbz</patterns>
+    <other-files/>
+  </action>
 </actions>

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# ripgrep — read through $RIPGREP_CONFIG_PATH (set in zsh/conf.d/00-env.zsh).
+# Interactive defaults only: `rg` keeps its own behaviour inside scripts because
+# a script that wants --hidden or -uu sets it explicitly.
+
+--hidden
+--smart-case
+--max-columns=250
+--max-columns-preview
+
+# Build output and caches are never what a search is looking for, and they are
+# where 90% of the noise comes from in a real repo.
+--glob=!.git
+--glob=!node_modules
+--glob=!target
+--glob=!dist
+--glob=!build
+--glob=!.cache
+--glob=!*.min.js
+--glob=!*.lock
+
+# Palette: matches stand out, file names stay secondary.
+--colors=match:fg:yellow
+--colors=match:style:bold
+--colors=path:fg:blue
+--colors=line:fg:bright-black
+--colors=column:fg:green

@@ -40,6 +40,8 @@ satty
 # Documents: a PDF reader is part of the desktop baseline (manual pages, RFCs).
 zathura
 zathura-pdf-mupdf
+# Images: imv is the keyboard viewer behind the Thunar "View Image" action.
+imv
 
 # Terminals: kitty is the default, alacritty is the supported alternative that
 # `archway applet terminal --pick` can switch to (same palette, same opacity).
@@ -64,6 +66,9 @@ pipewire
 pipewire-pulse
 pipewire-alsa
 wireplumber
+# Equalizer and effects for the microphone/speakers; its presets live in
+# ~/.config/easyeffects and stay user-owned.
+easyeffects
 pavucontrol
 networkmanager
 network-manager-applet

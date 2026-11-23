@@ -251,6 +251,10 @@ stop_service() {
     return 0
   fi
   run_root systemctl stop keyd || die "could not stop keyd" 1
+  # keyd exits with status 15 on SIGTERM, so systemd records the unit as failed
+  # after every deliberate stop and the user gets a scary red line in `systemctl
+  # status`. Clearing the state is part of `manage-units`, so the grant covers it.
+  systemctl reset-failed keyd > /dev/null 2>&1 || true
   ((DRY_RUN)) && return 0
   # Same split as `on`: stopping is manage-units and never prompts, disabling is
   # manage-unit-files and is attempted only where it cannot ask for a password.

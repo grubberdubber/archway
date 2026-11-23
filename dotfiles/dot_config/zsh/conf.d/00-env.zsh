@@ -3,10 +3,22 @@
 
 export EDITOR=nvim
 export VISUAL=nvim
+
+# Pagers. less keeps raw colour (-R), quits on one screen (-F), leaves the
+# screen intact (-X), ignores case in search (-i) and shows a long prompt (-M).
+# `man` is rendered by bat so it gets syntax highlighting and the theme; the
+# plugin path bat needs for man pages is set below, and man falls back to less
+# when bat is not installed.
 export PAGER=less
 export LESS='-R -F -X -i -M'
-export MANPAGER='bat --style=plain --pager=never --language=man'
+export LESSHISTFILE='-' # no keystroke history written to ~/.lesshst
+export LESSCHARSET=utf-8
 export SYSTEMD_PAGER=less
+export SYSTEMD_LESS='FRXMK'
+if command -v bat > /dev/null 2>&1; then
+  export MANPAGER='sh -c '\''col -bx | bat --style=plain --pager=never --language=man'\'''
+  export MANROFFOPT='-c'
+fi
 
 # Nerd Font glyphs render correctly in kitty; keep UTF-8 explicit.
 export LANG=${LANG:-en_US.UTF-8}
@@ -16,6 +28,13 @@ export LC_ALL=
 export ARCHWAY_THEME_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/archway/theme.d"
 export STARSHIP_CONFIG="$ARCHWAY_THEME_DIR/starship.toml"
 export BAT_THEME="archway"
+
+# ripgrep reads its defaults from a file, not from a flag set.
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
+
+# lazygit merges $LG_CONFIG_FILE (comma separated) left to right, so the base
+# config stays in ~/.config/lazygit and the palette arrives from the theme.
+export LG_CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/lazygit/config.yml,$ARCHWAY_THEME_DIR/lazygit-theme.yml"
 
 # Tool configs that respect XDG but default to $HOME.
 export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"

@@ -1,0 +1,191 @@
+/* Archway — Firefox chrome. Rendered from the Archway palette; do not edit the
+ * copy in the profile, edit themes/<theme>/palette.toml and re-apply.
+ *
+ * Goal: one flat, monochrome surface with square corners. No gradients, no
+ * rounded chrome, no blue accents — the accent only ever appears as a 1px
+ * border or a 2px underline, so the page keeps all the colour. */
+
+:root {
+  --aw-bg: @bg@;
+  --aw-surface: @surface@;
+  --aw-surface-alt: @surface_alt@;
+  --aw-overlay: @overlay@;
+  --aw-border: @border@;
+  --aw-text: @text@;
+  --aw-text-muted: @text_muted@;
+  --aw-accent: @primary@;
+}
+
+/* Square everywhere. Firefox 89+ rounds tabs, the address bar, popups and the
+ * content area separately; one declaration is the only way to keep them all. */
+* {
+  border-radius: 0 !important;
+}
+
+* {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* --- Toolbar ------------------------------------------------------------ */
+#navigator-toolbox {
+  background: var(--aw-bg) !important;
+  border-bottom: 1px solid var(--aw-border) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+#nav-bar {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 2px 4px !important;
+  min-height: 34px !important;
+}
+
+#TabsToolbar,
+#PersonalToolbar {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#PersonalToolbar {
+  padding: 0 4px !important;
+  border-top: 1px solid var(--aw-border) !important;
+}
+
+/* --- Tabs --------------------------------------------------------------- */
+#tabbrowser-tabs {
+  --tab-min-height: 28px !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+.tabbrowser-tab {
+  padding-inline: 0 !important;
+  margin: 0 !important;
+}
+
+.tab-background {
+  background: transparent !important;
+  border: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.tabbrowser-tab:hover .tab-background {
+  background: var(--aw-surface) !important;
+}
+
+.tabbrowser-tab[selected] .tab-background {
+  background: var(--aw-surface-alt) !important;
+  box-shadow: inset 0 -2px 0 var(--aw-accent) !important;
+}
+
+.tab-label {
+  color: var(--aw-text-muted) !important;
+}
+
+.tabbrowser-tab[selected] .tab-label {
+  color: var(--aw-text) !important;
+}
+
+/* The close button keeps its space but only draws on hover: a row of crosses
+ * is noise, and Ctrl+W is the shortcut anyway. */
+.tab-close-button {
+  opacity: 0 !important;
+  margin: 0 !important;
+  padding: 0 2px !important;
+}
+
+.tabbrowser-tab:hover .tab-close-button {
+  opacity: 0.8 !important;
+}
+
+/* --- Address bar -------------------------------------------------------- */
+#urlbar-background,
+#searchbar {
+  background: var(--aw-surface) !important;
+  border: 1px solid var(--aw-border) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#urlbar[focused] #urlbar-background,
+#urlbar:focus-within #urlbar-background {
+  border-color: var(--aw-text-muted) !important;
+}
+
+#urlbar-input,
+#searchbar {
+  color: var(--aw-text) !important;
+}
+
+#urlbar-input::placeholder {
+  color: var(--aw-text-muted) !important;
+}
+
+/* Extension, identity and site icons keep their shape but lose their colour:
+ * a page's favicon is the only saturated pixel left in the toolbar. */
+#identity-box,
+#tracking-protection-icon-container,
+#page-action-buttons,
+#unified-extensions-button {
+  filter: grayscale(1) !important;
+}
+
+#urlbar-results,
+.urlbarView-row {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text) !important;
+}
+
+.urlbarView-row[selected] {
+  background: var(--aw-surface-alt) !important;
+}
+
+.urlbarView-url {
+  color: var(--aw-text-muted) !important;
+}
+
+/* --- Panels, menus, sidebars -------------------------------------------- */
+panel,
+menupopup,
+#sidebar-box,
+#findbar,
+#statuspanel-label,
+#downloadsPanel,
+#unified-extensions-panel {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text) !important;
+  border: 1px solid var(--aw-border) !important;
+  box-shadow: none !important;
+}
+
+menupopup > menuitem,
+menupopup > menu {
+  padding-block: 3px !important;
+}
+
+menupopup > menuitem:hover,
+menupopup > menu:hover,
+.subviewbutton:hover {
+  background: var(--aw-surface-alt) !important;
+  color: var(--aw-text) !important;
+}
+
+menuseparator {
+  border-color: var(--aw-border) !important;
+}
+
+#statuspanel-label {
+  border-top: 1px solid var(--aw-border) !important;
+  border-right: 1px solid var(--aw-border) !important;
+  color: var(--aw-text-muted) !important;
+}
+
+/* --- Scrollbars --------------------------------------------------------- */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: var(--aw-overlay) transparent;
+}

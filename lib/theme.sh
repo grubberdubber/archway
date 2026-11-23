@@ -30,6 +30,9 @@ declare -gA THEME_TARGETS=(
   [alacritty]=alacritty-theme.toml
   [gtk]=gtk.css
   [yazi]=yazi-theme.toml
+  [zathura]=zathura-theme
+  [mpv]=mpv-theme.conf
+  [lazygit]=lazygit-theme.yml
 )
 
 # Templates shared by every theme live here; a theme only ships the modules it

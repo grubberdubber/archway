@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `archway applet firefox`: renders `chrome/userChrome.css`,
+  `chrome/userContent.css` and a `user.js` from the active theme palette, with
+  a backup of whatever it replaces. Square chrome, monochrome toolbar, dense
+  tabs and `about:` pages only in `userContent.css` (web content keeps its own
+  colours). `docs/firefox.md` covers the details.
+- New theme modules: `zathura`, `mpv` and `lazygit`. The first two are `include`d
+  by their configs; lazygit merges its theme through `$LG_CONFIG_FILE`, so
+  `archway theme set` now repaints all three instead of leaving them on a
+  hardcoded palette.
+- Configs for the tools that had none: `zathura`, `mpv` (`mpv.conf` +
+  `input.conf`), `imv`, `lazygit`, `tealdeer`, `fastfetch`, `ripgrep`, `mise`,
+  `git` (delta, `zdiff3`, `rerere`, histogram diffs) and an SSH snippet at
+  `~/.config/archway/ssh_config` that `~/.ssh/config` includes. `less` and `man`
+  now go through `bat` with `MANROFFOPT=-c`, and `LESSHISTFILE=-` stops `less`
+  writing a keystroke log. See `docs/cli-tools.md`.
+- Thunar: the rc was extended (tabs always visible, CSD off so Hyprland draws
+  the square frame, local-only thumbnails with a size cap, recursive search,
+  `Ctrl+scroll` zoom) and the action menu gained *View Image* (imv),
+  *Play with mpv* and *Read in zathura*.
+- `hypridle` now stages screen-off / warning / lock / suspend, and `hyprlock`
+  adds the user, a key hint and PAM login auth on top of the generated theme.
+- `xdg-desktop-portal/portals.conf` pins `FileChooser` to the GTK backend, and a
+  Hyprland window rule floats and centres portal dialogs.
+- `imv` and `easyeffects` added to the desktop manifest.
 - `doctor` now reports `keyd.grant`: when `keyd` is installed but the narrow
   polkit rule is missing, `Super+Alt+N` will raise an authentication dialog on
   every toggle (or fail when no agent is running), and the check says so with
@@ -303,6 +327,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- File uploads from a browser opened a picker where no shortcut seemed to work.
+  Since Firefox 149 the XDG portal picker is the default: it opens as its own
+  window, Hyprland tiled it behind the browser, and an unfocused dialog ignores
+  Ctrl, Ctrl+click and double-click. The Firefox prefs now pin
+  `widget.use-xdg-desktop-portal.file-picker = 0`, which keeps the in-process
+  GTK3 picker this desktop themes and floats.
+- `keyd` stayed in the `failed` state in `systemctl status` after every toggle:
+  `keyd` exits with status 15 on SIGTERM, and `stop` left that recorded. The
+  applet now runs `systemctl reset-failed keyd` after stopping (the grant covers
+  it, `reset-failed` is part of `manage-units`).
 - `Super+Alt+N` still asked for a password after `archway applet keyd grant`.
   The toggle ran `systemctl enable --now keyd`, and `enable` raises the
   `manage-unit-files` action, not the `manage-units` the rule authorises — the

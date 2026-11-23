@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Thunar settings tuned for a keyboard-first, 1366x768 laptop.
      Colours come from the GTK theme (dot_config/gtk-3.0/gtk.css), not here.
-     Details view + ISO dates + folders first: sortable, unambiguous, dense. -->
+     Every key below is one Thunar itself writes; an unknown name is ignored
+     silently, so nothing here can break the file manager.
+
+     Selection is the part worth being explicit about: single-click stays off
+     and multi-select uses the GTK defaults (Ctrl+click toggles, Shift+click
+     extends). Thunar and the GTK file chooser a browser opens share those
+     modifiers, so one setting is not "the dialog's" and another "Thunar's". -->
 <channel name="thunar" version="1.0">
   <property name="last-view" type="string" value="ThunarDetailsView"/>
   <property name="last-location-bar" type="string" value="ThunarLocationEntry"/>
@@ -14,6 +20,12 @@
   <property name="last-window-height" type="int" value="720"/>
   <property name="last-window-maximized" type="bool" value="false"/>
   <property name="last-show-hidden" type="bool" value="false"/>
+  <property name="last-statusbar-visible" type="bool" value="true"/>
+  <property name="last-menubar-visible" type="bool" value="true"/>
+  <!-- A preview pane on a 768px-tall screen costs a column of filenames and
+       buys nothing a Space press (or imv) does not give. -->
+  <property name="last-image-preview-visible" type="bool" value="false"/>
+  <property name="last-separator-position" type="int" value="170"/>
 
   <!-- Single click stays off: with a keyboard-first setup, accidental opens
        from a trackpad tap are the most common complaint. -->
@@ -23,9 +35,35 @@
   <!-- LOCAL_ONLY: no network round-trips while browsing, and no thumbnail
        daemon spinning on a remote mount. -->
   <property name="misc-thumbnail-mode" type="string" value="THUNAR_THUMBNAIL_MODE_LOCAL_ONLY"/>
+  <property name="misc-thumbnail-max-file-size" type="int" value="64"/>
+  <property name="misc-thumbnail-draw-frames" type="bool" value="false"/>
   <property name="misc-date-style" type="string" value="THUNAR_DATE_STYLE_ISO"/>
   <property name="misc-show-delete-action" type="bool" value="true"/>
   <property name="misc-volume-management" type="bool" value="true"/>
   <property name="misc-full-path-in-tab-title" type="bool" value="true"/>
   <property name="misc-file-size-binary" type="bool" value="false"/>
+  <property name="misc-case-sensitive" type="bool" value="false"/>
+  <property name="misc-recursive-search" type="bool" value="true"/>
+  <property name="misc-highlighting-enabled" type="bool" value="true"/>
+  <property name="misc-ctrl-scroll-wheel-to-zoom" type="bool" value="true"/>
+
+  <!-- Client-side decorations replaced the WM titlebar with a headerbar that
+       ignores the palette and rounds its own corners. Turning them off keeps
+       Thunar square and lets Hyprland draw (and theme) the border. -->
+  <property name="misc-use-csd" type="bool" value="false"/>
+  <property name="misc-small-toolbar-icons" type="bool" value="true"/>
+  <property name="misc-window-title-style" type="string" value="THUNAR_WINDOW_TITLE_STYLE_PATH"/>
+  <property name="misc-tree-lines-in-tree-sidepane" type="bool" value="true"/>
+
+  <!-- Tabs always visible: Ctrl+Page_Up/Page_Down and Ctrl+T then have a
+       visible target, and the tab strip doubles as a breadcrumb of open dirs. -->
+  <property name="misc-always-show-tabs" type="bool" value="true"/>
+  <property name="misc-open-new-window-as-tab" type="bool" value="true"/>
+  <property name="misc-switch-to-new-tab" type="bool" value="true"/>
+  <property name="misc-middle-click-in-tab" type="bool" value="true"/>
+  <property name="misc-tab-close-middle-click" type="bool" value="true"/>
+  <property name="misc-confirm-close-multiple-tabs" type="bool" value="true"/>
+
+  <property name="misc-confirm-move-to-trash" type="bool" value="true"/>
+  <property name="misc-undo-redo-history-size" type="int" value="16"/>
 </channel>

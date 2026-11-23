@@ -1,0 +1,30 @@
+# Archway — lazygit colours. Generated; merged through LG_CONFIG_FILE, which
+# lazygit reads as a comma-separated list (base config first, theme second).
+gui:
+  theme:
+    defaultFgColor:
+      - "@text@"
+    activeBorderColor:
+      - "@primary@"
+      - bold
+    inactiveBorderColor:
+      - "@border@"
+    searchingActiveBorderColor:
+      - "@tertiary@"
+      - bold
+    optionsTextColor:
+      - "@primary@"
+    selectedLineBgColor:
+      - "@selection_bg@"
+    inactiveViewSelectedLineBgColor:
+      - "@surface_alt@"
+    cherryPickedCommitBgColor:
+      - "@selection_bg@"
+    cherryPickedCommitFgColor:
+      - "@primary@"
+    unstagedChangesColor:
+      - "@error@"
+    markedBaseCommitFgColor:
+      - "@success@"
+    markedBaseCommitBgColor:
+      - "@surface_alt@"

@@ -1,0 +1,24 @@
+# Archway — zathura colours. Generated; included from ~/.config/zathura/zathurarc.
+
+set default-bg "@bg@"
+set default-fg "@text@"
+set statusbar-bg "@surface@"
+set statusbar-fg "@text_muted@"
+set inputbar-bg "@surface@"
+set inputbar-fg "@text@"
+set notification-bg "@surface@"
+set notification-fg "@text@"
+set notification-error-bg "@surface_alt@"
+set notification-error-fg "@error@"
+set notification-warning-bg "@surface_alt@"
+set notification-warning-fg "@warning@"
+
+set completion-bg "@surface@"
+set completion-fg "@text_muted@"
+set completion-group-bg "@surface@"
+set completion-group-fg "@primary@"
+set completion-highlight-bg "@selection_bg@"
+set completion-highlight-fg "@text@"
+
+set highlight-color "@tertiary@"
+set highlight-active-color "@primary@"
