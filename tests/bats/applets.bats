@@ -609,8 +609,10 @@ _keyd_mocks() {
     case $1 in
       is-active) [[ -e "$HOME/active" ]] ;;
       is-enabled) [[ -e "$HOME/enabled" ]] ;;
-      enable) touch "$HOME/active" "$HOME/enabled" ;;
-      disable) rm -f "$HOME/active" "$HOME/enabled" ;;
+      start) touch "$HOME/active" ;;
+      stop) rm -f "$HOME/active" ;;
+      enable) touch "$HOME/enabled" ;;
+      disable) rm -f "$HOME/enabled" ;;
     esac'
 }
 
@@ -629,7 +631,10 @@ _keyd_mocks() {
   run "$K" on
   assert_eq 0 "$status"
   assert_file_contains "$KEYD_DIR/default.conf" "capslock = overload(numpad, esc)"
-  assert_file_contains "$HOME/systemctl.log" "enable --now keyd"
+  # `start` is the manage-units action the polkit grant covers; `enable` is a
+  # separate one and is only attempted where it cannot prompt.
+  assert_file_contains "$HOME/systemctl.log" "start keyd"
+  assert_file_contains "$HOME/systemctl.log" "enable keyd"
   run "$K" status --json
   assert_contains "$output" '"active":true'
   assert_contains "$output" '"config":"managed"'
@@ -650,7 +655,7 @@ _keyd_mocks() {
   run "$K" on
   run "$K" off
   assert_eq 0 "$status"
-  assert_file_contains "$HOME/systemctl.log" "disable --now keyd"
+  assert_file_contains "$HOME/systemctl.log" "stop keyd"
   assert_file_contains "$KEYD_DIR/default.conf" "capslock = overload(numpad, esc)"
   run "$K" status --json
   assert_contains "$output" '"active":false'
@@ -716,7 +721,8 @@ _keyd_mocks() {
   _keyd_mocks
   run "$K" --dry-run on
   assert_eq 0 "$status"
-  assert_contains "$output" "[dry-run] systemctl enable --now keyd"
+  assert_contains "$output" "[dry-run] systemctl start keyd"
+  assert_contains "$output" "[dry-run] systemctl enable keyd"
   assert_missing "$KEYD_DIR/default.conf"
   # Reading the state is fine; changing it is not.
   if [[ -r $HOME/systemctl.log ]] && grep -qE '^(enable|disable)' "$HOME/systemctl.log"; then
@@ -741,6 +747,9 @@ _keyd_mocks() {
   K="$ARCHWAY_ROOT/applets/keyd/keyd.sh"
   export KEYD_DIR="$HOME/etc-keyd"
   export KEYD_BIN=keyd
+  # The developer's own machine may already have the rule installed; point at a
+  # path that cannot exist so the "no grant, no agent" branch is the one tested.
+  export POLKIT_RULE="$HOME/etc-polkit/49-archway-keyd.rules"
   mock_cmd keyd 'exit 0'
   mock_cmd notify-send 'exit 0'
   mock_cmd sudo '[[ $1 == -n ]] && exit 1

@@ -74,6 +74,12 @@ die() {
   exit "${2:-1}"
 }
 
+# Non-fatal: the action succeeded, but something about the state deserves a
+# line. A keybind has no scrollback, so the applet still notify-sends the result.
+warn() {
+  printf 'keyd: %s\n' "$1" >&2
+}
+
 have() { command -v "$1" > /dev/null 2>&1; }
 have_keyd() { command -v -- "$KEYD_BIN" > /dev/null 2>&1; }
 
@@ -205,13 +211,32 @@ start_service() {
   else
     printf 'keyd: using existing config (%s)\n' "$KEYD_CONF"
   fi
-  if service_active && service_enabled; then
+  if service_active; then
     printf 'keyd: already on\n'
     return 0
   fi
-  run_root systemctl enable --now keyd || die "could not enable keyd (see: journalctl -u keyd)" 1
+
+  # `systemctl start` is the `manage-units` action, which the grant rule
+  # authorises. `systemctl enable` writes a unit-file symlink instead
+  # (`manage-unit-files`), an action the rule deliberately does not cover — and
+  # cannot scope to one unit — so enabling is only attempted when it cannot
+  # prompt, and failing it never keeps the numpad off.
+  if ! service_enabled; then
+    if ((DRY_RUN)); then
+      printf '[dry-run] systemctl enable keyd\n'
+    elif ((EUID == 0)); then
+      systemctl enable keyd > /dev/null 2>&1 || true
+    elif sudo -n true > /dev/null 2>&1; then
+      sudo -n systemctl enable keyd > /dev/null 2>&1 || true
+    fi
+    if ! service_enabled; then
+      warn "keyd is not enabled; it will not start after a reboot (sudo systemctl enable keyd)"
+    fi
+  fi
+
+  run_root systemctl start keyd || die "could not start keyd (see: journalctl -u keyd)" 1
   ((DRY_RUN)) && return 0
-  service_active || die "keyd was enabled but is not running (journalctl -u keyd)" 1
+  service_active || die "keyd was started but is not running (journalctl -u keyd)" 1
   printf 'keyd: on — CapsLock tap = Esc, hold = numpad\n'
   notify "on — CapsLock tap = Esc, hold = numpad"
 }
@@ -221,12 +246,26 @@ stop_service() {
     printf 'keyd: not installed, nothing to turn off\n'
     return 0
   fi
-  if ! service_active && ! service_enabled; then
+  if ! service_active; then
     printf 'keyd: already off\n'
     return 0
   fi
-  run_root systemctl disable --now keyd || die "could not disable keyd" 1
+  run_root systemctl stop keyd || die "could not stop keyd" 1
   ((DRY_RUN)) && return 0
+  # Same split as `on`: stopping is manage-units and never prompts, disabling is
+  # manage-unit-files and is attempted only where it cannot ask for a password.
+  if service_enabled; then
+    if ((DRY_RUN)); then
+      printf '[dry-run] systemctl disable keyd\n'
+    elif ((EUID == 0)); then
+      systemctl disable keyd > /dev/null 2>&1 || true
+    elif sudo -n true > /dev/null 2>&1; then
+      sudo -n systemctl disable keyd > /dev/null 2>&1 || true
+    fi
+    if service_enabled; then
+      warn "keyd stays enabled; it will start again after a reboot (sudo systemctl disable keyd)"
+    fi
+  fi
   printf 'keyd: off — firmware keyboard mapping restored\n'
   notify "off — firmware keyboard mapping restored"
 }

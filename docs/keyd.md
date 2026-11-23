@@ -17,8 +17,16 @@ Archway owns the whole lifecycle from one applet, so you never hand-edit `/etc`:
 | Stop asking for a password | `archway applet keyd grant` (once, from a terminal) |
 | Undo that | `archway applet keyd revoke` |
 
-`on`/`off` only touch the systemd service. Turning it off restores the firmware
-mapping immediately and leaves `/etc/keyd/default.conf` alone.
+`on`/`off` only touch the systemd service, and only through actions the rule
+covers: `systemctl start` and `systemctl stop`. Turning it off restores the
+firmware mapping immediately and leaves `/etc/keyd/default.conf` alone.
+
+`systemctl enable`/`disable` are a different polkit action
+(`manage-unit-files`), which cannot be limited to one unit — granting it would
+let the caller rewrite any unit file on the system. Archway therefore only
+enables the service where it can authenticate (root, or cached `sudo`), and says
+so when it could not: the numpad still works for the session, it just will not
+come back after a reboot until `sudo systemctl enable keyd` runs once.
 
 Both need root, and a keybind has no terminal to type a password into. Run
 `archway applet keyd grant` once: it installs

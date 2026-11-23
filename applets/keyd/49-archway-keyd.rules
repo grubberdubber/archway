@@ -5,6 +5,11 @@
 // This rule lets a member of `wheel` start, stop, restart and reload keyd.service
 // without authentication — and nothing else: any other unit, or any other action,
 // falls through to the normal polkit policy.
+//
+// `systemctl enable`/`disable` are NOT covered: they ask for a different action
+// (`manage-unit-files`), which cannot be scoped to a single unit, so granting it
+// would allow rewriting any unit file. The Toggle key starts and stops the
+// service instead, and only enables it where it can authenticate.
 polkit.addRule(function(action, subject) {
   if (action.id != "org.freedesktop.systemd1.manage-units") {
     return polkit.Result.NOT_HANDLED;

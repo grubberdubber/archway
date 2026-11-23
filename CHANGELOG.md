@@ -303,6 +303,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `Super+Alt+N` still asked for a password after `archway applet keyd grant`.
+  The toggle ran `systemctl enable --now keyd`, and `enable` raises the
+  `manage-unit-files` action, not the `manage-units` the rule authorises — the
+  grant looked installed and did nothing. The toggle now only starts and stops
+  the service (both `manage-units`), and enables/disables it only where it can
+  authenticate, warning when it could not. `--dry-run` no longer enables the
+  unit either.
 - GTK file dialogs — the chooser Firefox opens for an upload — painted their
   places pane white while the rest of the window followed the palette. That pane
   is `placessidebar` (one word), a different node from Thunar's `.sidebar`, and
