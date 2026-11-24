@@ -103,17 +103,52 @@
 }
 
 /* --- Address bar -------------------------------------------------------- */
+/* No frame around the field. A border here is drawn around the *open* dropdown
+ * too (the results live inside `#urlbar`), which is the box someone sees around
+ * the suggestions. Focus and the open dropdown are marked with a hairline
+ * under the field instead. */
 #urlbar-background,
 #searchbar {
   background: var(--aw-surface) !important;
-  border: 1px solid var(--aw-border) !important;
+  border: 0 !important;
   box-shadow: none !important;
   outline: none !important;
 }
 
-#urlbar[focused] #urlbar-background,
-#urlbar:focus-within #urlbar-background {
-  border-color: var(--aw-text-muted) !important;
+#urlbar[focused] > #urlbar-background,
+#urlbar:focus-within > #urlbar-background,
+#searchbar:focus-within,
+#searchbar:focus {
+  border-bottom: 1px solid var(--aw-accent) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#urlbar[open] > #urlbar-background {
+  border-bottom: 1px solid var(--aw-border) !important;
+}
+
+/* Nothing inside the address bar draws its own outline: Firefox keeps a
+ * 1px border on the view body and a focus ring on the input container, both of
+ * which show up as the square-in-a-square on suggestions. */
+#urlbar,
+#urlbar-container,
+#urlbar-input-container,
+#urlbar-results,
+.urlbarView,
+.urlbarView-body-outer,
+.urlbarView-body-inner,
+.urlbarView-row,
+.urlbarView-row-inner {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+#urlbar-input:focus,
+#urlbar-input-container:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 #urlbar-input,
@@ -144,9 +179,8 @@
   background: var(--aw-surface-alt) !important;
 }
 
-/* The open address bar is one box. `#urlbar-background` already frames the
- * dropdown because the results live inside `#urlbar`; the inner view only
- * needs the fill, never a second outline. */
+/* The open address bar is one box: the results continue the field's surface
+ * and take no outline of their own. */
 #urlbar[open] .urlbarView {
   background: var(--aw-surface) !important;
   border: 0 !important;

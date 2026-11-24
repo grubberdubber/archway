@@ -173,7 +173,9 @@ user_pref("browser.uidensity", 1);
 user_pref("browser.compactmode.show", true);
 user_pref("browser.tabs.inTitlebar", 0);
 user_pref("browser.tabs.tabMinWidth", 120);
-user_pref("browser.tabs.closeWindowWithLastTab", false);
+// Closing the last tab must close the window. With `false`, clicking the tab's
+// X leaves an empty window behind and Firefox looks like it refuses to quit.
+user_pref("browser.tabs.closeWindowWithLastTab", true);
 user_pref("browser.tabs.insertAfterCurrent", true);
 user_pref("toolkit.tabbox.switchByScrolling", true);
 user_pref("browser.toolbars.bookmarks.visibility", "never");

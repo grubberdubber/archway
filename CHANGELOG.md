@@ -327,6 +327,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Firefox could not be closed: the prefs set
+  `browser.tabs.closeWindowWithLastTab = false`, so the X on the last tab left
+  an empty window that never went away. It is `true` again.
+- The address bar kept a frame around its suggestions: the 1px border lived on
+  `#urlbar-background`, which also wraps the open dropdown. The field is
+  borderless now, focus and the open list are marked by a one-pixel line under
+  it, and nothing inside draws an outline.
 - Firefox drew a square inside a square: the chrome stylesheet put a 1px
   border on `menupopup`/`panel` *and* on the content part Firefox paints inside
   them, so every context menu, panel and the search dropdown showed two nested
