@@ -144,22 +144,89 @@
   background: var(--aw-surface-alt) !important;
 }
 
+/* The open address bar is one box. `#urlbar-background` already frames the
+ * dropdown because the results live inside `#urlbar`; the inner view only
+ * needs the fill, never a second outline. */
+#urlbar[open] .urlbarView {
+  background: var(--aw-surface) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 .urlbarView-url {
   color: var(--aw-text-muted) !important;
 }
 
 /* --- Panels, menus, sidebars -------------------------------------------- */
+/* A popup is two boxes stacked: the window (or `panel`) and the content part
+ * Firefox paints inside it. Styling both drew a square inside a square, which
+ * is what a context menu, the search dropdown and every panel looked like.
+ * The frame belongs to the outer box only; the inner part keeps the fill. */
 panel,
 menupopup,
+#PopupSearchAutoComplete,
+#urlbar-results,
 #sidebar-box,
 #findbar,
 #statuspanel-label,
 #downloadsPanel,
 #unified-extensions-panel {
-  background: var(--aw-surface) !important;
+  background: transparent !important;
   color: var(--aw-text) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* The one frame. Panel-arrow scroll boxes are what actually carry the default
+ * theme's border. The `::part()` rules live alone on purpose: if a Firefox
+ * version does not expose that part, the selector is dropped and would take
+ * every other selector in the list with it. */
+.menupopup-arrowscrollbox,
+.panel-arrowcontent,
+#PopupSearchAutoComplete .autocomplete-richlistbox,
+#downloadsPanel .panel-subview-body,
+#unified-extensions-panel .panel-subview-body {
+  background: var(--aw-surface) !important;
   border: 1px solid var(--aw-border) !important;
   box-shadow: none !important;
+}
+
+menupopup::part(content),
+panel::part(content) {
+  background: var(--aw-surface) !important;
+  border: 1px solid var(--aw-border) !important;
+  box-shadow: none !important;
+}
+
+/* These two sit flush against the window edge, so only the edge they share with
+ * the page gets a line. A full border inside the chrome reads as a box drawn in
+ * a box. */
+#findbar {
+  background: var(--aw-surface) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--aw-border) !important;
+}
+
+#sidebar-box {
+  background: var(--aw-surface) !important;
+  border: 0 !important;
+  border-right: 1px solid var(--aw-border) !important;
+}
+
+/* Menus and the autocomplete list get the fill without a second outline: they
+ * sit inside a frame that already draws one. */
+menugroup,
+.menupopup-arrowscrollbox *:not(menuitem):not(menu),
+richlistbox,
+richlistitem,
+.urlbarView {
+  background-color: transparent !important;
+  border: 0 !important;
+}
+
+#urlbar-results,
+.urlbarView {
+  background: var(--aw-surface) !important;
 }
 
 menupopup > menuitem,
@@ -175,7 +242,10 @@ menupopup > menu:hover,
 }
 
 menuseparator {
-  border-color: var(--aw-border) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--aw-border) !important;
+  padding: 0 !important;
+  min-height: 1px !important;
 }
 
 #statuspanel-label {

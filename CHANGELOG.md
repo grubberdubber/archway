@@ -327,6 +327,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Firefox drew a square inside a square: the chrome stylesheet put a 1px
+  border on `menupopup`/`panel` *and* on the content part Firefox paints inside
+  them, so every context menu, panel and the search dropdown showed two nested
+  frames. Only the outer content part is framed now, menus get the fill alone,
+  and `#findbar`/`#sidebar-box` keep just the edge they share with the page.
 - `doctor` warned "run `archway applet keyd grant`" on a machine where the
   grant worked: `/etc/polkit-1/rules.d` is `0750 root:polkitd`, so a normal user
   cannot `[[ -r ]]` the rule file. The check now probes the capability itself
