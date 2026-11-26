@@ -50,12 +50,20 @@ teardown() {
 }
 
 @test "color-picker falls back to grim + slurp when hyprpicker is absent" {
-  # `have hyprpicker` must fail, so the stub PATH holds only the fallback tools.
   mock_cmd slurp 'printf "10,20\n"'
   mock_cmd grim 'printf "%s\n" "$*" > "$HOME/grim.args"; printf "png"'
   mock_cmd magick 'printf "123456\n"'
 
-  run "$CP" --no-copy
+  # hyprpicker is installed on the developer machine but not in the container,
+  # so the test builds its own PATH: `have hyprpicker` must fail there.
+  local bin="$SANDBOX/minbin"
+  mkdir -p "$bin"
+  ln -sf "$(command -v bash)" "$bin/bash"
+  ln -sf "$(command -v sed)" "$bin/sed"
+  local tool
+  for tool in slurp grim magick; do ln -sf "$SANDBOX/bin/$tool" "$bin/$tool"; done
+
+  run env PATH="$bin" "$CP" --no-copy
   assert_eq 0 "$status"
   assert_eq "#123456" "$output"
   # grim has to be asked for exactly one pixel at the selected point.
