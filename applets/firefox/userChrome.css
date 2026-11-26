@@ -199,6 +199,29 @@
   outline: none !important;
 }
 
+/* The nova "smartbar" dresses the field in a 24px radius and a violet-pink-
+ * yellow gradient border painted by `::after` with a mask, plus a glow on
+ * `::before`. Its rules are nested under `.smartbar > .urlbar-background`, so
+ * neither `#urlbar-background` nor a plain class reset reaches them. Square
+ * corners and no pseudo-element frames: the palette owns this field. */
+#urlbar,
+#urlbar-background,
+.urlbar-background,
+.urlbar-background::before,
+.urlbar-background::after {
+  border-radius: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background-image: none !important;
+  mask: none !important;
+}
+
+.urlbar-background::before,
+.urlbar-background::after {
+  content: none !important;
+}
+
 #urlbar[focused] > #urlbar-background,
 #urlbar:focus-within > #urlbar-background,
 #searchbar:focus-within,
