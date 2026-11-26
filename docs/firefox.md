@@ -67,6 +67,21 @@ variant at `fill: unset` so it keeps its built-in colours; the stylesheet
 forces `fill: currentColor` on `#identity-icon` so all three variants read as
 one family in the active palette.
 
+## Address bar suggestions
+
+The open dropdown is painted by two elements: `.urlbar-background` (the field)
+and `.urlbarView-background` (the half that reaches below the toolbar). Firefox
+frames the second one with `1px solid var(--panel-border-color)` and a drop
+shadow, so the suggestions came with a grey box that belonged to the browser's
+ramp rather than the theme. Both are now frameless and continue the field's
+`surface`.
+
+The lines *inside* the list come from `--urlbarview-separator-color` (a
+`currentColor` mix or `gray-60`), `--border-color-selected` and the hover and
+selection backgrounds. Those tokens live in `urlbarview.tokens.css` inside
+`@layer` blocks, so the unlayered overrides in `userChrome.css` set them to
+`border`, `accent`, `surface_alt` and `selection` without a specificity fight.
+
 ## Selection in the file picker
 
 The picker is GTK3, so its rows are drawn by the GTK theme, not by Firefox. The

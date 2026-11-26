@@ -350,6 +350,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The address-bar suggestions no longer wear a grey frame. Firefox paints the
+  lower half of the open field (`.urlbarView-background`) with
+  `1px solid var(--panel-border-color)` plus a shadow; the frame and the shadow
+  are gone and the field's `surface` continues through the dropdown. The
+  separators, hover and selected colours inside the list now come from the
+  palette instead of Firefox's grey ramp.
 - Gaming mode no longer appears to switch itself on after a reboot. The mode
   stamps the kernel boot id in `gaming.state`; `gaming reconcile` (run at
   Hyprland session start and by `gaming status`) undoes a mode left over from a

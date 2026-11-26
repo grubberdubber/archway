@@ -212,6 +212,22 @@
   border-bottom: 1px solid var(--aw-border) !important;
 }
 
+/* Firefox derives the lines inside the suggestion list from `currentColor`
+ * mixes and from its own grey ramp (`rgb(240, 240, 244)` / `gray-60`), not
+ * from the theme. On a hand-made dark palette that reads as a foreign grey
+ * hairline above the search engines and around the "search with" tips. These
+ * tokens are defined in `urlbarview.tokens.css` inside @layer blocks, so an
+ * unlayered declaration here wins without fighting specificity. */
+:root {
+  --urlbarview-separator-color: var(--aw-border) !important;
+  --border-color-selected: var(--aw-accent) !important;
+  --urlbarview-background-color-hover: var(--aw-surface-alt) !important;
+  --urlbarview-background-color-selected: var(--aw-selection) !important;
+  --urlbarview-text-color-selected: var(--aw-text) !important;
+  --panel-border-color: var(--aw-border) !important;
+  --panel-separator-color: var(--aw-border) !important;
+}
+
 /* Nothing inside the address bar draws its own outline: Firefox keeps a 1px
  * border on the view body and a focus ring on the input container, both of
  * which show up as the square-in-a-square on suggestions. */
@@ -239,6 +255,19 @@
  * and take no outline of their own. */
 #urlbar[open] .urlbarView {
   background: var(--aw-surface) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* The lower half of the "joint background" is a separate element
+ * (`.urlbarView-background`) that Firefox paints with
+ * `border: 1px solid var(--panel-border-color)` and a drop shadow. That 1px
+ * panel border is the grey frame around the suggestions: it belongs to the
+ * browser's own ramp, not to the theme. The field's surface is continued here
+ * instead, with no frame and no shadow. */
+#urlbar .urlbarView-background,
+.urlbarView-background {
+  background-color: var(--aw-surface) !important;
   border: 0 !important;
   box-shadow: none !important;
 }
@@ -280,6 +309,14 @@
   background: var(--aw-surface) !important;
   color: var(--aw-text-muted) !important;
   border-top: 1px solid var(--aw-border) !important;
+}
+
+/* Tips ("search with", tab-to-search) draw their own separators, and the
+ * nova view adds a top line to the one-off row: both use the token above, but
+ * naming them keeps the theme in charge even if the token is renamed. */
+#urlbar .urlbarView-row[type="tip"],
+#urlbar:not([noresults]) > .urlbarView > .search-one-offs:not([hidden]) {
+  border-color: var(--aw-border) !important;
 }
 
 #urlbar .searchbar-engine-one-off-item:hover,
