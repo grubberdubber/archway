@@ -19,6 +19,9 @@ teardown() {
   mock_cmd hyprpicker 'printf "#f5a97f\n"'
   mock_cmd wl-copy 'cat > "$HOME/clipboard"'
   mock_cmd notify-send 'printf "%s\n" "$@" > "$HOME/notify"'
+  # ImageMagick is not installed in the CI container: the stub only has to
+  # leave the swatch behind, the applet checks that the file is real.
+  mock_cmd magick ': > "$XDG_RUNTIME_DIR/archway/color.png"'
 
   run "$CP"
   assert_eq 0 "$status"

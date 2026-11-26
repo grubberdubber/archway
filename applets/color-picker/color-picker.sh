@@ -130,6 +130,9 @@ swatch() {
   have magick || return 0
   mkdir -p -- "$RUNTIME_DIR"
   magick -size 96x96 "xc:${hex}" "png:${file}" 2> /dev/null || return 0
+  # Only advertise a swatch that really exists: a broken image path in the
+  # hint is worse than a plain text notification.
+  [[ -f $file ]] || return 0
   printf '%s' "$file"
 }
 
