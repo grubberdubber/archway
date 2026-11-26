@@ -60,9 +60,16 @@ archway applet color-picker --dry-run  # say which backend would run
 
 `hyprpicker` is the backend: the cursor becomes a zoom lens so the pixel under
 it is visible before you commit, and `-s 6` keeps that lens readable on a
-1366-wide panel. On a session without it the applet falls back to `slurp -p`
-(a precise crosshair) plus a 1x1 `grim` grab, which still lands on the exact
-pixel but cannot preview it.
+1366-wide panel. It ships in `extra`; `archway install` pulls it in, and on an
+existing machine it is one package:
+
+```bash
+sudo pacman -S hyprpicker
+```
+
+Without it the applet falls back to `slurp -p` (a precise crosshair) plus a 1x1
+`grim` grab: the pixel is still exact, but there is no lens. `--dry-run` says
+which one you would get (`lens: zoom` or `lens: none`).
 
 The colour is copied **once**, by the applet, rather than letting hyprpicker
 copy and then copying again — two clipboard writes per pick show up twice in

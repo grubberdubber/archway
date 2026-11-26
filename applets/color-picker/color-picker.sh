@@ -165,7 +165,13 @@ main() {
     die "no colour picker available: install hyprpicker (or grim, slurp and imagemagick)" 1
   fi
   if ((DRY_RUN)); then
-    printf '[dry-run] backend: %s; copy: %s\n' "$be" "$([[ $COPY == 1 ]] && echo yes || echo no)"
+    # The lens is the reason hyprpicker is the preferred backend: it is the
+    # only one of the three that shows the pixel magnified while you aim.
+    local lens=none
+    [[ $be == hyprpicker ]] && lens=zoom
+    [[ $be == xcolor ]] && lens=zoom
+    printf '[dry-run] backend: %s; lens: %s; copy: %s\n' \
+      "$be" "$lens" "$([[ $COPY == 1 ]] && echo yes || echo no)"
     return 0
   fi
 
