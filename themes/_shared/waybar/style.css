@@ -250,13 +250,34 @@ window#waybar {
   color: @warning@;
 }
 
+/* Three states, three weights: off is muted, powered on is full text, and a
+ * live connection is the only one that earns the accent. The module prints no
+ * "on" word, so the colour is what tells them apart. */
 #bluetooth {
   color: @text_muted@;
   min-width: 26px;
 }
 
+#bluetooth.enabled {
+  color: @text@;
+}
+
 #bluetooth.connected,
 #bluetooth.discoverable {
+  color: @primary@;
+}
+
+#bluetooth:hover {
+  color: @text@;
+}
+
+/* Eyedropper pill: quiet until hovered, like the other tools. */
+#custom-color {
+  color: @text_muted@;
+  min-width: 24px;
+}
+
+#custom-color:hover {
   color: @primary@;
 }
 

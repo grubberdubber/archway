@@ -356,6 +356,13 @@ category = "archway"
 description = "Wi-Fi menu"
 
 [[keybind]]
+id = "color-picker"
+keys = "super + alt + c"
+command = "$HOME/.local/bin/archway applet color-picker"
+category = "archway"
+description = "Colour picker (copy the hex of any pixel)"
+
+[[keybind]]
 id = "wallpaper-picker"
 keys = "super + alt + w"
 command = "$HOME/.local/bin/archway applet wallpaper --rofi"

@@ -62,6 +62,7 @@
   "group/controls": {
     "orientation": "horizontal",
     "modules": [
+      "custom/color",
       "pulseaudio",
       "backlight",
       "custom/nightlight",
@@ -193,12 +194,23 @@
     "on-click-right": "nm-connection-editor",
     "tooltip": true
   },
+  // No "on"/"off" text: the glyph already says Bluetooth, and the colour says
+  // the state (muted off, text on, accent when a device is connected). The
+  // tooltip carries the adapter, so nothing is lost by dropping the word.
   "bluetooth": {
-    "format": "\uf293 {status}",
-    "format-disabled": "\uf293 off",
+    "format": "\uf293",
+    "format-disabled": "\uf293",
     "format-connected": "\uf293 {num_connections}",
     "tooltip-format": "{controller_alias}\t{controller_address}",
-    "on-click": "blueman-manager"
+    "on-click": "$HOME/.local/bin/archway applet bluetooth --rofi"
+  },
+
+  // Eyedropper: picks a pixel, copies the hex and shows a swatch of it.
+  "custom/color": {
+    "format": "\uf1fb",
+    "tooltip": true,
+    "tooltip-format": "Pick a colour from the screen\nSuper+Alt+C",
+    "on-click": "$HOME/.local/bin/archway applet color-picker"
   },
 
   "custom/resources": {

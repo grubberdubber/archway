@@ -29,8 +29,11 @@ wl-clipboard
 wl-clip-persist
 cliphist
 swayosd
-# hyprpicker: colour picker for the screenshot/theme workflow (Super+Shift+S)
+# hyprpicker: the eyedropper behind Super+Alt+C; its zoom lens is what makes a
+# pixel preview possible. Without it the applet falls back to grim + slurp.
 hyprpicker
+# imagemagick draws the swatch thumbnail in the colour-picker notification.
+imagemagick
 
 # Capture and sharing (Wayland-native; no maim/slop/xclip)
 grim

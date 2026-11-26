@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `color-picker` applet (`Super+Alt+C` and an eyedropper pill in the bar):
+  picks a pixel, copies it as `#RRGGBB` once, and shows a notification with the
+  hex, the RGB triple and a swatch of the colour. `hyprpicker`'s zoom lens is
+  the default backend; without it the applet falls back to `slurp -p` plus a
+  1x1 `grim` grab. `--json`, `--no-copy` and `--dry-run` included, cancelled
+  picks exit `4`.
 - Firefox chrome rebuilt against the full palette: every colour is a token, so
   a theme switch repaints tabs, menus, suggestions and panels; accent marks
   focus, the active tab, the selected suggestion and download progress;
@@ -186,6 +192,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The Bluetooth pill no longer prints "on"/"off": the glyph says what it is
+  and the colour says the state — muted when off, full text when powered on,
+  accent when a device is connected. Clicking it opens the Archway Bluetooth
+  menu instead of `blueman-manager`.
 - `archway keys generate` now delivers the chords to the running session: it
   copies the generated file to `~/.config/hypr/conf.d/20-keybinds.lua`, keeps the
   chezmoi source in step and reloads Hyprland. Until now it wrote only the

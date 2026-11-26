@@ -31,6 +31,31 @@ can read a generated file; the rest are static and documented as such.
 Themes render `zathura-theme`, `mpv-theme.conf` and `lazygit-theme.yml`; a theme
 without those modules inherits them from `themes/_shared/`.
 
+## Colour picker
+
+`Super+Alt+C`, or the eyedropper pill in the bar.
+
+```bash
+archway applet color-picker            # pick, copy, notify
+archway applet color-picker --no-copy  # pick and print only
+archway applet color-picker --json
+archway applet color-picker --dry-run  # say which backend would run
+```
+
+`hyprpicker` is the backend: the cursor becomes a zoom lens so the pixel under
+it is visible before you commit, and `-s 6` keeps that lens readable on a
+1366-wide panel. On a session without it the applet falls back to `slurp -p`
+(a precise crosshair) plus a 1x1 `grim` grab, which still lands on the exact
+pixel but cannot preview it.
+
+The colour is copied **once**, by the applet, rather than letting hyprpicker
+copy and then copying again — two clipboard writes per pick show up twice in
+`cliphist`. The notification carries the hex, the RGB triple and a swatch image
+of the colour, so what was copied is on screen, not just in the clipboard.
+
+Exit codes follow the CLI contract: `0` copied, `1` backend failure, `2` bad
+usage, `4` cancelled (Esc or right click).
+
 ## Thunar
 
 `~/.config/Thunar/thunar.xml` is written to be explicit rather than clever:

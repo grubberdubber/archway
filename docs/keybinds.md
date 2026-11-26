@@ -82,6 +82,7 @@ Press `Super + /` at any time to open this list in a floating terminal.
 | `super + shift + m` | Mount / unmount Android device (MTP) | `$HOME/.local/bin/archway applet android-mount --rofi` |
 | `super + v` | Clipboard history | `$HOME/.local/bin/archway applet clipboard --rofi` |
 | `super + shift + n` | Wi-Fi menu | `$HOME/.local/bin/archway applet network --rofi` |
+| `super + alt + c` | Colour picker (copy the hex of any pixel) | `$HOME/.local/bin/archway applet color-picker` |
 | `super + alt + w` | Wallpaper picker | `$HOME/.local/bin/archway applet wallpaper --rofi` |
 | `super + shift + s` | Screenshot: region | `$HOME/.local/bin/archway applet screenshot region` |
 | `super + shift + r` | Screen recording: start/stop | `$HOME/.local/bin/archway applet record toggle` |
