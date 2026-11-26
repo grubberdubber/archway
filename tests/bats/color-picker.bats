@@ -47,6 +47,11 @@ teardown() {
   assert_eq "#8AB4F8" "$output"
   assert_eq "#8AB4F8" "$(cat "$HOME/clipboard")"
   assert_file_contains "$HOME/hp.args" "-b"
+  # -q suppresses the very line that prints the colour (Debug::log(NONE)), so
+  # the applet must never pass it; this is the bug that made a real pick copy
+  # nothing while every stub-based test passed.
+  run grep -c -- ' -q' "$HOME/hp.args"
+  assert_eq 1 "$status" # grep exits 1 when it finds nothing
 }
 
 @test "color-picker falls back to grim + slurp when hyprpicker is absent" {

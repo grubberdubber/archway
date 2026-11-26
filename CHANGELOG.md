@@ -350,11 +350,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The colour picker copied nothing under the real `hyprpicker`: it decorates
-  its output with ANSI colour escapes unless `-b` is passed, so the result was
-  not a hex code and the applet bailed out before touching the clipboard. It now
-  asks for plain output and strips escapes anyway, and a test covers the
-  decorated output.
+- The colour picker copied nothing under the real `hyprpicker`: the applet
+  passed `-q`, and hyprpicker prints the picked colour through
+  `Debug::log(NONE, ...)` — quiet drops every level but `ERR`/`CRIT`, so the
+  colour never reached stdout and the applet treated the empty result as a
+  cancelled pick. `-q` is gone, `-b` keeps the output plain, and the escapes are
+  stripped too. Failures are also logged to
+  `~/.local/state/archway/logs/color-picker.log`, since a keybind run has no
+  visible stderr.
 - The address-bar suggestions no longer wear a grey frame. Firefox paints the
   lower half of the open field (`.urlbarView-background`) with
   `1px solid var(--panel-border-color)` plus a shadow; the frame and the shadow

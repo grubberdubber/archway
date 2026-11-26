@@ -36,9 +36,21 @@ swatch. Exit codes: 0 ok, 1 error, 2 usage, 4 cancelled.
 EOF
 }
 
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/archway"
+
 have() { command -v "$1" > /dev/null 2>&1; }
 
+# A pick runs from a keybind, where stderr is invisible. One line per failure in
+# the state dir is what makes the next "it does nothing" debuggable.
+log_failure() {
+  local stamp
+  mkdir -p -- "$STATE_DIR/logs" 2> /dev/null || return 0
+  printf -v stamp '%(%Y-%m-%dT%H:%M:%S%z)T' -1
+  printf '%s color-picker: %s\n' "$stamp" "$1" >> "$STATE_DIR/logs/color-picker.log" 2> /dev/null || true
+}
+
 die() {
+  log_failure "$1"
   printf 'color-picker: %s\n' "$1" >&2
   exit "${2:-1}"
 }
@@ -92,12 +104,13 @@ normalise_hex() {
 
 pick_hyprpicker() {
   # -s 6 keeps the lens readable on a 1366-wide panel without covering the
-  # pixel underneath; -q silences the log, the colour is the only output.
-  # -b/--no-fancy is not cosmetic: hyprpicker prints the colour wrapped in ANSI
-  # escapes by default, so without it the result is not a hex code and the
-  # copy never happens. The sed below is the belt to that brace.
+  # pixel underneath. No -q/--quiet here: hyprpicker prints the picked colour
+  # through Debug::log(NONE, ...), and quiet drops every level except ERR and
+  # CRIT — the colour included, leaving an empty result that looks like a
+  # cancelled pick. -b/--no-fancy keeps the output plain; the sed below strips
+  # escapes should that ever be ignored.
   local raw
-  raw=$(hyprpicker -f hex -s 6 -q -b 2> /dev/null | sed $'s/\033\\[[0-9;]*m//g') || return 1
+  raw=$(hyprpicker -f hex -s 6 -b 2> /dev/null | sed $'s/\033\\[[0-9;]*m//g') || return 1
   # No output means the pick was cancelled; output that is not a colour means
   # the backend is broken. They are different exit codes, not one failure.
   [[ -n ${raw//[[:space:]]/} ]] || return 4
