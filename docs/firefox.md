@@ -48,6 +48,25 @@ edits. Beyond the four surface colours it uses:
 There are no literal hex values in `userChrome.css`; `archway applet firefox`
 fails rather than leave an unresolved token behind.
 
+## Site identity icons
+
+The lock and the shield are the one place where colour carries information, so
+they are the only toolbar icons exempt from the monochrome filter. The classes
+are the ones this build actually sets (`identity-block.css`), not guesses:
+
+| State | Selector | Colour |
+|---|---|---|
+| https, verified | `#identity-box.verifiedDomain` | `success` |
+| blocked trackers | `#trust-icon-container.has-blocked-trackers` | `primary` |
+| mixed content, weak cipher | `.mixedDisplayContent`, `.weakCipher`, `.certUserOverridden` | `warning` |
+| broken or insecure | `.notSecure`, `.mixedActiveContent`, `.httpsOnlyErrorPage` | `error` |
+| chrome UI, extensions | `.chromeUI`, `.extensionPage` | `text_muted` |
+
+Firefox paints the security SVGs with `currentColor` but leaves the warning
+variant at `fill: unset` so it keeps its built-in colours; the stylesheet
+forces `fill: currentColor` on `#identity-icon` so all three variants read as
+one family in the active palette.
+
 ## Selection in the file picker
 
 The picker is GTK3, so its rows are drawn by the GTK theme, not by Firefox. The

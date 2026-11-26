@@ -288,11 +288,9 @@
   color: var(--aw-text) !important;
 }
 
-/* Extension, identity and site icons keep their shape but lose their colour:
- * a page's favicon is the only saturated pixel left in the toolbar. Security
- * state is the exception, because there the colour is the message. */
-#identity-box,
-#tracking-protection-icon-container,
+/* Extension and toolbar icons keep their shape but lose their colour: a page's
+ * favicon is the only saturated pixel left in the toolbar. The security icons
+ * are excluded because there the colour *is* the message. */
 #page-action-buttons,
 #unified-extensions-button,
 #library-button,
@@ -300,17 +298,73 @@
   filter: grayscale(1) !important;
 }
 
-#identity-box.notSecure,
-#identity-box.notSecureText,
-#identity-box.chromeUI {
+/* --- Security icons (lock / shield / broken lock) ------------------------ */
+/* Firefox draws these as SVGs filled with `currentColor`, and sets
+ * `fill: unset` on the warning variant so it keeps its own colours. Forcing
+ * the fill makes all three read as one family, tinted by the palette. The
+ * class names are the ones in this build's identity-block.css: `verifiedDomain`
+ * for https, `weakCipher`/`mixedDisplayContent` for partial content,
+ * `notSecure`/`mixedActiveContent` for a broken connection, and the newer
+ * `#trust-icon-container` for the shield that counts blocked trackers. */
+#identity-box,
+#tracking-protection-icon-container,
+#trust-icon-container {
   filter: none !important;
-  color: var(--aw-warning) !important;
+}
+
+#identity-icon,
+#trust-icon,
+#tracking-protection-icon {
+  fill: currentColor !important;
+  fill-opacity: 1 !important;
+}
+
+#identity-box,
+#trust-icon-container {
+  color: var(--aw-text-muted) !important;
 }
 
 #identity-box.verifiedDomain,
-#identity-box.verifiedIdentity {
-  filter: none !important;
+#identity-box.verifiedIdentity,
+#identity-box.mixedActiveBlocked,
+#trust-icon-container.secure {
   color: var(--aw-success) !important;
+}
+
+#identity-box.weakCipher,
+#identity-box.mixedDisplayContent,
+#identity-box.mixedDisplayContentLoadedActiveBlocked,
+#identity-box.certUserOverridden {
+  color: var(--aw-warning) !important;
+}
+
+/* Blocked trackers are a win, not a warning: the accent, never red. */
+#trust-icon-container.has-blocked-trackers:not(.insecure, .breached) {
+  color: var(--aw-accent) !important;
+}
+
+#identity-box.notSecure,
+#identity-box.notSecureText,
+#identity-box.mixedActiveContent,
+#identity-box.certErrorPage,
+#identity-box.httpsOnlyErrorPage,
+#trust-icon-container.insecure,
+#trust-icon-container.breached {
+  color: var(--aw-error) !important;
+}
+
+/* Chrome UI and extension pages are not a security statement at all. */
+#identity-box.chromeUI,
+#identity-box.extensionPage {
+  color: var(--aw-text-muted) !important;
+}
+
+/* The shield turns into a count pill once trackers are blocked; the number has
+ * to stay readable, so it inherits the accent instead of the muted text. */
+#trust-icon-container.has-blocked-trackers #trust-icon-tracker-count-longform-wrapper,
+#trust-icon-container.has-blocked-trackers #trust-icon-tracker-count-shortform-wrapper,
+#trust-icon-container.has-blocked-trackers #trust-label {
+  color: var(--aw-accent) !important;
 }
 
 /* --- Panels, menus, sidebars -------------------------------------------- */

@@ -192,6 +192,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Firefox's security icons (lock, shield, broken lock) are the only toolbar
+  icons exempt from the monochrome filter: https is `success`, blocked trackers
+  `primary`, mixed content `warning` and a broken connection `error`. The
+  selectors come from this build's `identity-block.css`, and the warning SVG's
+  `fill: unset` is overridden so all three variants share the palette.
 - The Bluetooth pill no longer prints "on"/"off": the glyph says what it is
   and the colour says the state — muted when off, full text when powered on,
   accent when a device is connected. Clicking it opens the Archway Bluetooth
