@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Firefox chrome rebuilt against the full palette: every colour is a token, so
+  a theme switch repaints tabs, menus, suggestions and panels; accent marks
+  focus, the active tab, the selected suggestion and download progress;
+  `selection_bg` marks hover and selection; `tertiary` flags a tab asking for
+  attention, `secondary` marks private windows, and `success`/`warning`/`error`
+  are reserved for site identity, infobars and the close button. Also themed:
+  window controls, find bar with a not-found state, downloads panel, private
+  browsing, reader button, sidebar headers and `color-scheme: dark`.
 - `archway applet firefox`: renders `chrome/userChrome.css`,
   `chrome/userContent.css` and a `user.js` from the active theme palette, with
   a backup of whatever it replaces. Square chrome, monochrome toolbar, dense
@@ -327,6 +335,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The file chooser did not show what was selected: Ctrl+click really selected
+  files (they uploaded), but no row was highlighted. The GTK theme only painted
+  `treeview.view:selected:focus`, and a selection built with the keyboard
+  focus elsewhere never matched it. `:selected`, `:selected:backdrop` and the
+  hovered variants are now styled for views, icon views and lists, with a 2px
+  accent bar on the selected row.
 - Firefox could not be closed: the prefs set
   `browser.tabs.closeWindowWithLastTab = false`, so the X on the last tab left
   an empty window that never went away. It is `true` again.

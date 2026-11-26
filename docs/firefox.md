@@ -30,6 +30,33 @@ to `~/.mozilla/firefox`.
 - `userContent.css` styles `about:` pages only. Web content is untouched on
   purpose: recolouring a page you did not design breaks its contrast.
 
+## Palette
+
+Every colour in the stylesheet is a palette token (`@bg@`…`@selection_bg@`),
+substituted at render time, so switching themes repaints the browser with no
+edits. Beyond the four surface colours it uses:
+
+| Token | Used for |
+|---|---|
+| `primary` | focus hairline, active tab, selected row bar, progress |
+| `selection_bg` | hovered rows, selected suggestions, menu highlight |
+| `tertiary` | tab asking for attention |
+| `secondary` | private browsing marker |
+| `success` / `warning` / `error` | site identity state, infobars, not-secure field, close button hover |
+| `overlay` | scrollbar thumb, progress track |
+
+There are no literal hex values in `userChrome.css`; `archway applet firefox`
+fails rather than leave an unresolved token behind.
+
+## Selection in the file picker
+
+The picker is GTK3, so its rows are drawn by the GTK theme, not by Firefox. The
+stock theme only paints `:selected:focus`, and Ctrl+click builds a selection
+while the list is not focused — the files were really selected (they uploaded),
+but no row looked selected. `themes/_shared/gtk/gtk.css` now defines
+`:selected`, `:selected:backdrop` and the unfocused variants for every view and
+adds a 2px accent bar on the left of each selected row.
+
 ## Why the file picker pref is pinned
 
 `widget.use-xdg-desktop-portal.file-picker` is set to `0`, which keeps Firefox's

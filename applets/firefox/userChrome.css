@@ -1,9 +1,12 @@
 /* Archway — Firefox chrome. Rendered from the Archway palette; do not edit the
- * copy in the profile, edit themes/<theme>/palette.toml and re-apply.
+ * copy in the profile, edit the palette and re-run `archway applet firefox`.
  *
- * Goal: one flat, monochrome surface with square corners. No gradients, no
- * rounded chrome, no blue accents — the accent only ever appears as a 1px
- * border or a 2px underline, so the page keeps all the colour. */
+ * Goal: one flat, monochrome surface with square corners. Every colour here is
+ * a palette token, so a theme switch repaints the whole browser; no literal hex
+ * values, no gradients, no rounded chrome. The accent appears only where it
+ * carries meaning (focus, the active tab, the selected row, progress), and the
+ * state colours from the palette are used only for state.
+ */
 
 :root {
   --aw-bg: @bg@;
@@ -14,6 +17,16 @@
   --aw-text: @text@;
   --aw-text-muted: @text_muted@;
   --aw-accent: @primary@;
+  --aw-secondary: @secondary@;
+  --aw-tertiary: @tertiary@;
+  --aw-error: @error@;
+  --aw-warning: @warning@;
+  --aw-success: @success@;
+  --aw-selection: @selection_bg@;
+
+  /* Native widgets (scrollbars in panels, form controls in `about:` pages and
+   * the tooltips GTK draws for us) pick their colours from this. */
+  color-scheme: dark !important;
 }
 
 /* Square everywhere. Firefox 89+ rounds tabs, the address bar, popups and the
@@ -27,9 +40,12 @@
   animation: none !important;
 }
 
-/* --- Toolbar ------------------------------------------------------------ */
+/* --- Window ------------------------------------------------------------- */
+
+#titlebar,
 #navigator-toolbox {
   background: var(--aw-bg) !important;
+  border: 0 !important;
   border-bottom: 1px solid var(--aw-border) !important;
   box-shadow: none !important;
   padding: 0 !important;
@@ -54,7 +70,32 @@
   border-top: 1px solid var(--aw-border) !important;
 }
 
+/* Window controls, when Firefox draws them. Muted until hovered; closing is the
+ * one destructive action in the strip, so it is the one that turns red. */
+.titlebar-buttonbox-container {
+  margin: 0 !important;
+}
+
+.titlebar-button {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 10px !important;
+  min-height: 28px !important;
+  color: var(--aw-text-muted) !important;
+}
+
+.titlebar-button:hover {
+  background: var(--aw-surface-alt) !important;
+  color: var(--aw-text) !important;
+}
+
+.titlebar-button.titlebar-close:hover {
+  background: var(--aw-error) !important;
+  color: var(--aw-bg) !important;
+}
+
 /* --- Tabs --------------------------------------------------------------- */
+
 #tabbrowser-tabs {
   --tab-min-height: 28px !important;
   margin: 0 !important;
@@ -82,12 +123,39 @@
   box-shadow: inset 0 -2px 0 var(--aw-accent) !important;
 }
 
+/* A tab that wants attention says so with the accent, not with a coloured
+ * favicon or a bouncing animation. */
+.tabbrowser-tab[attention] .tab-background {
+  box-shadow: inset 0 -2px 0 var(--aw-tertiary) !important;
+}
+
+.tabbrowser-tab[pending] .tab-label {
+  opacity: 0.6 !important;
+}
+
 .tab-label {
   color: var(--aw-text-muted) !important;
 }
 
+.tabbrowser-tab:hover .tab-label {
+  color: var(--aw-text) !important;
+}
+
 .tabbrowser-tab[selected] .tab-label {
   color: var(--aw-text) !important;
+}
+
+/* Favicons are the only saturated pixels in the strip while scanning for a
+ * tab, so they stay grey until the tab is the one you are looking at. */
+.tab-icon-image {
+  filter: grayscale(1) !important;
+  opacity: 0.85 !important;
+}
+
+.tabbrowser-tab[selected] .tab-icon-image,
+.tabbrowser-tab:hover .tab-icon-image {
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 /* The close button keeps its space but only draws on hover: a row of crosses
@@ -102,7 +170,23 @@
   opacity: 0.8 !important;
 }
 
-/* --- Address bar -------------------------------------------------------- */
+.tabbrowser-tab[selected]:hover .tab-close-button {
+  opacity: 1 !important;
+}
+
+#tabs-newtab-button,
+#new-tab-button {
+  color: var(--aw-text-muted) !important;
+}
+
+#tabs-newtab-button:hover,
+#new-tab-button:hover {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text) !important;
+}
+
+/* --- Address bar and search --------------------------------------------- */
+
 /* No frame around the field. A border here is drawn around the *open* dropdown
  * too (the results live inside `#urlbar`), which is the box someone sees around
  * the suggestions. Focus and the open dropdown are marked with a hairline
@@ -128,8 +212,8 @@
   border-bottom: 1px solid var(--aw-border) !important;
 }
 
-/* Nothing inside the address bar draws its own outline: Firefox keeps a
- * 1px border on the view body and a focus ring on the input container, both of
+/* Nothing inside the address bar draws its own outline: Firefox keeps a 1px
+ * border on the view body and a focus ring on the input container, both of
  * which show up as the square-in-a-square on suggestions. */
 #urlbar,
 #urlbar-container,
@@ -151,6 +235,14 @@
   box-shadow: none !important;
 }
 
+/* The open address bar is one box: the results continue the field's surface
+ * and take no outline of their own. */
+#urlbar[open] .urlbarView {
+  background: var(--aw-surface) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
 #urlbar-input,
 #searchbar {
   color: var(--aw-text) !important;
@@ -160,38 +252,69 @@
   color: var(--aw-text-muted) !important;
 }
 
-/* Extension, identity and site icons keep their shape but lose their colour:
- * a page's favicon is the only saturated pixel left in the toolbar. */
-#identity-box,
-#tracking-protection-icon-container,
-#page-action-buttons,
-#unified-extensions-button {
-  filter: grayscale(1) !important;
-}
-
 #urlbar-results,
 .urlbarView-row {
   background: var(--aw-surface) !important;
   color: var(--aw-text) !important;
 }
 
+.urlbarView-row:hover,
 .urlbarView-row[selected] {
-  background: var(--aw-surface-alt) !important;
+  background: var(--aw-selection) !important;
+  box-shadow: inset 2px 0 0 var(--aw-accent) !important;
 }
 
-/* The open address bar is one box: the results continue the field's surface
- * and take no outline of their own. */
-#urlbar[open] .urlbarView {
-  background: var(--aw-surface) !important;
-  border: 0 !important;
-  box-shadow: none !important;
+.urlbarView-row[type="switchtab"] .urlbarView-title {
+  color: var(--aw-text) !important;
 }
 
-.urlbarView-url {
+.urlbarView-url,
+.urlbarView-action,
+.urlbarView-title-separator {
   color: var(--aw-text-muted) !important;
 }
 
+/* The one-shot search buttons and the engine name follow the muted text. */
+#urlbar .search-one-offs,
+#urlbar .searchbar-engine-one-off-item {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text-muted) !important;
+  border-top: 1px solid var(--aw-border) !important;
+}
+
+#urlbar .searchbar-engine-one-off-item:hover,
+#urlbar .searchbar-engine-one-off-item[selected] {
+  background: var(--aw-surface-alt) !important;
+  color: var(--aw-text) !important;
+}
+
+/* Extension, identity and site icons keep their shape but lose their colour:
+ * a page's favicon is the only saturated pixel left in the toolbar. Security
+ * state is the exception, because there the colour is the message. */
+#identity-box,
+#tracking-protection-icon-container,
+#page-action-buttons,
+#unified-extensions-button,
+#library-button,
+#downloads-button {
+  filter: grayscale(1) !important;
+}
+
+#identity-box.notSecure,
+#identity-box.notSecureText,
+#identity-box.chromeUI {
+  filter: none !important;
+  color: var(--aw-warning) !important;
+}
+
+#identity-box.verifiedDomain,
+#identity-box.verifiedIdentity {
+  filter: none !important;
+  color: var(--aw-success) !important;
+}
+
 /* --- Panels, menus, sidebars -------------------------------------------- */
+
 /* A popup is two boxes stacked: the window (or `panel`) and the content part
  * Firefox paints inside it. Styling both drew a square inside a square, which
  * is what a context menu, the search dropdown and every panel looked like.
@@ -263,16 +386,36 @@ richlistitem,
   background: var(--aw-surface) !important;
 }
 
+/* Panels built from views (downloads, extensions) hold their content in a
+ * multi-view stack, not in `.panel-arrowcontent`. Without a fill they inherit
+ * the transparent popup window and show the page through them. */
+panelmultiview,
+panelview,
+.panel-viewstack,
+.panel-viewcontainer {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text) !important;
+}
+
 menupopup > menuitem,
 menupopup > menu {
   padding-block: 3px !important;
+  color: var(--aw-text) !important;
 }
 
 menupopup > menuitem:hover,
 menupopup > menu:hover,
-.subviewbutton:hover {
-  background: var(--aw-surface-alt) !important;
+menupopup > menuitem[_moz-menuactive="true"],
+menupopup > menu[_moz-menuactive="true"],
+.subviewbutton:hover,
+.subviewbutton[_moz-menuactive="true"] {
+  background: var(--aw-selection) !important;
   color: var(--aw-text) !important;
+}
+
+menuitem[disabled="true"],
+menu[disabled="true"] {
+  color: var(--aw-text-muted) !important;
 }
 
 menuseparator {
@@ -285,10 +428,130 @@ menuseparator {
 #statuspanel-label {
   border-top: 1px solid var(--aw-border) !important;
   border-right: 1px solid var(--aw-border) !important;
+  background: var(--aw-surface) !important;
   color: var(--aw-text-muted) !important;
 }
 
+/* --- Downloads ---------------------------------------------------------- */
+
+#downloadsListBox {
+  background: var(--aw-surface) !important;
+}
+
+.downloadMainArea,
+.downloadTarget {
+  color: var(--aw-text) !important;
+}
+
+.downloadDetails {
+  color: var(--aw-text-muted) !important;
+}
+
+#downloadsPanel .downloadProgress::-moz-progress-bar,
+.downloadProgress::-moz-progress-bar {
+  background: var(--aw-accent) !important;
+}
+
+.downloadProgress {
+  background: var(--aw-overlay) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* --- Find bar ----------------------------------------------------------- */
+
+.findbar-textbox {
+  background: var(--aw-surface-alt) !important;
+  color: var(--aw-text) !important;
+  border: 1px solid var(--aw-border) !important;
+  box-shadow: none !important;
+}
+
+.findbar-textbox:focus {
+  border-color: var(--aw-accent) !important;
+}
+
+.findbar-textbox[status="notfound"] {
+  border-color: var(--aw-error) !important;
+}
+
+.findbar-find-status {
+  color: var(--aw-text-muted) !important;
+}
+
+.findbar-highlight {
+  color: var(--aw-text) !important;
+}
+
+/* --- Notifications, infobars and alerts ---------------------------------- */
+
+notification-message,
+.notificationbox-stack notification,
+.infobar {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text) !important;
+  border: 0 !important;
+  border-left: 2px solid var(--aw-accent) !important;
+  box-shadow: none !important;
+}
+
+notification-message[type="warning"],
+notification-message[value="warning"] {
+  border-left-color: var(--aw-warning) !important;
+}
+
+notification-message[type="error"],
+notification-message[value="error"] {
+  border-left-color: var(--aw-error) !important;
+}
+
+.notification-button {
+  background: var(--aw-surface-alt) !important;
+  color: var(--aw-text) !important;
+  border: 1px solid var(--aw-border) !important;
+}
+
+.notification-button:hover {
+  border-color: var(--aw-accent) !important;
+}
+
+/* --- Private browsing --------------------------------------------------- */
+
+/* Stock uses purple. One accent per surface: private windows are marked with
+ * the secondary colour and a square mask icon instead. */
+#private-browsing-indicator-with-label,
+.private-browsing-indicator {
+  color: var(--aw-secondary) !important;
+}
+
+:root[privatebrowsingmode="temporary"] #navigator-toolbox {
+  border-bottom-color: var(--aw-secondary) !important;
+}
+
+:root[privatebrowsingmode="temporary"] .tabbrowser-tab[selected] .tab-background {
+  box-shadow: inset 0 -2px 0 var(--aw-secondary) !important;
+}
+
+/* --- Reader mode and sidebars ------------------------------------------- */
+
+#reader-mode-button[open] {
+  color: var(--aw-accent) !important;
+}
+
+#sidebar-header,
+#sidebar-search-container {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text-muted) !important;
+  border-bottom: 1px solid var(--aw-border) !important;
+}
+
+#sidebar {
+  background: var(--aw-surface) !important;
+  color: var(--aw-text) !important;
+}
+
 /* --- Scrollbars --------------------------------------------------------- */
+
 :root {
   scrollbar-width: thin;
   scrollbar-color: var(--aw-overlay) transparent;

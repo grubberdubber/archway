@@ -238,6 +238,34 @@ treeview.view header button:active {
   color: @text@;
 }
 
+/* Selection in every view, with or without keyboard focus. The stock theme only
+ * paints `:selected:focus`, so in a file chooser — where Ctrl+click builds a
+ * selection while the list itself is not focused — the rows looked unselected
+ * even though the selection existed and the files were really picked. */
+treeview.view:selected,
+treeview.view:selected:hover,
+treeview.view:selected:backdrop,
+iconview:selected,
+.view:selected,
+.view:selected:backdrop,
+list row:selected,
+list row:selected:backdrop,
+filechooser treeview.view:selected,
+filechooser iconview:selected,
+filechooser .view:selected {
+  background-image: none;
+  background-color: @selection_bg@;
+  color: @text@;
+}
+
+/* A left bar keeps a multi-selection readable when several rows share the same
+ * fill, and it costs no border: the geometry stays square. */
+treeview.view:selected,
+iconview:selected,
+filechooser treeview.view:selected {
+  border-left: 2px solid @primary@;
+}
+
 /* Scroll edge shadows use a gradient of the stock colours. */
 scrolledwindow undershoot.top,
 scrolledwindow undershoot.bottom,
