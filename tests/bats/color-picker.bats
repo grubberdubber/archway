@@ -33,6 +33,22 @@ teardown() {
   assert_file_contains "$HOME/notify" "image-path:$XDG_RUNTIME_DIR/archway/color.png"
 }
 
+@test "color-picker strips the ANSI colour hyprpicker prints by default" {
+  # hyprpicker paints its output with the picked colour unless -b is passed; the
+  # applet then rejected it as "not a colour" and never copied anything.
+  mock_cmd hyprpicker 'printf "%s\n" "$*" > "$HOME/hp.args"
+    printf "\033[38;2;138;180;248m#8ab4f8\033[0m\n"'
+  mock_cmd wl-copy 'cat > "$HOME/clipboard"'
+  mock_cmd notify-send 'printf "%s\n" "$@" > "$HOME/notify"'
+  mock_cmd magick ': > "$XDG_RUNTIME_DIR/archway/color.png"'
+
+  run "$CP"
+  assert_eq 0 "$status"
+  assert_eq "#8AB4F8" "$output"
+  assert_eq "#8AB4F8" "$(cat "$HOME/clipboard")"
+  assert_file_contains "$HOME/hp.args" "-b"
+}
+
 @test "color-picker falls back to grim + slurp when hyprpicker is absent" {
   # `have hyprpicker` must fail, so the stub PATH holds only the fallback tools.
   mock_cmd slurp 'printf "10,20\n"'

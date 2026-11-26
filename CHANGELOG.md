@@ -350,6 +350,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The colour picker copied nothing under the real `hyprpicker`: it decorates
+  its output with ANSI colour escapes unless `-b` is passed, so the result was
+  not a hex code and the applet bailed out before touching the clipboard. It now
+  asks for plain output and strips escapes anyway, and a test covers the
+  decorated output.
 - The address-bar suggestions no longer wear a grey frame. Firefox paints the
   lower half of the open field (`.urlbarView-background`) with
   `1px solid var(--panel-border-color)` plus a shadow; the frame and the shadow

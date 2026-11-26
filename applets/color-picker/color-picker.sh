@@ -93,8 +93,11 @@ normalise_hex() {
 pick_hyprpicker() {
   # -s 6 keeps the lens readable on a 1366-wide panel without covering the
   # pixel underneath; -q silences the log, the colour is the only output.
+  # -b/--no-fancy is not cosmetic: hyprpicker prints the colour wrapped in ANSI
+  # escapes by default, so without it the result is not a hex code and the
+  # copy never happens. The sed below is the belt to that brace.
   local raw
-  raw=$(hyprpicker -f hex -s 6 -q 2> /dev/null) || return 1
+  raw=$(hyprpicker -f hex -s 6 -q -b 2> /dev/null | sed $'s/\033\\[[0-9;]*m//g') || return 1
   # No output means the pick was cancelled; output that is not a colour means
   # the backend is broken. They are different exit codes, not one failure.
   [[ -n ${raw//[[:space:]]/} ]] || return 4
