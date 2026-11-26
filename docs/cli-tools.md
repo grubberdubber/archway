@@ -31,6 +31,22 @@ can read a generated file; the rest are static and documented as such.
 Themes render `zathura-theme`, `mpv-theme.conf` and `lazygit-theme.yml`; a theme
 without those modules inherits them from `themes/_shared/`.
 
+## Gaming mode
+
+`Super+Alt+G`, the rocket pill in the bar, or `archway applet gaming on|off`.
+It sets the `performance` power profile, turns on do-not-disturb and pauses
+`hypridle` (SIGSTOP, so the previous state comes back). `off` restores the
+profile and DND value saved when it was enabled.
+
+It is a **session** state, not a preference: the state file records the kernel
+boot id, and anything stamped with a different boot is undone by
+`archway applet gaming reconcile`, which Hyprland runs at session start and
+`gaming status` also runs. Without that, a shutdown while the mode was on left
+`power-profiles-daemon` remembering `performance` (it persists its profile in
+`/var/lib/power-profiles-daemon/state.ini`) and the next login looked like
+gaming mode had switched itself on. If the leftover is only the profile, set it
+back with `powerprofilesctl set balanced`.
+
 ## Colour picker
 
 `Super+Alt+C`, or the eyedropper pill in the bar.

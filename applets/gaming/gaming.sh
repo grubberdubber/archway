@@ -34,6 +34,8 @@ Usage:
 
 On:  performance power profile, notifications silenced, idle/lock paused.
 Off: restores the profile and notification mode saved when it was enabled.
+reconcile: undo a mode left on by a previous boot (the session runs this at
+           start; `status` also does, so the bar heals within one poll).
 No root, no systemd changes; state lives in ~/.local/state/archway/gaming.state.
 EOF
 }
@@ -55,6 +57,10 @@ state_get() {
   sed -n "s/^${key}=//p" "$STATE_FILE" | head -n1
 }
 
+boot_id() {
+  cat /proc/sys/kernel/random/boot_id 2> /dev/null || printf 'unknown'
+}
+
 state_write() {
   local enabled=$1 profile=$2 dnd=$3 idle=$4
   ((DRY_RUN)) && return 0
@@ -64,12 +70,38 @@ state_write() {
     printf 'saved_profile=%s\n' "$profile"
     printf 'saved_dnd=%s\n' "$dnd"
     printf 'paused_hypridle=%s\n' "$idle"
+    # Gaming mode is a session state, not a preference: a reboot ends it. The
+    # boot id is what makes that checkable without a daemon.
+    printf 'boot_id=%s\n' "$(boot_id)"
   } > "$STATE_FILE.tmp"
   mv -f -- "$STATE_FILE.tmp" "$STATE_FILE"
   chmod 644 -- "$STATE_FILE"
 }
 
-is_on() { [[ $(state_get enabled) == 1 ]]; }
+is_on() {
+  [[ $(state_get enabled) == 1 ]] || return 1
+  [[ $(state_get boot_id) == $(boot_id) ]]
+}
+
+# A shutdown with gaming mode on used to leave DND, the performance profile and
+# the saved values behind, so the next login looked like gaming mode had turned
+# itself on. Anything stamped with a different boot is undone here.
+reconcile() {
+  [[ $(state_get enabled) == 1 ]] || return 0
+  [[ $(state_get boot_id) == $(boot_id) ]] && return 0
+
+  local profile dnd idle
+  profile=$(state_get saved_profile)
+  dnd=$(state_get saved_dnd)
+  idle=$(state_get paused_hypridle)
+  [[ $idle == 1 ]] && pause_idle resume
+  set_dnd "${dnd:-false}"
+  set_profile "${profile:-balanced}"
+  state_write 0 '' '' 0
+  ((DRY_RUN)) && return 0
+  printf 'gaming mode was left on by a previous boot; restored %s\n' "${profile:-balanced}"
+  notify "reset after reboot — ${profile:-balanced} profile restored"
+}
 
 hypridle_running() { pgrep -x hypridle > /dev/null 2>&1; }
 hypridle_paused() {
@@ -186,7 +218,7 @@ while (($#)); do
       ;;
     --dry-run) DRY_RUN=1 ;;
     --json) JSON=1 ;;
-    status) ACTION=status ;;
+    status | reconcile) ACTION=$1 ;;
     on | off | toggle) ACTION=$1 ;;
     *)
       printf 'gaming: unknown option: %s\n' "$1" >&2
@@ -201,10 +233,18 @@ case ${ACTION:-} in
     usage >&2
     exit 2
     ;;
-  status) status ;;
-  on) enable ;;
+  reconcile) reconcile ;;
+  status)
+    reconcile
+    status
+    ;;
+  on)
+    reconcile
+    enable
+    ;;
   off) disable ;;
   toggle)
+    reconcile
     if is_on; then disable; else enable; fi
     ;;
 esac

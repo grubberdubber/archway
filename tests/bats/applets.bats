@@ -454,6 +454,35 @@ JSON
   assert_contains "$output" '"enabled":false'
 }
 
+@test "gaming mode does not survive a reboot" {
+  GAME="$ARCHWAY_ROOT/applets/gaming/gaming.sh"
+  mock_cmd powerprofilesctl 'case "$1" in
+    get) cat "$HOME/profile" 2>/dev/null || echo balanced ;;
+    set) printf "%s\n" "$2" > "$HOME/profile" ;;
+  esac'
+  mock_cmd swaync-client 'case "$1" in
+    -D) cat "$HOME/dnd" 2>/dev/null || echo false ;;
+    -dn) echo true > "$HOME/dnd" ;;
+    -df) echo false > "$HOME/dnd" ;;
+  esac'
+  mock_cmd notify-send 'printf "%s\n" "$@" >> "$HOME/notify.log"'
+
+  run "$GAME" on
+  assert_eq 0 "$status"
+  assert_file_contains "$HOME/profile" "performance"
+
+  # A shutdown with the mode on: the state keeps the old boot id, DND stays
+  # toggled in swaync and the profile stays performance.
+  sed -i 's/^boot_id=.*/boot_id=previous-boot/' "$XDG_STATE_HOME/archway/gaming.state"
+  assert_file_contains "$XDG_STATE_HOME/archway/gaming.state" "boot_id=previous-boot"
+
+  run "$GAME" status --json
+  assert_eq 0 "$status"
+  assert_contains "$output" '"enabled":false'
+  assert_file_contains "$HOME/profile" "balanced"
+  assert_file_contains "$HOME/dnd" "false"
+}
+
 @test "gaming toggle is idempotent about its state file" {
   GAME="$ARCHWAY_ROOT/applets/gaming/gaming.sh"
   mock_cmd powerprofilesctl 'printf "%s\n" "$2" > "$HOME/profile"'

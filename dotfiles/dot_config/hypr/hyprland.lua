@@ -175,4 +175,8 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("command -v cliphist >/dev/null 2>&1 && wl-paste --type image --watch cliphist store")
   -- Restore the wallpaper picked with Super+Alt+W (no-op when none was set).
   hl.exec_cmd("command -v archway >/dev/null 2>&1 && archway applet wallpaper --restore")
+  -- Gaming mode is a session state: if the machine was shut down with it on,
+  -- the profile, DND and idle come back to their saved values before the first
+  -- poll of the bar.
+  hl.exec_cmd("command -v archway >/dev/null 2>&1 && archway applet gaming reconcile")
 end)

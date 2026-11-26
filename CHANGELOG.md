@@ -350,6 +350,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Gaming mode no longer appears to switch itself on after a reboot. The mode
+  stamps the kernel boot id in `gaming.state`; `gaming reconcile` (run at
+  Hyprland session start and by `gaming status`) undoes a mode left over from a
+  previous boot: saved profile restored, DND back to its saved value, `hypridle`
+  resumed. `power-profiles-daemon` persists its profile across boots, which is
+  why a shutdown with the mode on came back as `performance` with no state.
 - The file chooser did not show what was selected: Ctrl+click really selected
   files (they uploaded), but no row was highlighted. The GTK theme only painted
   `treeview.view:selected:focus`, and a selection built with the keyboard
