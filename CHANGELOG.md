@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with no gaps or rounded pills. Theme-specific geometry now lives in
   `themes/<id>/overrides/<module>`, appended after the shared stylesheet, so a
   variant no longer copies (and drifts from) the whole CSS.
+- The `jan` status line uses the reference bar's colour language: Wi-Fi green
+  when connected and red when offline or degraded, Bluetooth blue, plus a
+  restrained accent per module family. Jan also follows the reference's
+  `BORDER_WIDTH=0`, leaving a single hairline under the bar.
 - The shared starship prompt reports `took <duration>` from 100 ms (with
   milliseconds) instead of 800 ms, so timing a script while writing it does not
   need a stopwatch.

@@ -62,8 +62,9 @@ radius_window = 0
 radius_input  = 0
 radius_pill   = 0
 padding       = 10
-border_width  = 1
-focus_width   = 2
+# The reference rice runs BORDER_WIDTH=0; no frame around windows or modules.
+border_width  = 0
+focus_width   = 1
 
 [typography]
 font_mono     = "JetBrainsMono Nerd Font"
