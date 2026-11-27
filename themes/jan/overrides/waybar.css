@@ -113,10 +113,6 @@ tooltip {
   color: @amber@;
 }
 
-#custom-disk {
-  color: @bluegray@;
-}
-
 #custom-power {
   color: @pink@;
 }
@@ -131,4 +127,40 @@ tooltip {
 
 #idle_inhibitor.activated {
   color: @amber@;
+}
+
+/* Dimmed states stay for "off", but quiet icons that are always on screen get
+ * a readable colour instead of sitting at muted grey. The window title is full
+ * text: it is the one label the eye looks for before reading anything else. */
+#window {
+  color: @text@;
+}
+
+#custom-color {
+  color: @ansi_cyan@;
+}
+
+#custom-language,
+#custom-gaming {
+  color: @text@;
+}
+
+#idle_inhibitor {
+  color: @text@;
+}
+
+#custom-nightlight {
+  color: @amber@;
+}
+
+#custom-nightlight.muted {
+  color: @text_muted@;
+}
+
+#custom-resources {
+  color: @bluegray@;
+}
+
+#custom-disk {
+  color: @ansi_blue@;
 }
