@@ -106,6 +106,12 @@ theme_load_palette() {
   done < "$file"
 
   ((${#PALETTE[@]})) || die "palette is empty or unparsable: $file" "$EX_FAIL"
+
+  # Optional geometry and focus keys with safe defaults, so older palettes keep
+  # the exact same rendering while a theme can soften or tighten them.
+  PALETTE[focus_alpha]=${PALETTE[focus_alpha]:-ff}
+  PALETTE[gaps_in]=${PALETTE[gaps_in]:-4}
+  PALETTE[gaps_out]=${PALETTE[gaps_out]:-8}
 }
 
 _palette_get() { printf '%s' "${PALETTE[$1]:-}"; }

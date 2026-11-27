@@ -18,8 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variant no longer copies (and drifts from) the whole CSS.
 - The `jan` status line uses the reference bar's colour language: Wi-Fi green
   when connected and red when offline or degraded, Bluetooth blue, plus a
-  restrained accent per module family. Jan also follows the reference's
-  `BORDER_WIDTH=0`, leaving a single hairline under the bar.
+  restrained accent per module family. Its focus border is a 1 px cyan hairline
+  at 35% alpha, and tighter gaps (`gaps_in 3`, `gaps_out 5`) give windows more
+  room; the floating terminal grows to `85% 72%`. Palettes now accept optional
+  `focus_alpha`, `gaps_in` and `gaps_out` keys with backward-compatible
+  defaults, so existing themes render exactly as before.
 - The shared starship prompt reports `took <duration>` from 100 ms (with
   milliseconds) instead of 800 ms, so timing a script while writing it does not
   need a stopwatch.

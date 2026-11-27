@@ -62,9 +62,14 @@ radius_window = 0
 radius_input  = 0
 radius_pill   = 0
 padding       = 10
-# The reference rice runs BORDER_WIDTH=0; no frame around windows or modules.
-border_width  = 0
+# One hairline, at 35% alpha: enough to find the focused window, quiet enough
+# that it reads as a tint instead of a frame.
+border_width  = 1
+focus_alpha   = "59"
 focus_width   = 1
+# Tighter than the shared 4/8: the terminal gets the pixels instead of the gap.
+gaps_in       = 3
+gaps_out      = 5
 
 [typography]
 font_mono     = "JetBrainsMono Nerd Font"

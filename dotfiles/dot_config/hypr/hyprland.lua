@@ -121,7 +121,8 @@ hl.window_rule({
   match = { class = "^(floating-term)$" },
   float = true,
   center = true,
-  size = "70% 60%",
+  -- Wide enough for a real command, still leaves the wallpaper as context.
+  size = "85% 72%",
 })
 -- Terminals are square. A rounded corner arcs the compositor border over the
 -- first cells of the grid; with a full-bleed background that reads as a phantom

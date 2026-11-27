@@ -134,6 +134,24 @@ STUB
   [ "$output" -gt "$base_line" ]
 }
 
+@test "jan softens the focus border and tightens the gaps" {
+  local dest="$SANDBOX/render"
+  mkdir -p "$dest"
+  theme_render jan "$dest"
+  assert_file_contains "$dest/hyprland.lua" "border_size = 1"
+  assert_file_contains "$dest/hyprland.lua" "active_border = \"rgba(27FBFE59)\""
+  assert_file_contains "$dest/hyprland.lua" "gaps_in = 3"
+  assert_file_contains "$dest/hyprland.lua" "gaps_out = 5"
+}
+
+@test "a palette without focus keys keeps the opaque border" {
+  local dest="$SANDBOX/render"
+  mkdir -p "$dest"
+  theme_render android-mount "$dest"
+  assert_file_contains "$dest/hyprland.lua" "active_border = \"rgba(8AB4F8ff)\""
+  assert_file_contains "$dest/hyprland.lua" "gaps_out = 8"
+}
+
 @test "the prompt renders command duration in the layout" {
   local dest="$SANDBOX/render"
   mkdir -p "$dest"

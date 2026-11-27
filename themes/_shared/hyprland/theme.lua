@@ -5,14 +5,14 @@ hl.config({
   general = {
     border_size = @border_width@,
     -- Compact by default: small laptop panels lose too much to gaps.
-    gaps_in = 4,
-    gaps_out = 8,
+    gaps_in = @gaps_in@,
+    gaps_out = @gaps_out@,
     resize_on_border = true,
     col = {
       -- One flat hairline, focused window only. A two-colour gradient reads as
       -- a thicker band at one pixel, and a ring around every unfocused window
       -- pulls the eye away from the focused one, so that ring is transparent.
-      active_border = "rgba(@primary:hex@ff)",
+      active_border = "rgba(@primary:hex@@focus_alpha@)",
       inactive_border = "rgba(@border:hex@00)",
     },
   },
@@ -34,7 +34,7 @@ hl.config({
   },
   group = {
     col = {
-      border_active = "rgba(@primary:hex@ff)",
+      border_active = "rgba(@primary:hex@@focus_alpha@)",
       border_inactive = "rgba(@border:hex@00)",
     },
     groupbar = {
