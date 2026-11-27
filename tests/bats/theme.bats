@@ -158,6 +158,14 @@ STUB
   theme_render jan "$dest"
   assert_file_contains "$dest/starship.toml" '$cmd_duration'
   assert_file_contains "$dest/starship.toml" 'min_time = 100'
+  # Exit code, privilege, container, virtualenv and VPN context.
+  assert_file_contains "$dest/starship.toml" '$status'
+  assert_file_contains "$dest/starship.toml" '[username]'
+  assert_file_contains "$dest/starship.toml" '[container]'
+  assert_file_contains "$dest/starship.toml" '${custom.venv}'
+  assert_file_contains "$dest/starship.toml" '[custom.venv]'
+  assert_file_contains "$dest/starship.toml" '[custom.vpn]'
+  assert_file_contains "$dest/starship.toml" '/sys/class/net/tun0'
 }
 
 @test "theme list --names pairs the id with the display name" {

@@ -131,6 +131,50 @@ PY
 now() { date -Ins; }
 epoch() { date +%s; }
 
+# Jump to a directory picked by fuzzy search, without typing the path.
+fcd() {
+  if (( ! $+commands[fzf] )); then
+    print -u2 -- "fcd: fzf is required"
+    return 1
+  fi
+  local dir
+  if (( $+commands[fd] )); then
+    dir=$(fd --type d --hidden --exclude .git --exclude node_modules | fzf --prompt='dir> ') || return 1
+  else
+    dir=$(find . -type d -not -path '*/.git/*' | fzf --prompt='dir> ') || return 1
+  fi
+  cd -- "$dir" || return 1
+}
+
+# A/AAAA/MX in one shot, with a resolver fallback.
+dns() {
+  local name=${1:?usage: dns <name>}
+  if (( $+commands[dig] )); then
+    print -r -- '-- A --'
+    dig +short A -- "$name"
+    print -r -- '-- AAAA --'
+    dig +short AAAA -- "$name"
+    print -r -- '-- MX --'
+    dig +short MX -- "$name"
+  elif (( $+commands[resolvectl] )); then
+    resolvectl query -- "$name"
+  else
+    getent ahosts -- "$name"
+  fi
+}
+
+# Create and activate a project-local virtualenv, so test tools stay out of
+# the system Python.
+venv() {
+  local dir=${1:-.venv}
+  if (( ! $+commands[python3] )); then
+    print -u2 -- "venv: python3 is required"
+    return 1
+  fi
+  [[ -d $dir ]] || python3 -m venv "$dir" || return 1
+  source "$dir/bin/activate"
+}
+
 # Extract by extension instead of remembering the tar flags.
 extract() {
   local file=${1:?usage: extract <archive>}

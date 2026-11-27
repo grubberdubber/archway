@@ -29,6 +29,9 @@ history_filter = [
   "^\\s*curl\\s+.*token=",
   "^\\s*mysql.*-p",
   "^\\s*psql\\s+.*password=",
+  "Authorization:",
+  "PRIVATE KEY",
+  "--(password|passwd|token|secret|api-key|apikey)(=|[[:space:]])",
 ]
 
 [stats]

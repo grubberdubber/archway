@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Vi editing mode in the zsh line editor (`conf.d/05-keymap.zsh`), with
+  `keymap vi|emacs` to switch and persist the choice. Arrow keys keep the same
+  behaviour in both modes and keymaps (prefix-aware history, word jumps on
+  Ctrl+Left/Right, Home/End), command mode gets `u`/`^R`/`v` and a block
+  cursor, a vim-style `-- NORMAL --` line appears below the prompt while not
+  inserting (`ARCHWAY_VIM_STATUS=0` disables it), and the module stays safe
+  when sourced without ZLE.
+- Credential-aware history (`conf.d/35-history.zsh`): the history file moves to
+  `~/.local/state/zsh/history`, a `zshaddhistory` hook drops commands carrying
+  `Authorization:`, `--password`/`--token`, `export *_TOKEN=` or private-key
+  headers, and atuin's filter list matches. `rec` records a timestamped
+  transcript for audits and `rec-ls` lists them.
+- `fcd` (fzf directory jump), `dns` (A/AAAA/MX) and `venv` (project-local
+  virtualenv) helpers, plus prompt context for exit codes, root/SSH identity,
+  containers, the active virtualenv and `tun0`/`wg0` VPN addresses.
 - Terminal workflow helpers in `~/.config/zsh/conf.d/40-workflow.zsh`:
   `croot`, `serve` (loopback only), `killport`, `fkill`, `status`, `headers`,
   `cert`, `json`, `sha`, `b64e`/`b64d`, `urlenc`/`urldec`, `jwt` (local decode,

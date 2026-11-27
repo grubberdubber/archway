@@ -38,6 +38,55 @@ teardown() {
   assert_eq 0 "$status"
 }
 
+@test "the keymap module defaults to vi and keeps the arrow keys" {
+  command -v zsh > /dev/null || skip "zsh is not installed in this environment"
+  local keymap_file="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/05-keymap.zsh"
+  run zsh -n "$keymap_file"
+  assert_eq 0 "$status"
+  # Vi is the default, and both keymaps get the same arrow behaviour.
+  run grep -qF "bindkey -v" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF "'^[[A' up-line-or-beginning-search" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF "_archway_bind_common viins" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF "_archway_bind_common vicmd" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF "bindkey -M vicmd 'u' undo" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF "bindkey -M vicmd 'L' end-of-line" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF -- '-- NORMAL --' "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF 'ARCHWAY_VIM_STATUS' "$keymap_file"
+  assert_eq 0 "$status"
+  # Sourcing it in a non-interactive shell must not fail on ZLE widgets.
+  run zsh -f -c 'source "$1"; print ok' _ "$keymap_file"
+  assert_eq 0 "$status"
+  assert_eq "ok" "$output"
+}
+
+@test "the history module filters credentials and uses XDG state" {
+  command -v zsh > /dev/null || skip "zsh is not installed in this environment"
+  local history_file="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/35-history.zsh"
+  run zsh -n "$history_file"
+  assert_eq 0 "$status"
+  run env XDG_STATE_HOME="$SANDBOX/state" zsh -f -c '
+    source "$1"
+    if _archway_private_command "export GITHUB_TOKEN=abc"; then print leaked; else print filtered; fi
+    if _archway_private_command "curl -H Authorization: Bearer abc https://x"; then print leaked; else print filtered; fi
+    if _archway_private_command "git status"; then print kept; else print dropped; fi
+    print -r -- "$HISTFILE"
+  ' _ "$history_file"
+  assert_eq 0 "$status"
+  assert_contains "$output" "filtered"
+  assert_contains "$output" "kept"
+  assert_contains "$output" "$SANDBOX/state/zsh/history"
+  if [[ $output == *"leaked"* ]]; then
+    fail "a credential-bearing command reached history"
+  fi
+}
+
 @test "pruning stale artifacts never removes a live dotfile" {
   local src="$SANDBOX/src"
   mkdir -p "$src/dot_config/zsh" "$HOME/.config/zsh"

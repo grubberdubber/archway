@@ -26,7 +26,9 @@ if (( $+commands[starship] )); then
 fi
 
 # sheldon manages plugins declaratively (~/.config/sheldon/plugins.toml).
-if (( $+commands[sheldon] )); then
+# Only call it when that file exists: a bare sheldon binary prints a config
+# lock error on every shell and would hide the distro fallback below.
+if (( $+commands[sheldon] )) && [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/sheldon/plugins.toml" ]]; then
   eval "$(sheldon source)"
 else
   # Fallback: distribution packages, loaded lazily enough to stay under 100 ms.

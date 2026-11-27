@@ -9,6 +9,9 @@ so (`status`, `headers`, `cert`).
 | Helper | What it does |
 |---|---|
 | `croot` | `cd` to the root of the current git repository |
+| `fcd` | pick a directory with `fd` + `fzf` and `cd` into it |
+| `dns <name>` | A, AAAA and MX records (`dig`, else `resolvectl`) |
+| `venv [dir]` | create and activate a project-local Python virtualenv |
 | `serve [port] [dir]` | HTTP server on `127.0.0.1`, never on `0.0.0.0` |
 | `killport <port>` | kill the process listening on a TCP port (`lsof`, else `fuser`) |
 | `fkill` | pick a process with `fzf`, then `SIGTERM` it |
@@ -22,6 +25,57 @@ so (`status`, `headers`, `cert`).
 | `jwt [token]` | decode a JWT header and payload locally; never verifies |
 | `now` / `epoch` | ISO-8601 timestamp / unix epoch for notes and logs |
 | `extract <archive>` | unpack by extension: tar.{gz,xz,zst,bz2}, zip, 7z, rar, gz, xz, zst |
+
+## Editing mode and keys
+
+`conf.d/05-keymap.zsh` enables **vi mode** by default: Esc, `h/j/k/l`, `w/b/e`,
+`u` to undo, `v` to open the current line in `$EDITOR`. The prompt marker turns
+from `❯` to `❮` in command mode, and the cursor switches between block and beam
+on terminals that support it. While the line editor is in command or search
+mode a vim-style `-- NORMAL --` / `-- SEARCH --` line appears in the message
+area below the prompt, and disappears as soon as you type again. Set
+`ARCHWAY_VIM_STATUS=0` to turn it off.
+
+```sh
+keymap            # print the active mode
+keymap emacs      # readline-style, remembered for the next session
+keymap vi         # back to vi
+```
+
+The arrow keys behave the same in both modes and in both keymaps:
+
+| Key | Action |
+|---|---|
+| Up / Down | history search by the text already typed |
+| Left / Right | move one character |
+| Ctrl+Left / Ctrl+Right | move one word |
+| Home / End | beginning / end of line |
+| Ctrl+R | atuin fuzzy history (falls back to `history-incremental-search-backward`) |
+
+## History and transcripts
+
+History lives in `~/.local/state/zsh/history` for both zsh and atuin. A
+`zshaddhistory` hook drops commands that carry credentials (`Authorization:`,
+`--password`, `--token`, `export *_TOKEN=`, private-key headers) before they
+reach disk; atuin applies the same patterns. This is a safety net, not a
+substitute for a password manager.
+
+`rec` starts a timestamped transcript under
+`~/.local/state/archway/sessions/` in a nested login shell, and `rec-ls` lists
+the recordings. Use it for audits, lab work or a debugging session you may need
+to replay.
+
+```sh
+rec                 # start; type exit or Ctrl-D to stop
+rec-ls              # list recordings
+```
+
+## Prompt indicators
+
+Beyond the directory and git state, the prompt shows only context that changes
+a decision: the exit code of a failed command, `user@host` for root or SSH, the
+container name, the active virtualenv, and the `tun0`/`wg0` address when a lab
+VPN is up. Everything else stays out of the way.
 
 ## Examples
 

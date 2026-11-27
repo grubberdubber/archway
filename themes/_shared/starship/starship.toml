@@ -6,8 +6,8 @@ add_newline = false
 command_timeout = 500
 
 format = """
-[](fg:@primary@)$os[](fg:@primary@ bg:@surface@)$directory\
-[](fg:@surface@ bg:@surface_alt@)$git_branch$git_status$cmd_duration\
+[](fg:@primary@)$os$username$hostname$container[](fg:@primary@ bg:@surface@)$directory\
+[](fg:@surface@ bg:@surface_alt@)$git_branch$git_status${custom.venv}${custom.vpn}$cmd_duration$status\
 [](fg:@surface_alt@ bg:@bg@)$character"""
 
 palette = "android_mount"
@@ -64,3 +64,37 @@ format = "[ took $duration ]($style)"
 ssh_only = true
 style = "bg:@surface@ fg:@text_muted@"
 format = "[ $hostname ]($style)"
+
+[username]
+# Shown only for root or over SSH: user@host is a privilege warning, not decor.
+show_always = false
+style_user = "bg:@surface@ fg:@text_muted@"
+style_root = "bg:@error@ fg:@bg@ bold"
+format = "[ $user ]($style)"
+
+[status]
+# Only appears when the previous command failed, next to its exit code.
+disabled = false
+style = "bg:@surface_alt@ fg:@error@"
+symbol = "✘ "
+format = "[ $symbol$status ]($style)"
+
+[container]
+# Built-in detection for docker/podman/toolbox/systemd-nspawn.
+style = "bg:@surface@ fg:@tertiary@"
+symbol = "󰏖 "
+format = "[ $symbol$name ]($style)"
+
+[custom.venv]
+# Active Python virtualenv, so test tooling is never confused with the system.
+when = 'test -n "$VIRTUAL_ENV"'
+command = 'printf "%s" "${VIRTUAL_ENV##*/}"'
+style = "bg:@surface_alt@ fg:@secondary@"
+format = "[ 󰌠 $output ]($style)"
+
+[custom.vpn]
+# Lab/VPN interface and its IPv4, so you always know which network you are on.
+when = 'test -d /sys/class/net/tun0 || test -d /sys/class/net/wg0'
+command = 'for i in tun0 wg0; do if [ -d "/sys/class/net/$i" ]; then ip -4 -o addr show "$i" 2>/dev/null | awk "{print \$4}" | cut -d/ -f1; break; fi; done'
+style = "bg:@surface_alt@ fg:@tertiary@"
+format = "[ 󰦝 $output ]($style)"
