@@ -13,9 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `keymap vi|emacs` to switch and persist the choice. Arrow keys keep the same
   behaviour in both modes and keymaps (prefix-aware history, word jumps on
   Ctrl+Left/Right, Home/End), command mode gets `u`/`^R`/`v` and a block
-  cursor, a vim-style `-- NORMAL --` line appears below the prompt while not
-  inserting (`ARCHWAY_VIM_STATUS=0` disables it), and the module stays safe
-  when sourced without ZLE.
+  cursor, and the prompt double chevron turns yellow (`❯❯`) while not inserting,
+  green (`❯❯`) otherwise. Backspace is rebound in command mode, where zsh only moved
+  the cursor. The `-- NORMAL --` message line was removed: repainting it on
+  every Esc/i ate the output above the prompt. The module stays safe when
+  sourced without ZLE.
 - Credential-aware history (`conf.d/35-history.zsh`): the history file moves to
   `~/.local/state/zsh/history`, a `zshaddhistory` hook drops commands carrying
   `Authorization:`, `--password`/`--token`, `export *_TOKEN=` or private-key
@@ -51,9 +53,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   normally-dim icons (colour picker, language, night light, resources, gaming,
   keep-awake) use readable palette colours now, and the volume OSD is repainted
   by the same theme when its server restarts.
-- The shared starship prompt reports `took <duration>` from 100 ms (with
+- The shared starship prompt reports the command duration from 100 ms (with
   milliseconds) instead of 800 ms, so timing a script while writing it does not
-  need a stopwatch.
+  need a stopwatch. It renders as muted text on the terminal background rather
+  than as a filled block.
 - `color-picker` applet (`Super+Alt+C` and an eyedropper pill in the bar):
   picks a pixel, copies it as `#RRGGBB` once, and shows a notification with the
   hex, the RGB triple and a swatch of the colour. `hyprpicker`'s zoom lens is

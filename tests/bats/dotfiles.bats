@@ -56,10 +56,14 @@ teardown() {
   assert_eq 0 "$status"
   run grep -qF "bindkey -M vicmd 'L' end-of-line" "$keymap_file"
   assert_eq 0 "$status"
-  run grep -qF -- '-- NORMAL --' "$keymap_file"
+  # Backspace must delete in command mode, where zsh binds it to move-only.
+  run grep -qF "'^?' backward-delete-char" "$keymap_file"
   assert_eq 0 "$status"
-  run grep -qF 'ARCHWAY_VIM_STATUS' "$keymap_file"
+  run grep -qF "'^H' backward-delete-char" "$keymap_file"
   assert_eq 0 "$status"
+  # The mode is shown by the prompt symbol, not by repainting the message area.
+  run grep -qF "zle -M '" "$keymap_file"
+  assert_eq 1 "$status"
   # Sourcing it in a non-interactive shell must not fail on ZLE widgets.
   run zsh -f -c 'source "$1"; print ok' _ "$keymap_file"
   assert_eq 0 "$status"

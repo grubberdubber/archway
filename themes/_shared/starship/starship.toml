@@ -7,8 +7,8 @@ command_timeout = 500
 
 format = """
 [](fg:@primary@)$os$username$hostname$container[](fg:@primary@ bg:@surface@)$directory\
-[](fg:@surface@ bg:@surface_alt@)$git_branch$git_status${custom.venv}${custom.vpn}$cmd_duration$status\
-[](fg:@surface_alt@ bg:@bg@)$character"""
+[](fg:@surface@ bg:@surface_alt@)$git_branch$git_status${custom.venv}${custom.vpn}$status\
+[](fg:@surface_alt@ bg:@bg@)$cmd_duration$character"""
 
 palette = "android_mount"
 
@@ -47,18 +47,22 @@ symbol = "󰊢 "
 style = "bg:@surface_alt@ fg:@tertiary@"
 format = "[$all_status$ahead_behind ]($style)"
 
+# Double chevrons as in the reference prompt, unboxed on the terminal
+# background: `❯❯` green normally, yellow in vi command mode, red after a
+# failure. A literal `>>` was dropped because it reads as shell redirection.
 [character]
-success_symbol = "[❯](bold @secondary@)"
-error_symbol = "[❯](bold @error@)"
-vimcmd_symbol = "[❮](bold @tertiary@)"
+success_symbol = "[❯❯](bold @success@)"
+error_symbol = "[❯❯](bold @error@)"
+vimcmd_symbol = "[❯❯](bold @tertiary@)"
 
 [cmd_duration]
 # 100 ms, not 800: while writing scripts the interesting commands are the short
 # ones, and millisecond precision is what tells a good loop from a bad one.
+# Muted text without a background: a filled block here read as a stray widget.
 min_time = 100
 show_milliseconds = true
-style = "bg:@surface_alt@ fg:@text@"
-format = "[ took $duration ]($style)"
+style = "fg:@text_muted@"
+format = "[ $duration ]($style)"
 
 [hostname]
 ssh_only = true

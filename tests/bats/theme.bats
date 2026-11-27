@@ -152,12 +152,32 @@ STUB
   assert_file_contains "$dest/hyprland.lua" "gaps_out = 8"
 }
 
+@test "the prompt marks vi command mode with a yellow chevron" {
+  local dest="$SANDBOX/render"
+  mkdir -p "$dest"
+  theme_render jan "$dest"
+  assert_file_contains "$dest/starship.toml" 'success_symbol = "[❯❯](bold #A6E22E)"'
+  assert_file_contains "$dest/starship.toml" 'vimcmd_symbol = "[❯❯](bold #F3E430)"'
+  assert_file_contains "$dest/starship.toml" 'error_symbol = "[❯❯](bold #FB007A)"'
+  # No literal shell redirection in the prompt.
+  run grep -F '[>>]' "$dest/starship.toml"
+  assert_eq 1 "$status"
+}
+
 @test "the prompt renders command duration in the layout" {
   local dest="$SANDBOX/render"
   mkdir -p "$dest"
   theme_render jan "$dest"
   assert_file_contains "$dest/starship.toml" '$cmd_duration'
   assert_file_contains "$dest/starship.toml" 'min_time = 100'
+  # Duration is muted text, never a filled block (it read as a stray widget).
+  run grep -F 'format = "[ $duration ]($style)"' "$dest/starship.toml"
+  assert_eq 0 "$status"
+  # No background in the duration module: it was a stray coloured block.
+  run grep -F 'style = "fg:#7D81A3"' "$dest/starship.toml"
+  assert_eq 0 "$status"
+  run bash -c 'sed -n "/^\[cmd_duration\]/,/^\[hostname\]/p" "$1" | grep -q bg:' _ "$dest/starship.toml"
+  assert_eq 1 "$status"
   # Exit code, privilege, container, virtualenv and VPN context.
   assert_file_contains "$dest/starship.toml" '$status'
   assert_file_contains "$dest/starship.toml" '[username]'

@@ -29,12 +29,20 @@ so (`status`, `headers`, `cert`).
 ## Editing mode and keys
 
 `conf.d/05-keymap.zsh` enables **vi mode** by default: Esc, `h/j/k/l`, `w/b/e`,
-`u` to undo, `v` to open the current line in `$EDITOR`. The prompt marker turns
-from `❯` to `❮` in command mode, and the cursor switches between block and beam
-on terminals that support it. While the line editor is in command or search
-mode a vim-style `-- NORMAL --` / `-- SEARCH --` line appears in the message
-area below the prompt, and disappears as soon as you type again. Set
-`ARCHWAY_VIM_STATUS=0` to turn it off.
+`u` to undo, `v` to open the current line in `$EDITOR`. The prompt marker is
+the double chevron from the reference prompt, recoloured: `❯❯` green while
+inserting, yellow in command mode, red after a failure. A literal `>>` was tried
+and dropped, because it reads as shell append redirection. The cursor switches
+between block and beam on terminals that support it.
+
+The mode lives in the prompt symbol on purpose. An earlier version also painted
+a `-- NORMAL --` line in the message area, but repainting it on every Esc/i ate
+the output above the prompt when the keys were pressed repeatedly, so it was
+removed.
+
+Backspace deletes backwards in both modes. zsh binds it to `vi-backward-char`
+in command mode, which only moves the cursor; Archway rebinds `^?` and `^H` to
+`backward-delete-char` so Esc, then Backspace, actually erases.
 
 ```sh
 keymap            # print the active mode

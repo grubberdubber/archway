@@ -37,6 +37,10 @@ _archway_bind_common() {
   bindkey -M "$keymap" '^[[1~' beginning-of-line
   bindkey -M "$keymap" '^[[4~' end-of-line
   bindkey -M "$keymap" '^[[3~' delete-char
+  # Backspace: vi command mode binds it to `vi-backward-char` (move only), which
+  # is why deleting did nothing after Esc. Delete backwards in every keymap.
+  bindkey -M "$keymap" '^?' backward-delete-char
+  bindkey -M "$keymap" '^H' backward-delete-char
   bindkey -M "$keymap" '^W' backward-kill-word
   bindkey -M "$keymap" '^X^E' edit-command-line
 }
@@ -66,28 +70,18 @@ _archway_cursor_shape() {
   esac
 }
 
-# A vim-style mode line in the message area: visible exactly while the line
-# editor is not in insert mode, and gone the moment you resume typing.
-# Disable with ARCHWAY_VIM_STATUS=0.
-_archway_mode_status() {
-  [[ ${ARCHWAY_VIM_STATUS:-1} == 0 ]] && return 0
-  case ${KEYMAP-} in
-    vicmd) zle -M $'\e[7m -- NORMAL -- \e[0m' ;;
-    isearch) zle -M $'\e[7m -- SEARCH -- \e[0m' ;;
-    *) zle -M '' ;;
-  esac
-}
-
+# The mode is shown by the prompt symbol starship draws (`❯❯` green in insert,
+# yellow in command mode) and by the cursor shape. An extra `zle -M` banner was
+# tried and removed: repainting the message area on every Esc/i ate the lines
+# above the prompt when the keys were pressed repeatedly.
 _archway_keymap_select() {
   _archway_cursor_shape
-  _archway_mode_status
 }
 
 zle -N zle-keymap-select _archway_keymap_select
 
 _archway_line_init() {
   _archway_cursor_shape
-  zle -M ''
 }
 
 zle -N zle-line-init _archway_line_init
