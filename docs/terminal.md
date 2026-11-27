@@ -69,6 +69,11 @@ keymap emacs      # readline-style, remembered for the next session
 keymap vi         # back to vi
 ```
 
+Ctrl+R opens atuin's compact picker with the reference layout: `Search │ Inspect`
+tabs, `GLOBAL` filter, duration and relative time per command, and a short
+preview of the highlighted entry. Settings live in `~/.config/atuin/config.toml`
+(`style`, `inline_height`, `show_tabs`, `show_preview`, `max_preview_height`).
+
 Tab completion opens in an `fzf` pane when `fzf-tab` is installed (AUR
 `fzf-tab-git`, already in `packages/aur-core.txt`): type part of a path or
 option, press Tab, and filter the candidates with the theme's colours. Without

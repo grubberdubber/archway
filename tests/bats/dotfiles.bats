@@ -77,6 +77,15 @@ teardown() {
   assert_eq "ok" "$output"
 }
 
+@test "atuin opens in the reference compact layout" {
+  local config="$ARCHWAY_ROOT/dotfiles/dot_config/atuin/config.toml"
+  assert_file_contains "$config" 'style = "compact"'
+  assert_file_contains "$config" 'show_tabs = true'
+  assert_file_contains "$config" 'show_preview = true'
+  assert_file_contains "$config" 'show_help = false'
+  assert_file_contains "$config" 'max_preview_height = 4'
+}
+
 @test "Tab completion uses fzf-tab when it is installed" {
   local tools_file="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/30-tools.zsh"
   run grep -qF 'fzf-tab-git/fzf-tab.zsh' "$tools_file"

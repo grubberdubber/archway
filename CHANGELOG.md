@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- atuin's picker uses the reference layout by default: compact style with
+  `Search │ Inspect` tabs, the `GLOBAL` filter line, duration and relative time
+  per command, and a four-line preview of the highlighted entry.
 - Tab completion in an `fzf` pane via `fzf-tab` when the plugin is installed
   (`fzf-tab-git`, added to `packages/aur-core.txt`). It loads after `compinit`
   and after `FZF_DEFAULT_OPTS`, so the completion picker uses the active theme's
