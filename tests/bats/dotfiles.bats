@@ -23,6 +23,8 @@ teardown() {
 }
 
 @test "workflow helpers are valid zsh and stay local" {
+  # The Arch CI container ships bash only; the check runs on a real Arch host.
+  command -v zsh > /dev/null || skip "zsh is not installed in this environment"
   local helpers="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/40-workflow.zsh"
   run zsh -n "$helpers"
   assert_eq 0 "$status"
