@@ -7,7 +7,7 @@ command_timeout = 500
 
 format = """
 [](fg:@primary@)$os[](fg:@primary@ bg:@surface@)$directory\
-[](fg:@surface@ bg:@surface_alt@)$git_branch$git_status\
+[](fg:@surface@ bg:@surface_alt@)$git_branch$git_status$cmd_duration\
 [](fg:@surface_alt@ bg:@bg@)$character"""
 
 palette = "android_mount"

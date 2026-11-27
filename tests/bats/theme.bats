@@ -134,6 +134,14 @@ STUB
   [ "$output" -gt "$base_line" ]
 }
 
+@test "the prompt renders command duration in the layout" {
+  local dest="$SANDBOX/render"
+  mkdir -p "$dest"
+  theme_render jan "$dest"
+  assert_file_contains "$dest/starship.toml" '$cmd_duration'
+  assert_file_contains "$dest/starship.toml" 'min_time = 100'
+}
+
 @test "theme list --names pairs the id with the display name" {
   run "$ARCHWAY_ROOT/bin/archway" theme list --names
   assert_eq 0 "$status"
