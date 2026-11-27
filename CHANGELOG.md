@@ -14,8 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   behaviour in both modes and keymaps (prefix-aware history, word jumps on
   Ctrl+Left/Right, Home/End), command mode gets `u`/`^R`/`v` and a block
   cursor, and the prompt double chevron turns yellow (`❯❯`) while not inserting,
-  green (`❯❯`) otherwise. Backspace is rebound in command mode, where zsh only moved
-  the cursor. The `-- NORMAL --` message line was removed: repainting it on
+  green   (`❯❯`) otherwise. Backspace is rebound in command mode, where zsh only moved
+  the cursor, and the terminal-standard readline keys (`^A`, `^E`, `^K`, `^U`,
+  `^Y`, `^L`) are restored in insert and emacs modes, where zsh's vi insert
+  left them as self-insert. The `-- NORMAL --` message line was removed: repainting it on
   every Esc/i ate the output above the prompt. The module stays safe when
   sourced without ZLE.
 - Credential-aware history (`conf.d/35-history.zsh`): the history file moves to
@@ -57,6 +59,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   milliseconds) instead of 800 ms, so timing a script while writing it does not
   need a stopwatch. It renders as muted text on the terminal background rather
   than as a filled block.
+- The starship prompt is flat: all segment backgrounds (`bg:` fills, purple git
+  blocks and the like) are gone, so modules read correctly over a transparent
+  terminal or a wallpaper. Git uses the nerd-font branch glyph `` plus the
+  branch name and status marks on the terminal background.
 - `color-picker` applet (`Super+Alt+C` and an eyedropper pill in the bar):
   picks a pixel, copies it as `#RRGGBB` once, and shows a notification with the
   hex, the RGB triple and a swatch of the colour. `hyprpicker`'s zoom lens is

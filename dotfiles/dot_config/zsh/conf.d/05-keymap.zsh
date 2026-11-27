@@ -45,6 +45,19 @@ _archway_bind_common() {
   bindkey -M "$keymap" '^X^E' edit-command-line
 }
 
+# Readline keys people use in every terminal. zsh's vi insert mode leaves
+# Ctrl+A/E/K/Y unbound (they self-insert), so they felt broken after switching
+# to vi. Command mode keeps vim semantics; insert mode and emacs get these.
+_archway_bind_readline() {
+  local keymap=$1
+  bindkey -M "$keymap" '^A' beginning-of-line
+  bindkey -M "$keymap" '^E' end-of-line
+  bindkey -M "$keymap" '^K' kill-line
+  bindkey -M "$keymap" '^U' backward-kill-line
+  bindkey -M "$keymap" '^Y' yank
+  bindkey -M "$keymap" '^L' clear-screen
+}
+
 _archway_bind_vi() {
   bindkey -M viins '^[[Z' reverse-menu-complete
   # Command mode: undo/redo and the line-level jumps vi keeps for itself.
@@ -106,6 +119,8 @@ _archway_keymap_apply() {
   _archway_bind_common viins
   _archway_bind_common vicmd
   _archway_bind_common emacs
+  _archway_bind_readline viins
+  _archway_bind_readline emacs
 }
 
 _archway_keymap_apply "$ARCHWAY_KEYMAP"

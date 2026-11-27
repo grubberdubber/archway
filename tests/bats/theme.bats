@@ -171,10 +171,18 @@ STUB
   assert_file_contains "$dest/starship.toml" '$cmd_duration'
   assert_file_contains "$dest/starship.toml" 'min_time = 100'
   # Duration is muted text, never a filled block (it read as a stray widget).
-  run grep -F 'format = "[ $duration ]($style)"' "$dest/starship.toml"
+  run grep -F 'format = "[ $duration]($style)"' "$dest/starship.toml"
   assert_eq 0 "$status"
   # No background in the duration module: it was a stray coloured block.
   run grep -F 'style = "fg:#7D81A3"' "$dest/starship.toml"
+  assert_eq 0 "$status"
+  # The whole prompt is flat: no filled segments anywhere.
+  run grep -F 'bg:' "$dest/starship.toml"
+  assert_eq 1 "$status"
+  assert_file_contains "$dest/starship.toml" 'symbol = "\ue725 "'
+  # The working directory is red; the chevron follows the last segment.
+  assert_file_contains "$dest/starship.toml" 'style = "fg:#FB007A"'
+  run grep -F 'format = "[ $path ]($style)"' "$dest/starship.toml"
   assert_eq 0 "$status"
   run bash -c 'sed -n "/^\[cmd_duration\]/,/^\[hostname\]/p" "$1" | grep -q bg:' _ "$dest/starship.toml"
   assert_eq 1 "$status"

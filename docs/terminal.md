@@ -44,6 +44,25 @@ Backspace deletes backwards in both modes. zsh binds it to `vi-backward-char`
 in command mode, which only moves the cursor; Archway rebinds `^?` and `^H` to
 `backward-delete-char` so Esc, then Backspace, actually erases.
 
+zsh's vi insert mode leaves the usual terminal shortcuts unbound, so Archway
+restores them in insert and emacs modes (command mode keeps vim semantics):
+
+| Key | Action |
+|---|---|
+| Ctrl+A / Ctrl+E | beginning / end of line |
+| Ctrl+K | kill to end of line |
+| Ctrl+U | kill to beginning of line |
+| Ctrl+Y | yank |
+| Ctrl+L | clear screen |
+| Ctrl+W | delete previous word |
+
+The prompt is flat on purpose: every module paints only a foreground colour,
+with no filled segment blocks, so it works over a transparent terminal or a
+wallpaper. The working directory is red, the git segment is the nerd-font
+branch glyph plus the branch name (`` `main`) and the usual status marks, and
+the chevrons follow the last visible segment with a single space instead of a
+floating gap.
+
 ```sh
 keymap            # print the active mode
 keymap emacs      # readline-style, remembered for the next session

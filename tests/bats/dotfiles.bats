@@ -61,6 +61,13 @@ teardown() {
   assert_eq 0 "$status"
   run grep -qF "'^H' backward-delete-char" "$keymap_file"
   assert_eq 0 "$status"
+  # Readline keys stay usable in insert mode, where zsh leaves them unbound.
+  run grep -qF "'^A' beginning-of-line" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF "'^K' kill-line" "$keymap_file"
+  assert_eq 0 "$status"
+  run grep -qF '_archway_bind_readline viins' "$keymap_file"
+  assert_eq 0 "$status"
   # The mode is shown by the prompt symbol, not by repainting the message area.
   run grep -qF "zle -M '" "$keymap_file"
   assert_eq 1 "$status"
