@@ -171,6 +171,30 @@ doctor_run() {
     doctor_add "uwsm" warn "uwsm missing; start Hyprland through uwsm for systemd integration"
   fi
 
+  # 5c. Shell loader: without ZDOTDIR the installed zsh tree is invisible and
+  # the old ~/.zshrc keeps winning, which silently drops every Archway alias.
+  if [[ ${SHELL:-} == */zsh ]]; then
+    if grep -q 'archway-zsh' "$HOME/.zshenv" 2> /dev/null; then
+      doctor_add "shell.zsh" ok "ZDOTDIR loader present in ~/.zshenv"
+    else
+      doctor_add "shell.zsh" warn "ZDOTDIR loader missing; run 'archway install --link-shell' so ~/.config/zsh is actually read"
+    fi
+  fi
+
+  # 5d. Is the tracked configuration actually applied? `chezmoi status` is
+  # read-only, so this is safe even on a production host.
+  local dot_src="$ARCHWAY_ROOT/dotfiles" dot_drift=''
+  if have chezmoi && [[ -d $dot_src ]]; then
+    dot_drift=$(chezmoi --source "$dot_src" status 2> /dev/null | grep -c . || true)
+    if [[ ${dot_drift:-0} -eq 0 ]]; then
+      doctor_add "dotfiles" ok "every tracked file is applied"
+    else
+      doctor_add "dotfiles" warn "${dot_drift} tracked file(s) differ; run 'archway install' to reconcile"
+    fi
+  else
+    doctor_add "dotfiles" warn "chezmoi is missing; cannot verify tracked dotfiles"
+  fi
+
   # keyd lives in /etc, so toggling it needs root once. The narrow polkit rule
   # is what makes Super+Alt+N quiet; without it every toggle raises an
   # authentication dialog, and fails outright when no agent is running.

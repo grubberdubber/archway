@@ -274,7 +274,9 @@ cmd_install() {
   local profile='' wm='' terminal='' shell='' theme='' editor='' dry_requested=0
   local skip_packages=0 skip_dotfiles=0 skip_nvim=0
   ADOPT=0
-  LINK_SHELL=0
+  # Default on: without the loader, ~/.config/zsh exists but the shell still
+  # reads ~/.zshrc, so the installed config is never actually exercised.
+  LINK_SHELL=1
 
   # Flags that take a value consume two entries; `continue` prevents the
   # trailing single shift from leaving the value behind as a positional.
@@ -316,6 +318,7 @@ cmd_install() {
         ;;
       --adopt) ADOPT=1 ;;
       --link-shell) LINK_SHELL=1 ;;
+      --no-link-shell) LINK_SHELL=0 ;;
       --no-nvim) skip_nvim=1 ;;
       --no-packages) skip_packages=1 ;;
       --no-dotfiles) skip_dotfiles=1 ;;
@@ -480,7 +483,8 @@ Options:
   --theme <id>                                  default: android-mount
   --editor <neovim|helix|none>                  default: neovim
   --adopt            treat existing configs as replaceable (after backup)
-  --link-shell       append the ZDOTDIR loader to ~/.zshenv (backup + consent)
+  --link-shell       append the ZDOTDIR loader to ~/.zshenv (default)
+  --no-link-shell    keep ~/.zshenv untouched
   --no-nvim          skip Neovim entirely
   --no-packages      skip package installation
   --no-dotfiles      skip chezmoi apply

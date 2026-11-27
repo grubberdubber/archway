@@ -22,6 +22,20 @@ teardown() {
   assert_eq 1 "$status"
 }
 
+@test "workflow helpers are valid zsh and stay local" {
+  local helpers="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/40-workflow.zsh"
+  run zsh -n "$helpers"
+  assert_eq 0 "$status"
+  run zsh -f -c 'source "$1"; print -n "a b&c" | urlenc' _ "$helpers"
+  assert_eq 0 "$status"
+  assert_eq "a%20b%26c" "$output"
+  # No helper may open an inbound socket on every interface.
+  run grep -n 'http\.server.*0\.0\.0\.0' "$helpers"
+  assert_eq 1 "$status"
+  run grep -nF -- '--bind 127.0.0.1' "$helpers"
+  assert_eq 0 "$status"
+}
+
 @test "pruning stale artifacts never removes a live dotfile" {
   local src="$SANDBOX/src"
   mkdir -p "$src/dot_config/zsh" "$HOME/.config/zsh"

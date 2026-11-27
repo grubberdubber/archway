@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Terminal workflow helpers in `~/.config/zsh/conf.d/40-workflow.zsh`:
+  `croot`, `serve` (loopback only), `killport`, `fkill`, `status`, `headers`,
+  `cert`, `json`, `sha`, `b64e`/`b64d`, `urlenc`/`urldec`, `jwt` (local decode,
+  no verification), `now`/`epoch` and `extract`. Every dependency is optional
+  and nothing performs offensive automation; `docs/terminal.md` documents them.
+- `archway install` now links the zsh `ZDOTDIR` loader by default (backup +
+  marked line in `~/.zshenv`), because without it `~/.config/zsh` was never
+  read and an old `~/.zshrc` silently won. `--no-link-shell` opts out, and
+  `archway doctor` now warns when the loader is missing or when tracked
+  dotfiles differ from what is applied (`chezmoi status`, read-only).
 - New `jan` theme: the CyberPunk palette of `gh0stzk/dotfiles`'
   `config/bspwm/rices/jan`, reproduced exactly on Archway's Hyprland + Waybar
   stack. Kitty gets the reference's 16 ANSI slots verbatim, and the status line

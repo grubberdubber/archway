@@ -84,8 +84,10 @@ Every command supports `--help`; mutating commands support `--dry-run` and
 - `~/.zshrc`, `~/.config/hypr`, `~/.config/waybar`, `~/.config/nvim` and
   friends are never
   overwritten silently: backup → manifest → consent, or explicit `--adopt`.
-- Configs are additive. The zsh config lives in `~/.config/zsh` and is loaded
-  with one line you add yourself.
+- Configs are additive. The zsh config lives in `~/.config/zsh`; `install`
+  appends one marked `ZDOTDIR` line to `~/.zshenv` (backup first) so the
+  installed tree is actually read. `--no-link-shell` opts out, and `archway
+  doctor` warns when the loader is missing.
 - On a host listed in `production_hosts` (default: `arch`), `install` is forced
   to `--dry-run` unless `--apply-production` is passed.
 - No secrets in the repository. `gitleaks` runs in CI and pre-commit.
@@ -105,6 +107,7 @@ docs/                keybinds, troubleshooting, uninstall
 
 - [`docs/keybinds.md`](docs/keybinds.md) — generated cheatsheet
 - [`docs/cli-tools.md`](docs/cli-tools.md) — zathura, mpv, lazygit, ripgrep, Thunar, idle/lock
+- [`docs/terminal.md`](docs/terminal.md) — workflow helpers for development and security
 - [`docs/firefox.md`](docs/firefox.md) — Firefox theme and the file-picker fix
 - [`docs/troubleshooting.md`](docs/troubleshooting.md)
 - [`docs/uninstall.md`](docs/uninstall.md)
