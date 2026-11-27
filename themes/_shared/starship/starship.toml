@@ -53,8 +53,11 @@ error_symbol = "[❯](bold @error@)"
 vimcmd_symbol = "[❮](bold @tertiary@)"
 
 [cmd_duration]
-min_time = 800
-style = "bg:@surface_alt@ fg:@text_muted@"
+# 100 ms, not 800: while writing scripts the interesting commands are the short
+# ones, and millisecond precision is what tells a good loop from a bad one.
+min_time = 100
+show_milliseconds = true
+style = "bg:@surface_alt@ fg:@text@"
 format = "[ took $duration ]($style)"
 
 [hostname]

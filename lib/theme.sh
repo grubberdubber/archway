@@ -264,6 +264,25 @@ theme_render_file() {
   chmod 644 -- "$dest"
 }
 
+# A theme may adjust a shared module without duplicating it: files under
+# themes/<id>/overrides/ are rendered and appended after the module's own
+# template. Geometry belongs in data, so a flush status line is one small file
+# instead of a 400-line copy of the shared stylesheet that would drift.
+theme_render_overrides() {
+  local id=$1 dest=$2 module target src tmp
+  for module in "${!THEME_TARGETS[@]}"; do
+    target=${THEME_TARGETS[$module]}
+    src="$(theme_path "$id")/overrides/$target"
+    [[ -f $src && -f $dest/$target ]] || continue
+    tmp="$dest/.${target}.override"
+    theme_render_file "$src" "$tmp"
+    ((DRY_RUN)) && continue
+    printf '\n' >> "$dest/$target"
+    cat -- "$tmp" >> "$dest/$target"
+    rm -f -- "$tmp"
+  done
+}
+
 # Render every module of a theme into <dest_dir>/<module>.<ext>.
 theme_render() {
   local id=$1 dest=$2
@@ -273,6 +292,7 @@ theme_render() {
     template=$(theme_module_template "$id" "$module") || continue
     theme_render_file "$template" "$dest/${THEME_TARGETS[$module]}"
   done
+  theme_render_overrides "$id" "$dest"
 
   # Drop artifacts for targets this theme no longer ships, otherwise a file from
   # an older Archway (e.g. hyprland.conf after the Lua migration) lingers and

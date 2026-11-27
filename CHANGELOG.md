@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New `jan` theme: the CyberPunk palette of `gh0stzk/dotfiles`'
+  `config/bspwm/rices/jan`, reproduced exactly on Archway's Hyprland + Waybar
+  stack. Kitty gets the reference's 16 ANSI slots verbatim, and the status line
+  keeps Archway's module order but becomes one flush, full-width Waybar strip
+  with no gaps or rounded pills. Theme-specific geometry now lives in
+  `themes/<id>/overrides/<module>`, appended after the shared stylesheet, so a
+  variant no longer copies (and drifts from) the whole CSS.
+- The shared starship prompt reports `took <duration>` from 100 ms (with
+  milliseconds) instead of 800 ms, so timing a script while writing it does not
+  need a stopwatch.
 - `color-picker` applet (`Super+Alt+C` and an eyedropper pill in the bar):
   picks a pixel, copies it as `#RRGGBB` once, and shows a notification with the
   hex, the RGB triple and a swatch of the colour. `hyprpicker`'s zoom lens is

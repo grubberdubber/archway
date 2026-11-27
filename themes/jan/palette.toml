@@ -1,0 +1,78 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Jan — CyberPunk palette taken verbatim from gh0stzk/dotfiles
+# (config/bspwm/rices/jan/theme-config.bash). Colours are not approximated:
+# `archway theme validate` checks readability, and the kitty template below
+# reproduces the exact 16 ANSI slots that rice writes to current-theme.conf.
+#
+# The desktop is Hyprland + Waybar; only the colours come from the reference,
+# never its bspwm/polybar machinery.
+
+[palette]
+theme_name  = "Jan"
+# surfaces: accent_color / magentab / magenta / black / whiteb / grey / fg /
+# cyan / yellow / red / yellow / green / red / magentab, in that order.
+bg          = "#070219"
+surface     = "#09021F"
+surface_alt = "#472575"
+overlay     = "#6800D2"
+border      = "#626483"
+text        = "#D5DDEE"
+text_muted  = "#7D81A3"
+primary     = "#27FBFE"
+secondary   = "#43FBFF"
+tertiary    = "#F3E430"
+error       = "#FB007A"
+warning     = "#F3E430"
+success     = "#A6E22E"
+selection   = "#FB007A"
+selection_bg = "#472575"
+
+# Reference keys kept with their original names so the terminal and the status
+# line can both quote the palette instead of hardcoding hex twice.
+purple      = "#B026FF"
+amber       = "#FFB700"
+pink        = "#FF2E9F"
+orange      = "#FF5F1F"
+indigo      = "#4D3DFF"
+lime        = "#CCFF00"
+grey        = "#7D81A3"
+bluegray    = "#4D6FA8"
+arch_icon   = "#0F94D2"
+
+# ANSI slots, exactly as 05-kitty.sh writes them for jan.
+ansi_black         = "#626483"
+ansi_red           = "#FB007A"
+ansi_green         = "#A6E22E"
+ansi_yellow        = "#F3E430"
+ansi_blue          = "#19BFFE"
+ansi_magenta       = "#6800D2"
+ansi_cyan          = "#43FBFF"
+ansi_white         = "#D5DDEE"
+ansi_black_bright  = "#626483"
+ansi_red_bright    = "#FB007A"
+ansi_green_bright  = "#A6E22E"
+ansi_yellow_bright = "#F3E430"
+ansi_blue_bright   = "#58AFC2"
+ansi_magenta_bright = "#472575"
+ansi_cyan_bright   = "#926BCA"
+ansi_white_bright  = "#D5DDEE"
+
+[geometry]
+radius_window = 0
+radius_input  = 0
+radius_pill   = 0
+padding       = 10
+border_width  = 1
+focus_width   = 2
+
+[typography]
+font_mono     = "JetBrainsMono Nerd Font"
+font_ui       = "Inter"
+font_fallback = "Noto Sans"
+font_size     = 11
+
+[effects]
+# Matches the reference rice (P_TERM_OPACITY) without touching the wallpaper.
+opacity      = 0.96
+transitions  = 120
+reduce_motion = 0

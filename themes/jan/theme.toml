@@ -1,0 +1,30 @@
+# Jan theme metadata.
+id = "jan"
+name = "Jan"
+variant = "dark"
+schema = 1
+version = "0.1.0"
+description = "CyberPunk palette from gh0stzk/dotfiles' jan rice, on Archway's Hyprland + Waybar stack: a flush, full-width status line and an exact 16-colour terminal."
+inspiration = "gh0stzk/dotfiles, config/bspwm/rices/jan (GPL-3.0); palette only."
+license = "GPL-3.0-or-later"
+wallpapers = "none (the reference wallpaper is not redistributed; Super+Alt+W picks from your own folders)"
+
+[variants]
+dark = "palette.toml"
+light = "planned"
+high_contrast = "planned"
+
+[targets]
+kitty = "terminal (exact ANSI palette from the reference)"
+hyprland = "compositor (borders, gaps, opacity)"
+waybar = "status line (Hyprland only, flush modules, full-width strip)"
+swaync = "notifications"
+swayosd = "volume / brightness OSD"
+hyprlock = "lock screen"
+rofi = "launcher and applets"
+tmux = "multiplexer"
+starship = "shell prompt (same prompt, command duration on)"
+fzf = "fuzzy finder"
+bat = "pager / syntax highlighting"
+gtk = "GTK3 apps (Thunar, file dialogs)"
+nvim = "artifact consumed through grubberdubber/nvim-config hook"
