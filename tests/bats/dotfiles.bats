@@ -77,6 +77,14 @@ teardown() {
   assert_eq "ok" "$output"
 }
 
+@test "Tab completion uses fzf-tab when it is installed" {
+  local tools_file="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/30-tools.zsh"
+  run grep -qF 'fzf-tab-git/fzf-tab.zsh' "$tools_file"
+  assert_eq 0 "$status"
+  run grep -qF "zstyle ':completion:*' menu no" "$tools_file"
+  assert_eq 0 "$status"
+}
+
 @test "the history module filters credentials and uses XDG state" {
   command -v zsh > /dev/null || skip "zsh is not installed in this environment"
   local history_file="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/35-history.zsh"

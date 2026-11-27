@@ -9,6 +9,7 @@ paru
 
 # Shell ergonomics
 carapace-bin          # universal completions for zsh/bash/fish/nushell
+fzf-tab-git           # Tab completion in an fzf pane (needs fzf, official)
 zsh-you-should-use    # reminds you that an alias already exists
 
 # Android MTP mounting (AGENTS.md §9.3). Not in core/extra.

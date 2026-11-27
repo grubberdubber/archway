@@ -15,6 +15,20 @@ fi
 if (( $+commands[fzf] )); then
   [[ -r "$ARCHWAY_THEME_DIR/fzf.sh" ]] && source "$ARCHWAY_THEME_DIR/fzf.sh"
   source <(fzf --zsh)
+
+  # fzf-tab: Tab completion in the fzf picker, with the theme's colours from
+  # FZF_DEFAULT_OPTS. Loaded after compinit (10-completion) and after fzf.
+  # `menu no` stops zsh from painting its own menu behind the picker.
+  for _archway_fzf_tab in \
+    /usr/share/zsh/plugins/fzf-tab-git/fzf-tab.zsh \
+    /usr/share/zsh/plugins/fzf-tab/fzf-tab.zsh; do
+    if [[ -r $_archway_fzf_tab ]]; then
+      source "$_archway_fzf_tab"
+      zstyle ':completion:*' menu no
+      break
+    fi
+  done
+  unset _archway_fzf_tab
 fi
 
 if (( $+commands[direnv] )); then

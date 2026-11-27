@@ -69,6 +69,11 @@ keymap emacs      # readline-style, remembered for the next session
 keymap vi         # back to vi
 ```
 
+Tab completion opens in an `fzf` pane when `fzf-tab` is installed (AUR
+`fzf-tab-git`, already in `packages/aur-core.txt`): type part of a path or
+option, press Tab, and filter the candidates with the theme's colours. Without
+the plugin, Tab keeps zsh's built-in completion menu.
+
 The arrow keys behave the same in both modes and in both keymaps:
 
 | Key | Action |

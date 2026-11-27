@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Tab completion in an `fzf` pane via `fzf-tab` when the plugin is installed
+  (`fzf-tab-git`, added to `packages/aur-core.txt`). It loads after `compinit`
+  and after `FZF_DEFAULT_OPTS`, so the completion picker uses the active theme's
+  colours; without the plugin zsh's built-in menu is unchanged.
 - Vi editing mode in the zsh line editor (`conf.d/05-keymap.zsh`), with
   `keymap vi|emacs` to switch and persist the choice. Arrow keys keep the same
   behaviour in both modes and keymaps (prefix-aware history, word jumps on
