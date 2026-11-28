@@ -20,6 +20,8 @@ warning     = "#FDD663"
 success     = "#81C995"
 selection   = "#F29B94"
 selection_bg = "#2E1E1E"
+purple      = "#F29B94"
+orange      = "#FDD663"
 
 [geometry]
 radius_window = 12

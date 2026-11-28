@@ -170,16 +170,19 @@ STUB
   theme_render jan "$dest"
   assert_file_contains "$dest/starship.toml" '$cmd_duration'
   assert_file_contains "$dest/starship.toml" 'min_time = 100'
-  # Duration is muted text, never a filled block (it read as a stray widget).
+  # Duration is cyan text, never a filled block (it read as a stray widget).
   run grep -F 'format = "[ $duration]($style)"' "$dest/starship.toml"
   assert_eq 0 "$status"
-  # No background in the duration module: it was a stray coloured block.
-  run grep -F 'style = "fg:#7D81A3"' "$dest/starship.toml"
+  run bash -c 'sed -n "/^\[cmd_duration\]/,/^\[hostname\]/p" "$1" | grep -qF "style = \"fg:#43FBFF\""' _ "$dest/starship.toml"
   assert_eq 0 "$status"
   # The whole prompt is flat: no filled segments anywhere.
   run grep -F 'bg:' "$dest/starship.toml"
   assert_eq 1 "$status"
   assert_file_contains "$dest/starship.toml" 'symbol = "\ue725 "'
+  # Git icon purple, branch name yellow, dirty markers orange.
+  assert_file_contains "$dest/starship.toml" 'format = "[$symbol](fg:#B026FF)[$branch](fg:#F3E430)"'
+  run bash -c 'sed -n "/^\[git_status\]/,/^\[character\]/p" "$1" | grep -qF "style = \"fg:#FF5F1F\""' _ "$dest/starship.toml"
+  assert_eq 0 "$status"
   # The working directory is red; the chevron follows the last segment.
   assert_file_contains "$dest/starship.toml" 'style = "fg:#FB007A"'
   run grep -F 'format = "[ $path ]($style)"' "$dest/starship.toml"

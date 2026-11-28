@@ -58,10 +58,10 @@ restores them in insert and emacs modes (command mode keeps vim semantics):
 
 The prompt is flat on purpose: every module paints only a foreground colour,
 with no filled segment blocks, so it works over a transparent terminal or a
-wallpaper. The working directory is red, the git segment is the nerd-font
-branch glyph plus the branch name (`` `main`) and the usual status marks, and
-the chevrons follow the last visible segment with a single space instead of a
-floating gap.
+wallpaper. The working directory is red, the git icon keeps the purple of the
+reference prompt, the branch name stays yellow, dirty markers (`!?`) are
+orange and command duration is cyan. The chevrons follow the last visible
+segment with a single space instead of a floating gap.
 
 ```sh
 keymap            # print the active mode
@@ -74,10 +74,12 @@ tabs, `GLOBAL` filter, duration and relative time per command, and a short
 preview of the highlighted entry. Settings live in `~/.config/atuin/config.toml`
 (`style`, `inline_height`, `show_tabs`, `show_preview`, `max_preview_height`).
 
-Tab completion opens in an `fzf` pane when `fzf-tab` is installed (AUR
-`fzf-tab-git`, already in `packages/aur-core.txt`): type part of a path or
-option, press Tab, and filter the candidates with the theme's colours. Without
-the plugin, Tab keeps zsh's built-in completion menu.
+Tab completion opens in an `fzf` picker when `fzf-tab` is installed (AUR
+`fzf-tab-git`, already in `packages/aur-core.txt`). It runs with the reference
+rice's layout: three panes labelled `Search`, `Results` and `Preview` with
+coloured borders, a `>` pointer, `space` to accept and previews of directories
+(`eza`) and files (`bat`). Without the plugin, Tab keeps zsh's built-in
+completion menu.
 
 The arrow keys behave the same in both modes and in both keymaps:
 

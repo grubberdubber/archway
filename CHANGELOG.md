@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fzf-tab` uses the reference rice's three-pane layout (`Search`, `Results`,
+  `Preview`) with coloured borders, `>` pointer and `eza`/`bat` previews.
+- The prompt colours the git icon purple, the branch name yellow, dirty
+  markers orange and command duration cyan.
 - atuin's picker uses the reference layout by default: compact style with
   `Search │ Inspect` tabs, the `GLOBAL` filter line, duration and relative time
   per command, and a four-line preview of the highlighted entry.
@@ -410,6 +414,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   trackpad, classic wheel direction on mice (`hl.device` rule included).
 
 ### Fixed
+
+- `Ctrl+R` opens atuin again: `fzf --zsh` binds that key, so atuin's
+  integration now loads after fzf instead of before it.
 
 - The colour picker copied nothing under the real `hyprpicker`: the applet
   passed `-q`, and hyprpicker prints the picked colour through

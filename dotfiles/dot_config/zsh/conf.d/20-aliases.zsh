@@ -10,8 +10,9 @@ if (( $+commands[eza] )); then
 fi
 
 if (( $+commands[bat] )); then
-  alias cat='bat --style=plain'
-  alias catn='bat --style=plain --paging=never'
+  # No pager: `cat file` must behave like cat, not open less.
+  alias cat='bat --style=plain --paging=never'
+  alias catn='bat --style=plain --paging=never --plain'
 fi
 
 (( $+commands[ripgrep] )) || true

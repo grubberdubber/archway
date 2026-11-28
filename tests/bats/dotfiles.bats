@@ -92,6 +92,22 @@ teardown() {
   assert_eq 0 "$status"
   run grep -qF "zstyle ':completion:*' menu no" "$tools_file"
   assert_eq 0 "$status"
+  # Three panes with the reference's labels, and previews for paths.
+  run grep -qF -- "--input-label ' Search '" "$tools_file"
+  assert_eq 0 "$status"
+  run grep -qF -- "--list-label ' Results '" "$tools_file"
+  assert_eq 0 "$status"
+  run grep -qF -- "--preview-label ' Preview '" "$tools_file"
+  assert_eq 0 "$status"
+  run grep -qF "fzf-tab:complete:cd:*' fzf-preview" "$tools_file"
+  assert_eq 0 "$status"
+  # atuin must load after fzf so Ctrl-R keeps opening the history picker.
+  local fzf_line atuin_line
+  fzf_line=$(grep -nF 'source <(fzf --zsh)' "$tools_file" | cut -d: -f1)
+  atuin_line=$(grep -nF 'atuin init zsh' "$tools_file" | head -1 | cut -d: -f1)
+  [[ -n $fzf_line ]]
+  [[ -n $atuin_line ]]
+  ((atuin_line > fzf_line))
 }
 
 @test "the history module filters credentials and uses XDG state" {

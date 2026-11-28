@@ -25,6 +25,8 @@ primary = "@primary@"
 secondary = "@secondary@"
 tertiary = "@tertiary@"
 error = "@error@"
+purple = "@purple@"
+orange = "@orange@"
 
 [os]
 style = "fg:@primary@"
@@ -44,15 +46,16 @@ truncation_length = 3
 truncation_symbol = "…/"
 
 [git_branch]
-# `` is the nerd-font git glyph used in the reference prompt.
-style = "fg:@secondary@"
-format = "[$symbol$branch]($style)"
+# `` keeps the purple of the reference prompt and the branch name stays
+# yellow, independent of the rest of the palette.
+style = "fg:@purple@"
+format = "[$symbol](fg:@purple@)[$branch](fg:@tertiary@)"
 symbol = "\ue725 "
 
 [git_status]
-# Each module owns exactly one leading space and no trailing one, so the
-# chevrons hug the last visible segment instead of leaving a gap.
-style = "fg:@tertiary@"
+# `!?` (dirty markers) in orange, so they stand out without competing with the
+# yellow branch name. Each module owns one leading space and no trailing one.
+style = "fg:@orange@"
 format = "[ $all_status$ahead_behind]($style)"
 
 # Double chevrons as in the reference prompt: `❯❯` green normally, yellow in vi
@@ -68,7 +71,8 @@ vimcmd_symbol = "[❯❯](bold @tertiary@)"
 # ones, and millisecond precision is what tells a good loop from a bad one.
 min_time = 100
 show_milliseconds = true
-style = "fg:@text_muted@"
+# Cyan instead of muted grey: the duration is easy to spot at a glance.
+style = "fg:@secondary@"
 format = "[ $duration]($style)"
 
 [hostname]
