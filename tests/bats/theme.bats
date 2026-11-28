@@ -170,10 +170,10 @@ STUB
   theme_render jan "$dest"
   assert_file_contains "$dest/starship.toml" '$cmd_duration'
   assert_file_contains "$dest/starship.toml" 'min_time = 100'
-  # Duration is cyan text, never a filled block (it read as a stray widget).
+  # Duration is muted text, never a filled block (it read as a stray widget).
   run grep -F 'format = "[ $duration]($style)"' "$dest/starship.toml"
   assert_eq 0 "$status"
-  run bash -c 'sed -n "/^\[cmd_duration\]/,/^\[hostname\]/p" "$1" | grep -qF "style = \"fg:#43FBFF\""' _ "$dest/starship.toml"
+  run bash -c 'sed -n "/^\[cmd_duration\]/,/^\[hostname\]/p" "$1" | grep -qF "style = \"fg:#7D81A3\""' _ "$dest/starship.toml"
   assert_eq 0 "$status"
   # The whole prompt is flat: no filled segments anywhere.
   run grep -F 'bg:' "$dest/starship.toml"
@@ -197,6 +197,18 @@ STUB
   assert_file_contains "$dest/starship.toml" '[custom.venv]'
   assert_file_contains "$dest/starship.toml" '[custom.vpn]'
   assert_file_contains "$dest/starship.toml" '/sys/class/net/tun0'
+}
+
+@test "the Ctrl-T and Alt-C pickers carry theme labels" {
+  local dest="$SANDBOX/render"
+  mkdir -p "$dest"
+  theme_render jan "$dest"
+  assert_file_contains "$dest/fzf.sh" "--border-label=' Files '"
+  assert_file_contains "$dest/fzf.sh" "--preview-label=' Preview '"
+  assert_file_contains "$dest/fzf.sh" "--border-label=' Directories '"
+  # Ctrl-T marks several paths and previews the selected file.
+  assert_file_contains "$dest/fzf.sh" '--multi'
+  assert_file_contains "$dest/fzf.sh" 'bat --style=numbers'
 }
 
 @test "theme list --names pairs the id with the display name" {

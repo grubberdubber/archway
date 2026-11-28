@@ -10,8 +10,11 @@ so (`status`, `headers`, `cert`).
 |---|---|
 | `croot` | `cd` to the root of the current git repository |
 | `fcd` | pick a directory with `fd` + `fzf` and `cd` into it |
+| `zi` | pick a directory from zoxide's frecency database and `cd` into it |
+| `loadenv [file]` | export a project `.env` (default `.env`) and warn if it is group/world readable |
+| `passgen [len]` | random password from the kernel CSPRNG (`openssl`), 24 chars by default |
 | `dns <name>` | A, AAAA and MX records (`dig`, else `resolvectl`) |
-| `venv [dir]` | create and activate a project-local Python virtualenv |
+| `venv [dir]` | create and activate a project-local Python virtualenv (direnv loads `.envrc` automatically) |
 | `serve [port] [dir]` | HTTP server on `127.0.0.1`, never on `0.0.0.0` |
 | `killport <port>` | kill the process listening on a TCP port (`lsof`, else `fuser`) |
 | `fkill` | pick a process with `fzf`, then `SIGTERM` it |
@@ -25,6 +28,29 @@ so (`status`, `headers`, `cert`).
 | `jwt [token]` | decode a JWT header and payload locally; never verifies |
 | `now` / `epoch` | ISO-8601 timestamp / unix epoch for notes and logs |
 | `extract <archive>` | unpack by extension: tar.{gz,xz,zst,bz2}, zip, 7z, rar, gz, xz, zst |
+
+## tmux
+
+The prefix is the default `C-b` and windows are numbered from `0`, so the
+stock shortcuts work without relearning anything:
+
+| Keys | Action |
+|---|---|
+| `C-b c` | new window (in the current directory) |
+| `C-b n` / `C-b p` | next / previous window |
+| `C-b 0..9` | jump to that window |
+| `C-b ,` | rename the window |
+| `C-b %` / `C-b "` | split left-right / top-bottom |
+| `C-b` + arrows or `o` | move focus between panes |
+| `C-b x` | close the pane (asks to confirm) |
+| `C-b z` | zoom / unzoom the pane |
+| `C-b d` | detach, leaving the session running |
+| `C-b [` | copy mode (`q` exits, `Space` marks, `Enter` copies) |
+| `C-b ?` | list every bound key |
+| `C-b C-b` | send a literal `C-b` to the pane |
+
+No tmux binding grabs a key the shell needs: the prefix is consumed by tmux
+before the line editor sees it, and `C-b` is not bound in zsh.
 
 ## Editing mode and keys
 
@@ -73,6 +99,12 @@ Ctrl+R opens atuin's compact picker with the reference layout: `Search │ Inspe
 tabs, `GLOBAL` filter, duration and relative time per command, and a short
 preview of the highlighted entry. Settings live in `~/.config/atuin/config.toml`
 (`style`, `inline_height`, `show_tabs`, `show_preview`, `max_preview_height`).
+
+Ctrl+T opens the file picker and inserts the selected path(s) into the command
+line (`tab` marks several, `ctrl-/` toggles the preview); Alt+C does the same for
+directories and runs `cd`. Both use the theme's palette with `Files` /
+`Directories` and `Preview` labels, and previews come from `bat` (files) and
+`eza` (directories).
 
 Tab completion opens in an `fzf` picker when `fzf-tab` is installed (AUR
 `fzf-tab-git`, already in `packages/aur-core.txt`). It runs with the reference

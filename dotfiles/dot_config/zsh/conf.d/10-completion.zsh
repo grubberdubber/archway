@@ -22,8 +22,12 @@ zstyle ':completion:*' rehash true
 autoload -Uz _sudo
 zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin
 
-# carapace provides completions for hundreds of tools when installed.
-if (( $+commands[carapace] )); then
+# carapace provides completions for hundreds of tools, but it returns
+# candidates without the typed path prefix, so fzf-tab opens with a query like
+# `dir/` and an empty list. Off by default for that reason; opt in with
+# `export ARCHWAY_CARAPACE=1` when you want its completions more than the
+# picker for path arguments.
+if (( ${ARCHWAY_CARAPACE:-0} )) && (( $+commands[carapace] )); then
   source <(carapace _carapace zsh)
 fi
 

@@ -9,10 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Workflow helpers for projects and labs: `zi` (zoxide picker), `loadenv`
+  (per-project `.env` with a permissions warning, values never printed) and
+  `passgen` (kernel CSPRNG password).
+- The `fzf-tab` preview works for any command (`ls dir/`, `nvim dir/`, `vi`,
+  `nano`): directories open as an `eza` tree and files as a `bat` preview.
+- tmux keeps the stock `C-b` prefix and 0-based window numbers, so `C-b c/n/p`,
+  `C-b 0..9`, `,`, `%`, `"`, arrows, `x`, `z`, `d`, `[` and `?` all behave as
+  documented; `C-b C-b` sends a literal `C-b` and splits reuse the pane path.
+- The Ctrl-T (files) and Alt-C (directories) `fzf` pickers use the theme's
+  colours, `Files`/`Directories` and `Preview` border labels, a header with the
+  keys, `--multi` selection and `bat`/`eza` previews.
 - `fzf-tab` uses the reference rice's three-pane layout (`Search`, `Results`,
   `Preview`) with coloured borders, `>` pointer and `eza`/`bat` previews.
-- The prompt colours the git icon purple, the branch name yellow, dirty
-  markers orange and command duration cyan.
+- The prompt colours the git icon purple, the branch name yellow and dirty
+  markers orange; command duration stays muted so the line keeps a hierarchy.
 - atuin's picker uses the reference layout by default: compact style with
   `Search │ Inspect` tabs, the `GLOBAL` filter line, duration and relative time
   per command, and a four-line preview of the highlighted entry.
@@ -414,6 +425,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   trackpad, classic wheel direction on mice (`hl.device` rule included).
 
 ### Fixed
+
+- Path arguments complete again under `fzf-tab`: carapace returns candidates
+  without the typed prefix, which left the picker empty, so it is now opt-in
+  (`ARCHWAY_CARAPACE=1`).
 
 - `Ctrl+R` opens atuin again: `fzf --zsh` binds that key, so atuin's
   integration now loads after fzf instead of before it.

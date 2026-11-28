@@ -12,10 +12,44 @@ export FZF_DEFAULT_OPTS="
   --color=fg:@text@,bg:@bg@,hl:@primary@,fg+:@text@,bg+:@selection_bg@,hl+:@primary@
   --color=info:@text_muted@,prompt:@primary@,pointer:@primary@,marker:@secondary@
   --color=spinner:@tertiary@,header:@text_muted@,border:@border@
+  --color=label:@primary@,preview-border:@border@,preview-label:@tertiary@
   --bind='ctrl-/:toggle-preview'
 "
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+
+# Ctrl-T: pick files (or directories) and paste their paths into the command
+# line. Tab marks several; Ctrl-/ toggles the preview.
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS="
+  --multi
+  --height=80%
+  --layout=reverse
+  --border=rounded
+  --border-label=' Files '
+  --border-label-pos='2:bottom'
+  --info=inline
+  --prompt='  '
+  --pointer='>'
+  --marker='✓'
+  --header='enter: insert   tab: mark   ctrl-/: preview'
+  --preview 'bat --style=numbers --color=always --line-range :120 -- {} 2>/dev/null || eza -1 --icons=always --color=always -- {}'
+  --preview-window 'right,55%,border-rounded,<80(down,40%,border-rounded)'
+  --preview-label=' Preview '
+  --preview-label-pos='2:bottom'
+"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
-export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :120 {}'"
-export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --icons {}'"
+export FZF_ALT_C_OPTS="
+  --height=80%
+  --layout=reverse
+  --border=rounded
+  --border-label=' Directories '
+  --border-label-pos='2:bottom'
+  --info=inline
+  --prompt='  '
+  --pointer='>'
+  --header='enter: cd'
+  --preview 'eza --tree --level=2 --icons=always --color=always -- {}'
+  --preview-window 'right,55%,border-rounded,<80(down,40%,border-rounded)'
+  --preview-label=' Preview '
+  --preview-label-pos='2:bottom'
+"

@@ -4,7 +4,9 @@
 
 if (( $+commands[fzf] )); then
   [[ -r "$ARCHWAY_THEME_DIR/fzf.sh" ]] && source "$ARCHWAY_THEME_DIR/fzf.sh"
-  source <(fzf --zsh)
+  # fzf's zsh script toggles the `zle` option, which fails in shells without a
+  # terminal (`zsh -i -c`); only wire the widgets when there is one.
+  [[ -t 0 ]] && source <(fzf --zsh)
 
   # fzf-tab: Tab completion in the fzf picker, loaded after compinit
   # (10-completion) and after fzf so the theme's colours apply. `menu no` stops
@@ -30,6 +32,16 @@ if (( $+commands[fzf] )); then
       --input-label ' Search ' --color 'input-border:blue,input-label:blue:bold' \
       --list-label ' Results ' --color 'list-border:green,list-label:green:bold' \
       --preview-label ' Preview ' --preview-label-pos '27:bottom' --color 'preview-border:magenta,preview-label:magenta:bold'
+    # Preview for every completion, not only `cd`/`eza`/`bat`: `ls dir/`,
+    # `nvim dir/`, `vi`, `nano`, `cat` and friends all get a directory tree or a
+    # file preview. The snippet runs in a fresh zsh, so it stays inline instead
+    # of calling a shell function. fzf-tab exports `$realpath` and `$word`.
+    zstyle ':fzf-tab:complete:*:*' fzf-preview '
+      if [[ -d $realpath ]] && command -v eza >/dev/null; then
+        eza --tree --level=2 --icons=always --color=always -- "$realpath"
+      elif [[ -f $realpath ]] && command -v bat >/dev/null; then
+        bat --style=numbers --color=always --line-range=:80 -- "$realpath"
+      fi'
     if (( $+commands[eza] )); then
       zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --icons=always --color=always -a $realpath'
       zstyle ':fzf-tab:complete:eza:*' fzf-preview 'eza -1 --icons=always --color=always -a $realpath'

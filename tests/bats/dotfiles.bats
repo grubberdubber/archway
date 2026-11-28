@@ -101,6 +101,11 @@ teardown() {
   assert_eq 0 "$status"
   run grep -qF "fzf-tab:complete:cd:*' fzf-preview" "$tools_file"
   assert_eq 0 "$status"
+  # Every command gets a preview: `ls dir/`, `nvim dir/`, `vi`, `nano`.
+  run grep -qF "zstyle ':fzf-tab:complete:*:*' fzf-preview" "$tools_file"
+  assert_eq 0 "$status"
+  run grep -qF 'eza --tree --level=2' "$tools_file"
+  assert_eq 0 "$status"
   # atuin must load after fzf so Ctrl-R keeps opening the history picker.
   local fzf_line atuin_line
   fzf_line=$(grep -nF 'source <(fzf --zsh)' "$tools_file" | cut -d: -f1)
@@ -108,6 +113,37 @@ teardown() {
   [[ -n $fzf_line ]]
   [[ -n $atuin_line ]]
   ((atuin_line > fzf_line))
+}
+
+@test "tmux keeps the C-b prefix and 0-based window numbers" {
+  local conf="$ARCHWAY_ROOT/dotfiles/dot_config/tmux/tmux.conf"
+  assert_file_contains "$conf" 'set -g prefix C-b'
+  assert_file_contains "$conf" 'set -g base-index 0'
+  run grep -F 'prefix C-Space' "$conf"
+  assert_eq 1 "$status"
+  run grep -qF "bind % split-window -h" "$conf"
+  assert_eq 0 "$status"
+  run grep -qF "bind '\"' split-window" "$conf"
+  assert_eq 0 "$status"
+}
+
+@test "workflow helpers cover zoxide, project env and passwords" {
+  local workflow="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/40-workflow.zsh"
+  run grep -qF 'zi() {' "$workflow"
+  assert_eq 0 "$status"
+  run grep -qF 'zoxide query -i' "$workflow"
+  assert_eq 0 "$status"
+  run grep -qF 'loadenv() {' "$workflow"
+  assert_eq 0 "$status"
+  run grep -qF 'chmod 600 it' "$workflow"
+  assert_eq 0 "$status"
+  run grep -qF 'passgen() {' "$workflow"
+  assert_eq 0 "$status"
+}
+
+@test "carapace stays opt-in so fzf-tab lists path arguments" {
+  local completion="$ARCHWAY_ROOT/dotfiles/dot_config/zsh/conf.d/10-completion.zsh"
+  assert_file_contains "$completion" '${ARCHWAY_CARAPACE:-0}'
 }
 
 @test "the history module filters credentials and uses XDG state" {

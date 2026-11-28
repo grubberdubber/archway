@@ -175,6 +175,47 @@ venv() {
   source "$dir/bin/activate"
 }
 
+# Interactive zoxide jump: pick a directory from the frecency database and cd
+# there. `cd` itself already matches with zoxide; this is the picker variant.
+zi() {
+  if (( ! $+commands[zoxide] )); then
+    print -u2 -- "zi: zoxide is required"
+    return 1
+  fi
+  local dir
+  dir=$(zoxide query -i) || return 1
+  cd -- "$dir" || return 1
+}
+
+# Load per-project variables from a .env file without ever printing the values.
+# direnv handles .envrc automatically; this is the manual, auditable path.
+loadenv() {
+  local file=${1:-.env} mode
+  if [[ ! -r $file ]]; then
+    print -u2 -- "loadenv: cannot read $file"
+    return 1
+  fi
+  mode=$(stat -c '%a' -- "$file" 2> /dev/null)
+  if [[ -n $mode ]] && ((8#$mode & 8#077)); then
+    print -u2 -- "loadenv: warning: $file is readable by group/others; chmod 600 it"
+  fi
+  set -a
+  source -- "$file"
+  set +a
+  print -r -- "loaded $file"
+}
+
+# Random password from the kernel CSPRNG (openssl), printed on one line.
+passgen() {
+  local len=${1:-24}
+  if (( ! $+commands[openssl] )); then
+    print -u2 -- "passgen: openssl is required"
+    return 1
+  fi
+  openssl rand -base64 $(((len * 3 + 3) / 4)) | tr -d '\n' | cut -c 1-"$len"
+  print
+}
+
 # Extract by extension instead of remembering the tar flags.
 extract() {
   local file=${1:?usage: extract <archive>}

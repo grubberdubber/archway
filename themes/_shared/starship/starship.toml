@@ -71,8 +71,9 @@ vimcmd_symbol = "[❯❯](bold @tertiary@)"
 # ones, and millisecond precision is what tells a good loop from a bad one.
 min_time = 100
 show_milliseconds = true
-# Cyan instead of muted grey: the duration is easy to spot at a glance.
-style = "fg:@secondary@"
+# Muted: branch, dirty markers and exit code already carry colour, so the
+# duration recedes instead of adding a fourth saturated hue to the line.
+style = "fg:@text_muted@"
 format = "[ $duration]($style)"
 
 [hostname]
